@@ -373,16 +373,20 @@ GET /api/v1/products?page=1&limit=20&categoryId=cat-001&sortBy=price&sortOrder=a
     "productId": "prod-001",
     "optionGroups": [
       {
-        "groupName": "색상",
+        "id": "group-001",
+        "productId": "prod-001",
+        "name": "색상",
         "options": [
           {
             "id": "opt-001",
+            "groupId": "group-001",
             "name": "빨강",
             "additionalPrice": 0,
             "hasStock": true
           },
           {
             "id": "opt-002",
+            "groupId": "group-001",
             "name": "파랑",
             "additionalPrice": 0,
             "hasStock": false
@@ -390,16 +394,20 @@ GET /api/v1/products?page=1&limit=20&categoryId=cat-001&sortBy=price&sortOrder=a
         ]
       },
       {
-        "groupName": "사이즈",
+        "id": "group-002",
+        "productId": "prod-001",
+        "name": "사이즈",
         "options": [
           {
             "id": "opt-003",
+            "groupId": "group-002",
             "name": "S",
             "additionalPrice": 0,
             "hasStock": false
           },
           {
             "id": "opt-004",
+            "groupId": "group-002",
             "name": "M",
             "additionalPrice": 0,
             "hasStock": true
@@ -1209,7 +1217,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       "id": "coupon-001",
       "name": "10% 할인 쿠폰",
       "discountRate": 10,
-      "minAmount": 50000
+      "minAmount": 50000,
+      "issueStartDate": "2025-10-01T00:00:00Z",
+      "issueEndDate": "2025-10-31T23:59:59Z",
+      "totalQuantity": 100,
+      "issuedQuantity": 45
     },
     "status": "AVAILABLE",
     "expiresAt": "2025-11-30T23:59:59Z",
@@ -1282,7 +1294,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
           "id": "coupon-001",
           "name": "10% 할인 쿠폰",
           "discountRate": 10,
-          "minAmount": 50000
+          "minAmount": 50000,
+          "issueStartDate": "2025-10-01T00:00:00Z",
+          "issueEndDate": "2025-10-31T23:59:59Z",
+          "totalQuantity": 100,
+          "issuedQuantity": 100
         },
         "status": "AVAILABLE",
         "expiresAt": "2025-11-30T23:59:59Z",
@@ -1294,7 +1310,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
           "id": "coupon-002",
           "name": "20% 할인 쿠폰",
           "discountRate": 20,
-          "minAmount": 100000
+          "minAmount": 100000,
+          "issueStartDate": "2025-10-01T00:00:00Z",
+          "issueEndDate": "2025-10-31T23:59:59Z",
+          "totalQuantity": 50,
+          "issuedQuantity": 50
         },
         "status": "USED",
         "expiresAt": "2025-11-30T23:59:59Z",
@@ -1473,6 +1493,30 @@ interface ErrorResponse {
 }
 ```
 
+### User 관련 DTO
+
+#### User
+
+```typescript
+interface User {
+  id: string    // 사용자 ID
+  name: string  // 사용자 이름
+}
+```
+
+### Category 관련 DTO
+
+#### Category
+
+```typescript
+interface Category {
+  id: string    // 카테고리 ID
+  name: string  // 카테고리명
+}
+```
+
+**참고**: 카테고리는 단일 계층(depth 1) 구조로 설계됩니다. 카테고리 간 계층 관계는 없습니다.
+
 ### 상품 관련 DTO
 
 #### ProductListItem
@@ -1513,6 +1557,7 @@ interface ProductDetail {
 ```typescript
 interface ProductOption {
   id: string              // 옵션 ID
+  groupId: string         // 옵션 그룹 ID
   name: string            // 옵션명
   additionalPrice: number // 추가 가격
   hasStock: boolean       // 재고 유무
@@ -1523,7 +1568,9 @@ interface ProductOption {
 
 ```typescript
 interface ProductOptionGroup {
-  groupName: string       // 옵션 그룹명 (예: "색상", "사이즈")
+  id: string              // 옵션 그룹 ID
+  productId: string       // 상품 ID
+  name: string            // 옵션 그룹명 (예: "색상", "사이즈")
   options: ProductOption[] // 옵션 목록
 }
 ```
@@ -1598,6 +1645,10 @@ interface Coupon {
   name: string          // 쿠폰명
   discountRate: number  // 할인율 (%)
   minAmount?: number    // 최소 주문 금액 (선택)
+  issueStartDate: string // 발급 시작일 (ISO 8601)
+  issueEndDate: string   // 발급 종료일 (ISO 8601)
+  totalQuantity: number  // 총 발급 가능 수량
+  issuedQuantity: number // 현재 발급된 수량
 }
 ```
 
