@@ -9,7 +9,7 @@
 ## 문서 네비게이션
 
 **이전**: [← 요구사항 분석](requirements.md)
-**다음**: [유스케이스 →](use-cases.md)
+**다음**: [유스케이스 →](user-stories.md)
 
 ---
 
@@ -79,7 +79,7 @@
   4. 초기 재고 0으로 설정
   5. 초기 상태: 비활성화 (INACTIVE)
 - **출력**: 생성된 상품 ID 및 상품 정보
-- **관련 유스케이스**: [UC-ADMIN-PROD-01](use-cases.md#uc-admin-prod-01-상품-등록)
+- **관련 유스케이스**: [UC-ADMIN-PROD-01](user-stories.md#uc-admin-prod-01-상품-등록)
 
 **FR-ADMIN-PROD-02: 상품 수정**
 - **입력**:
@@ -91,7 +91,7 @@
   3. 카테고리 변경 시 카테고리 존재 여부 확인
   4. 상품 정보 업데이트
 - **출력**: 수정된 상품 정보
-- **관련 유스케이스**: [UC-ADMIN-PROD-02](use-cases.md#uc-admin-prod-02-상품-수정)
+- **관련 유스케이스**: [UC-ADMIN-PROD-02](user-stories.md#uc-admin-prod-02-상품-수정)
 
 **FR-ADMIN-PROD-03: 상품 삭제**
 - **입력**: 상품 ID
@@ -101,7 +101,7 @@
   3. 상품 삭제 또는 비활성화
 - **출력**: 삭제 확인 메시지
 - **제약사항**: 주문 내역이 있는 상품은 소프트 삭제 권장
-- **관련 유스케이스**: [UC-ADMIN-PROD-03](use-cases.md#uc-admin-prod-03-상품-삭제)
+- **관련 유스케이스**: [UC-ADMIN-PROD-03](user-stories.md#uc-admin-prod-03-상품-삭제)
 
 **FR-ADMIN-PROD-04: 상품 활성화/비활성화**
 - **입력**:
@@ -114,7 +114,7 @@
 - **효과**:
   - ACTIVE: 사용자에게 노출
   - INACTIVE: 사용자에게 비노출, 장바구니/주문 불가
-- **관련 유스케이스**: [UC-ADMIN-PROD-04](use-cases.md#uc-admin-prod-04-상품-활성화)
+- **관련 유스케이스**: [UC-ADMIN-PROD-04](user-stories.md#uc-admin-prod-04-상품-활성화)
 
 #### 비기능 요구사항
 
@@ -150,7 +150,7 @@
   3. 카테고리 생성
 - **출력**: 생성된 카테고리 ID 및 정보
 - **참고**: 카테고리는 단일 레벨 구조 (계층 없음)
-- **관련 유스케이스**: [UC-ADMIN-CAT-01](use-cases.md#uc-admin-cat-01-카테고리-생성)
+- **관련 유스케이스**: [UC-ADMIN-CAT-01](user-stories.md#uc-admin-cat-01-카테고리-생성)
 
 **FR-ADMIN-CAT-02: 카테고리 수정**
 - **입력**:
@@ -161,7 +161,7 @@
   2. 입력 데이터 유효성 검증
   3. 카테고리 정보 업데이트
 - **출력**: 수정된 카테고리 정보
-- **관련 유스케이스**: [UC-ADMIN-CAT-02](use-cases.md#uc-admin-cat-02-카테고리-수정)
+- **관련 유스케이스**: [UC-ADMIN-CAT-02](user-stories.md#uc-admin-cat-02-카테고리-수정)
 
 **FR-ADMIN-CAT-03: 카테고리 삭제**
 - **입력**: 카테고리 ID
@@ -171,7 +171,7 @@
   3. 삭제 또는 에러 반환
 - **출력**: 삭제 확인 메시지
 - **제약사항**: 상품이 연결된 경우 삭제 불가 (또는 상품을 다른 카테고리로 이동 후 삭제)
-- **관련 유스케이스**: [UC-ADMIN-CAT-03](use-cases.md#uc-admin-cat-03-카테고리-삭제)
+- **관련 유스케이스**: [UC-ADMIN-CAT-03](user-stories.md#uc-admin-cat-03-카테고리-삭제)
 
 #### 비기능 요구사항
 
@@ -207,7 +207,7 @@
   3. 옵션 그룹 생성
 - **출력**: 생성된 옵션 그룹 ID 및 정보
 - **예시**: 색상, 사이즈, 용량, 재질 등
-- **관련 유스케이스**: [UC-ADMIN-OPT-01](use-cases.md#uc-admin-opt-01-옵션-그룹-생성)
+- **관련 유스케이스**: [UC-ADMIN-OPT-01](user-stories.md#uc-admin-opt-01-옵션-그룹-생성)
 
 **FR-ADMIN-OPT-02: 옵션 그룹 수정/삭제**
 - **수정 입력**:
@@ -220,7 +220,7 @@
   3. 업데이트 또는 삭제
 - **출력**: 수정된 정보 또는 삭제 확인
 - **제약사항**: 옵션값이 연결된 그룹은 삭제 불가
-- **관련 유스케이스**: [UC-ADMIN-OPT-02](use-cases.md#uc-admin-opt-02-옵션-그룹-수정)
+- **관련 유스케이스**: [UC-ADMIN-OPT-02](user-stories.md#uc-admin-opt-02-옵션-그룹-수정)
 
 **FR-ADMIN-OPT-03: 옵션값 생성**
 - **입력**:
@@ -233,7 +233,7 @@
   3. 중복 옵션값 확인 (동일 그룹 내)
   4. 옵션값 생성
 - **출력**: 생성된 옵션값 ID 및 정보
-- **관련 유스케이스**: [UC-ADMIN-OPT-03](use-cases.md#uc-admin-opt-03-옵션값-생성)
+- **관련 유스케이스**: [UC-ADMIN-OPT-03](user-stories.md#uc-admin-opt-03-옵션값-생성)
 
 **FR-ADMIN-OPT-04: 옵션값 수정/삭제**
 - **수정 입력**:
@@ -246,7 +246,7 @@
   3. 업데이트 또는 삭제
 - **출력**: 수정된 정보 또는 삭제 확인
 - **제약사항**: 주문 내역이 있는 옵션값은 소프트 삭제 권장
-- **관련 유스케이스**: [UC-ADMIN-OPT-04](use-cases.md#uc-admin-opt-04-옵션값-수정)
+- **관련 유스케이스**: [UC-ADMIN-OPT-04](user-stories.md#uc-admin-opt-04-옵션값-수정)
 
 **FR-ADMIN-OPT-05: 상품-옵션 연결**
 - **입력**:
@@ -259,7 +259,7 @@
   4. 옵션 조합별 초기 재고 0 설정
 - **출력**: 연결된 옵션 정보
 - **예시**: 티셔츠 상품에 "색상" + "사이즈" 옵션 그룹 연결
-- **관련 유스케이스**: [UC-ADMIN-OPT-05](use-cases.md#uc-admin-opt-05-상품-옵션-연결)
+- **관련 유스케이스**: [UC-ADMIN-OPT-05](user-stories.md#uc-admin-opt-05-상품-옵션-연결)
 
 #### 비기능 요구사항
 
@@ -294,7 +294,7 @@
   1. 필터 조건에 맞는 재고 조회
   2. 상품/옵션 정보와 함께 반환
 - **출력**: 재고 목록 (상품명, 옵션, 현재 수량, 확보 수량, 가용 수량)
-- **관련 유스케이스**: [UC-ADMIN-INV-01](use-cases.md#uc-admin-inv-01-재고-조회)
+- **관련 유스케이스**: [UC-ADMIN-INV-01](user-stories.md#uc-admin-inv-01-재고-조회)
 
 **FR-ADMIN-INV-02: 재고 입고**
 - **입력**:
@@ -308,7 +308,7 @@
   3. 재고 수량 증가
   4. 재고 이력 기록
 - **출력**: 업데이트된 재고 정보
-- **관련 유스케이스**: [UC-ADMIN-INV-02](use-cases.md#uc-admin-inv-02-재고-입고)
+- **관련 유스케이스**: [UC-ADMIN-INV-02](user-stories.md#uc-admin-inv-02-재고-입고)
 
 **FR-ADMIN-INV-03: 재고 조정**
 - **입력**:
@@ -323,7 +323,7 @@
   4. 재고 이력 기록
 - **출력**: 조정된 재고 정보
 - **제약사항**: 조정 후 재고는 0 이상이어야 함
-- **관련 유스케이스**: [UC-ADMIN-INV-03](use-cases.md#uc-admin-inv-03-재고-조정)
+- **관련 유스케이스**: [UC-ADMIN-INV-03](user-stories.md#uc-admin-inv-03-재고-조정)
 
 **FR-ADMIN-INV-04: 재고 이력 조회**
 - **입력**:
@@ -336,7 +336,7 @@
   2. 페이지네이션 처리
 - **출력**: 재고 이력 목록 (일시, 유형, 변경 수량, 이전 수량, 이후 수량, 사유)
 - **활용**: 재고 추적, 재고 분석, 감사
-- **관련 유스케이스**: [UC-ADMIN-INV-04](use-cases.md#uc-admin-inv-04-재고-이력-조회)
+- **관련 유스케이스**: [UC-ADMIN-INV-04](user-stories.md#uc-admin-inv-04-재고-이력-조회)
 
 #### 비기능 요구사항
 
@@ -378,7 +378,7 @@
   3. 쿠폰 생성
   4. 초기 상태: ACTIVE
 - **출력**: 생성된 쿠폰 ID 및 정보
-- **관련 유스케이스**: [UC-ADMIN-COUPON-01](use-cases.md#uc-admin-coupon-01-쿠폰-생성)
+- **관련 유스케이스**: [UC-ADMIN-COUPON-01](user-stories.md#uc-admin-coupon-01-쿠폰-생성)
 
 **FR-ADMIN-COUPON-02: 쿠폰 수정**
 - **입력**:
@@ -393,7 +393,7 @@
 - **제약사항**:
   - 쿠폰 코드는 수정 불가
   - 발급 수량은 이미 발급된 수량보다 작게 설정 불가
-- **관련 유스케이스**: [UC-ADMIN-COUPON-02](use-cases.md#uc-admin-coupon-02-쿠폰-수정)
+- **관련 유스케이스**: [UC-ADMIN-COUPON-02](user-stories.md#uc-admin-coupon-02-쿠폰-수정)
 
 **FR-ADMIN-COUPON-03: 쿠폰 삭제/비활성화**
 - **입력**:
@@ -407,7 +407,7 @@
 - **효과**:
   - INACTIVE: 신규 발급 중단, 기존 발급된 쿠폰은 사용 가능
   - 삭제: 발급 이력이 없는 경우에만 물리적 삭제 가능
-- **관련 유스케이스**: [UC-ADMIN-COUPON-03](use-cases.md#uc-admin-coupon-03-쿠폰-비활성화)
+- **관련 유스케이스**: [UC-ADMIN-COUPON-03](user-stories.md#uc-admin-coupon-03-쿠폰-비활성화)
 
 **FR-ADMIN-COUPON-04: 쿠폰 발급 현황 조회**
 - **입력**:
@@ -423,7 +423,7 @@
   - 잔여 수량
   - 사용된 수량
   - 사용률
-- **관련 유스케이스**: [UC-ADMIN-COUPON-04](use-cases.md#uc-admin-coupon-04-발급-현황-조회)
+- **관련 유스케이스**: [UC-ADMIN-COUPON-04](user-stories.md#uc-admin-coupon-04-발급-현황-조회)
 
 #### 비기능 요구사항
 
@@ -458,7 +458,7 @@
   1. 필터 조건에 맞는 주문 조회
   2. 정렬 및 페이지네이션 적용
 - **출력**: 주문 목록 (주문 ID, 사용자, 주문일시, 결제 금액, 주문 상태)
-- **관련 유스케이스**: [UC-ADMIN-ORDER-01](use-cases.md#uc-admin-order-01-주문-목록-조회)
+- **관련 유스케이스**: [UC-ADMIN-ORDER-01](user-stories.md#uc-admin-order-01-주문-목록-조회)
 
 **FR-ADMIN-ORDER-02: 주문 상세 조회**
 - **입력**: 주문 ID
@@ -474,7 +474,7 @@
   - 결제 정보 (결제 금액, 할인 금액, 최종 금액)
   - 쿠폰 정보
   - 주문 상태 이력
-- **관련 유스케이스**: [UC-ADMIN-ORDER-02](use-cases.md#uc-admin-order-02-주문-상세-조회)
+- **관련 유스케이스**: [UC-ADMIN-ORDER-02](user-stories.md#uc-admin-order-02-주문-상세-조회)
 
 **FR-ADMIN-ORDER-03: 주문 상태 변경**
 - **입력**:
@@ -489,7 +489,7 @@
   5. 상태 변경 이력 기록
 - **출력**: 변경된 주문 상태
 - **제약사항**: 허용된 상태 전이만 가능
-- **관련 유스케이스**: [UC-ADMIN-ORDER-03](use-cases.md#uc-admin-order-03-주문-상태-변경)
+- **관련 유스케이스**: [UC-ADMIN-ORDER-03](user-stories.md#uc-admin-order-03-주문-상태-변경)
 
 **FR-ADMIN-ORDER-04: 주문 취소**
 - **입력**:
@@ -503,7 +503,7 @@
   5. 주문 상태를 CANCELLED로 변경
   6. 취소 이력 기록
 - **출력**: 취소 확인 및 환불 정보
-- **관련 유스케이스**: [UC-ADMIN-ORDER-04](use-cases.md#uc-admin-order-04-주문-취소)
+- **관련 유스케이스**: [UC-ADMIN-ORDER-04](user-stories.md#uc-admin-order-04-주문-취소)
 
 #### 비기능 요구사항
 
@@ -562,30 +562,30 @@
 
 | 요구사항 ID | 카테고리 | 설명 | 우선순위 | 유스케이스 | 구현 | 테스트 |
 |-----------|---------|------|---------|-----------|------|--------|
-| **FR-ADMIN-PROD-01** | 상품 관리 | 상품 등록 | MUST | [UC-ADMIN-PROD-01](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-PROD-02** | 상품 관리 | 상품 수정 | MUST | [UC-ADMIN-PROD-02](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-PROD-03** | 상품 관리 | 상품 삭제 | MUST | [UC-ADMIN-PROD-03](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-PROD-04** | 상품 관리 | 상품 활성화 | MUST | [UC-ADMIN-PROD-04](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-CAT-01** | 카테고리 관리 | 카테고리 생성 | MUST | [UC-ADMIN-CAT-01](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-CAT-02** | 카테고리 관리 | 카테고리 수정 | MUST | [UC-ADMIN-CAT-02](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-CAT-03** | 카테고리 관리 | 카테고리 삭제 | MUST | [UC-ADMIN-CAT-03](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-OPT-01** | 옵션 관리 | 옵션 그룹 생성 | MUST | [UC-ADMIN-OPT-01](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-OPT-02** | 옵션 관리 | 옵션 그룹 수정/삭제 | MUST | [UC-ADMIN-OPT-02](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-OPT-03** | 옵션 관리 | 옵션값 생성 | MUST | [UC-ADMIN-OPT-03](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-OPT-04** | 옵션 관리 | 옵션값 수정/삭제 | MUST | [UC-ADMIN-OPT-04](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-OPT-05** | 옵션 관리 | 상품-옵션 연결 | MUST | [UC-ADMIN-OPT-05](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-INV-01** | 재고 관리 | 재고 조회 | MUST | [UC-ADMIN-INV-01](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-INV-02** | 재고 관리 | 재고 입고 | MUST | [UC-ADMIN-INV-02](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-INV-03** | 재고 관리 | 재고 조정 | MUST | [UC-ADMIN-INV-03](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-INV-04** | 재고 관리 | 재고 이력 조회 | SHOULD | [UC-ADMIN-INV-04](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-COUPON-01** | 쿠폰 관리 | 쿠폰 생성 | MUST | [UC-ADMIN-COUPON-01](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-COUPON-02** | 쿠폰 관리 | 쿠폰 수정 | MUST | [UC-ADMIN-COUPON-02](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-COUPON-03** | 쿠폰 관리 | 쿠폰 삭제/비활성화 | MUST | [UC-ADMIN-COUPON-03](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-COUPON-04** | 쿠폰 관리 | 발급 현황 조회 | SHOULD | [UC-ADMIN-COUPON-04](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-ORDER-01** | 주문 관리 | 전체 주문 조회 | MUST | [UC-ADMIN-ORDER-01](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-ORDER-02** | 주문 관리 | 주문 상세 조회 | MUST | [UC-ADMIN-ORDER-02](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-ORDER-03** | 주문 관리 | 주문 상태 변경 | MUST | [UC-ADMIN-ORDER-03](use-cases.md) | TBD | ⏳ |
-| **FR-ADMIN-ORDER-04** | 주문 관리 | 주문 취소 | MUST | [UC-ADMIN-ORDER-04](use-cases.md) | TBD | ⏳ |
+| **FR-ADMIN-PROD-01** | 상품 관리 | 상품 등록 | MUST | [UC-ADMIN-PROD-01](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-PROD-02** | 상품 관리 | 상품 수정 | MUST | [UC-ADMIN-PROD-02](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-PROD-03** | 상품 관리 | 상품 삭제 | MUST | [UC-ADMIN-PROD-03](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-PROD-04** | 상품 관리 | 상품 활성화 | MUST | [UC-ADMIN-PROD-04](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-CAT-01** | 카테고리 관리 | 카테고리 생성 | MUST | [UC-ADMIN-CAT-01](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-CAT-02** | 카테고리 관리 | 카테고리 수정 | MUST | [UC-ADMIN-CAT-02](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-CAT-03** | 카테고리 관리 | 카테고리 삭제 | MUST | [UC-ADMIN-CAT-03](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-OPT-01** | 옵션 관리 | 옵션 그룹 생성 | MUST | [UC-ADMIN-OPT-01](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-OPT-02** | 옵션 관리 | 옵션 그룹 수정/삭제 | MUST | [UC-ADMIN-OPT-02](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-OPT-03** | 옵션 관리 | 옵션값 생성 | MUST | [UC-ADMIN-OPT-03](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-OPT-04** | 옵션 관리 | 옵션값 수정/삭제 | MUST | [UC-ADMIN-OPT-04](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-OPT-05** | 옵션 관리 | 상품-옵션 연결 | MUST | [UC-ADMIN-OPT-05](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-INV-01** | 재고 관리 | 재고 조회 | MUST | [UC-ADMIN-INV-01](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-INV-02** | 재고 관리 | 재고 입고 | MUST | [UC-ADMIN-INV-02](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-INV-03** | 재고 관리 | 재고 조정 | MUST | [UC-ADMIN-INV-03](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-INV-04** | 재고 관리 | 재고 이력 조회 | SHOULD | [UC-ADMIN-INV-04](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-COUPON-01** | 쿠폰 관리 | 쿠폰 생성 | MUST | [UC-ADMIN-COUPON-01](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-COUPON-02** | 쿠폰 관리 | 쿠폰 수정 | MUST | [UC-ADMIN-COUPON-02](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-COUPON-03** | 쿠폰 관리 | 쿠폰 삭제/비활성화 | MUST | [UC-ADMIN-COUPON-03](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-COUPON-04** | 쿠폰 관리 | 발급 현황 조회 | SHOULD | [UC-ADMIN-COUPON-04](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-ORDER-01** | 주문 관리 | 전체 주문 조회 | MUST | [UC-ADMIN-ORDER-01](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-ORDER-02** | 주문 관리 | 주문 상세 조회 | MUST | [UC-ADMIN-ORDER-02](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-ORDER-03** | 주문 관리 | 주문 상태 변경 | MUST | [UC-ADMIN-ORDER-03](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-ORDER-04** | 주문 관리 | 주문 취소 | MUST | [UC-ADMIN-ORDER-04](user-stories.md) | TBD | ⏳ |
 
 **범례**:
 - ✅ 테스트 완료
@@ -597,7 +597,7 @@
 ## 관련 문서
 
 - **이전**: [← 요구사항 분석 (사용자 기능)](requirements.md)
-- **다음**: [유스케이스 →](use-cases.md)
+- **다음**: [유스케이스 →](user-stories.md)
 - **API 참조**: [API 명세서](api-spec.md)
 - **구현 흐름**: [시퀀스 다이어그램](sequence-diagrams.md)
 

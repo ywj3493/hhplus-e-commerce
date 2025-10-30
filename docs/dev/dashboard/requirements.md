@@ -8,7 +8,7 @@
 
 ## 문서 네비게이션
 
-**다음**: [유스케이스 →](use-cases.md)
+**다음**: [유스케이스 →](user-stories.md)
 
 ---
 
@@ -78,12 +78,12 @@
 
 | ID | 요구사항 | 우선순위 | 상태 |
 |----|---------|---------|------|
-| **FR-PROD-01** | 시스템은 상품 목록을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-PROD-02** | 시스템은 상품 상세 정보를 조회할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-PROD-03** | 시스템은 카테고리별로 상품을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-PROD-04** | 시스템은 상품 옵션 정보를 조회할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-PROD-05** | 시스템은 상품 목록을 가격순/인기순/최신순으로 정렬할 수 있어야 함 | SHOULD | ⏳ 대기 |
-| **FR-PROD-06** | 시스템은 최근 3일간 인기 상품 Top 5를 조회할 수 있어야 함 | SHOULD | ⏳ 대기 |
+| **FR-PROD-01** | 사용자는 상품 목록을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-PROD-02** | 사용자는 상품 상세 정보를 조회할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-PROD-03** | 사용자는 카테고리별로 상품을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-PROD-04** | 사용자는 상품 옵션 정보를 조회할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-PROD-05** | 사용자는 상품 목록을 가격순/인기순/최신순으로 정렬할 수 있어야 함 | SHOULD | ⏳ 대기 |
+| **FR-PROD-06** | 사용자는 최근 3일간 인기 상품 Top 5를 조회할 수 있어야 함 | SHOULD | ⏳ 대기 |
 
 #### 상세 설명
 
@@ -97,7 +97,7 @@
   3. 정렬 기준 적용
   4. 페이지네이션 처리
 - **출력**: 상품 목록 (ID, 이름, 가격, 카테고리, 재고 유무)
-- **관련 유스케이스**: [UC-PROD-01](use-cases.md#uc-prod-01-상품-목록-조회)
+- **관련 유스케이스**: [UC-PROD-01](user-stories.md#uc-prod-01-상품-목록-조회)
 
 **FR-PROD-02: 상품 상세 조회**
 - **입력**: 상품 ID
@@ -106,7 +106,7 @@
   2. 상품 옵션 정보 조회
   3. 재고 정보 조회 (재고 유무만 확인)
 - **출력**: 상품 상세 정보 (이름, 가격, 설명, 옵션 목록, 재고 상태)
-- **관련 유스케이스**: [UC-PROD-02](use-cases.md#uc-prod-02-상품-상세-조회)
+- **관련 유스케이스**: [UC-PROD-02](user-stories.md#uc-prod-02-상품-상세-조회)
 
 **FR-PROD-03: 카테고리별 조회**
 - **입력**: 카테고리 ID
@@ -114,7 +114,7 @@
   1. 카테고리 ID 유효성 검증
   2. 해당 카테고리의 상품 목록 조회
 - **출력**: 카테고리별 상품 목록
-- **관련 유스케이스**: [UC-PROD-01](use-cases.md#uc-prod-01-상품-목록-조회)
+- **관련 유스케이스**: [UC-PROD-01](user-stories.md#uc-prod-01-상품-목록-조회)
 
 **FR-PROD-04: 상품 옵션 조회**
 - **입력**: 상품 ID
@@ -126,7 +126,7 @@
 - **예시**:
   - 색상: 빨강(+0원, 재고있음), 파랑(+0원, 재고있음)
   - 사이즈: S(+0원, 품절), M(+0원, 재고있음)
-- **관련 유스케이스**: [UC-PROD-02](use-cases.md#uc-prod-02-상품-상세-조회)
+- **관련 유스케이스**: [UC-PROD-02](user-stories.md#uc-prod-02-상품-상세-조회)
 
 **FR-PROD-05: 상품 정렬**
 - **정렬 기준**:
@@ -134,7 +134,7 @@
   - 인기순 (판매량 기준)
   - 최신순 (등록일 기준)
 - **기본값**: 최신순
-- **관련 유스케이스**: [UC-PROD-01](use-cases.md#uc-prod-01-상품-목록-조회)
+- **관련 유스케이스**: [UC-PROD-01](user-stories.md#uc-prod-01-상품-목록-조회)
 
 **FR-PROD-06: 인기 상품 통계**
 - **입력**: 없음 (최근 3일 고정)
@@ -150,7 +150,7 @@
   - 캐시 TTL: 15분
   - 백그라운드 배치 작업 주기: 10분마다 자동 갱신
   - API 응답은 캐시된 데이터 반환
-- **관련 유스케이스**: [UC-PROD-03](use-cases.md#uc-prod-03-인기-상품-조회)
+- **관련 유스케이스**: [UC-PROD-03](user-stories.md#uc-prod-03-인기-상품-조회)
 
 #### 비기능 요구사항
 
@@ -170,11 +170,12 @@
 
 | ID | 요구사항 | 우선순위 | 상태 |
 |----|---------|---------|------|
-| **FR-CART-01** | 시스템은 장바구니에 상품을 추가할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-CART-02** | 시스템은 장바구니 상품의 수량을 변경할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-CART-03** | 시스템은 장바구니에서 상품을 제거할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-CART-04** | 시스템은 장바구니 목록을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-CART-05** | 시스템은 장바구니 총 금액을 계산할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-CART-01** | 사용자는 장바구니에 상품을 추가할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-CART-02** | 사용자는 장바구니 상품의 수량을 변경할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-CART-03** | 사용자는 장바구니에서 상품을 제거할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-CART-04** | 사용자는 장바구니 목록을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-CART-05** | 시스템은 장바구니 총 금액을 계산하여 제공해야 함 | MUST | ⏳ 대기 |
+| **FR-CART-06** | 사용자는 장바구니의 모든 상품을 한 번에 제거할 수 있어야 함 | SHOULD | ⏳ 대기 |
 
 #### 상세 설명
 
@@ -191,7 +192,7 @@
   5. 장바구니에 추가 또는 기존 수량 증가
 - **출력**: 장바구니 항목 정보
 - **실패 시**: 재고 부족 에러 메시지
-- **관련 유스케이스**: [UC-CART-01](use-cases.md#uc-cart-01-장바구니-추가)
+- **관련 유스케이스**: [UC-CART-01](user-stories.md#uc-cart-01-장바구니-추가)
 
 **FR-CART-02: 수량 변경**
 - **입력**:
@@ -204,13 +205,13 @@
   4. 수량 업데이트
 - **출력**: 업데이트된 장바구니 항목
 - **실패 시**: 재고 부족 에러 메시지
-- **관련 유스케이스**: [UC-CART-02](use-cases.md#uc-cart-02-수량-변경)
+- **관련 유스케이스**: [UC-CART-02](user-stories.md#uc-cart-02-수량-변경)
 
 **FR-CART-03: 상품 제거**
 - **입력**: 장바구니 항목 ID
 - **처리 과정**: 장바구니에서 항목 삭제
 - **출력**: 삭제 확인 메시지
-- **관련 유스케이스**: [UC-CART-03](use-cases.md#uc-cart-03-상품-제거)
+- **관련 유스케이스**: [UC-CART-03](user-stories.md#uc-cart-03-상품-제거)
 
 **FR-CART-04: 장바구니 조회**
 - **입력**: 없음 (사용자별 조회)
@@ -219,7 +220,7 @@
   2. 각 항목의 최신 상품 정보 조회
   3. 재고 상태 확인
 - **출력**: 장바구니 항목 목록 (상품 정보, 옵션, 수량, 단가, 소계, 재고 상태)
-- **관련 유스케이스**: [UC-CART-04](use-cases.md#uc-cart-04-장바구니-조회)
+- **관련 유스케이스**: [UC-CART-04](user-stories.md#uc-cart-04-장바구니-조회)
 
 **FR-CART-05: 총 금액 계산**
 - **계산 방식**:
@@ -228,7 +229,18 @@
   장바구니 총액 = Σ(항목별 소계)
   ```
 - **출력**: 총 금액
-- **관련 유스케이스**: [UC-CART-04](use-cases.md#uc-cart-04-장바구니-조회)
+- **관련 유스케이스**: [UC-CART-04](user-stories.md#uc-cart-04-장바구니-조회)
+
+**FR-CART-06: 장바구니 전체 비우기**
+- **입력**: 없음 (사용자별 처리)
+- **처리 과정**:
+  1. 사용자의 모든 장바구니 항목 조회
+  2. 모든 항목 일괄 삭제
+- **출력**: 삭제된 항목 수
+- **비고**:
+  - 빈 장바구니여도 에러 없이 성공 반환
+  - 다른 사용자의 장바구니에는 영향 없음
+- **관련 유스케이스**: [US-CART-06](user-stories.md#us-cart-06-장바구니-전체-비우기)
 
 #### 비기능 요구사항
 
@@ -247,26 +259,27 @@
 
 | ID | 요구사항 | 우선순위 | 상태 |
 |----|---------|---------|------|
-| **FR-ORDER-01** | 시스템은 장바구니 기반으로 주문을 생성할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-ORDER-01** | 사용자는 장바구니 기반으로 주문을 생성할 수 있어야 함 | MUST | ⏳ 대기 |
 | **FR-ORDER-02** | 시스템은 주문 생성 시 재고를 확인하고 확보해야 함 | MUST | ⏳ 대기 |
 | **FR-ORDER-03** | 시스템은 쿠폰을 적용하여 주문 금액을 계산해야 함 | MUST | ⏳ 대기 |
 | **FR-ORDER-04** | 시스템은 주문 상태를 관리해야 함 | MUST | ⏳ 대기 |
-| **FR-ORDER-05** | 시스템은 주문 내역을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-ORDER-05** | 사용자는 주문 내역을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
 
 #### 상세 설명
 
 **FR-ORDER-01: 주문 생성**
 - **입력**:
-  - 장바구니 항목 ID 목록
   - 쿠폰 ID (선택)
 - **처리 과정**:
-  1. 장바구니 항목 유효성 확인
-  2. 재고 확인 및 확보 (FR-ORDER-02 참조)
-  3. 쿠폰 유효성 검증
-  4. 주문 금액 계산
-  5. 주문 생성 (PENDING 상태)
+  1. 사용자의 장바구니 전체 항목 조회
+  2. 장바구니가 비어있는 경우 에러 반환
+  3. 재고 확인 및 확보 (FR-ORDER-02 참조)
+  4. 쿠폰 유효성 검증
+  5. 주문 금액 계산
+  6. 주문 생성 (PENDING 상태)
 - **출력**: 주문 ID, 주문 상세 정보
-- **관련 유스케이스**: [UC-ORDER-01](use-cases.md#uc-order-01-주문-생성)
+- **비고**: 장바구니의 모든 항목으로 주문이 생성됨 (부분 주문 불가)
+- **관련 유스케이스**: [UC-ORDER-01](user-stories.md#uc-order-01-주문-생성)
 
 **FR-ORDER-02: 재고 확인 및 확보**
 - **처리 과정**:
@@ -281,7 +294,7 @@
 - **유지 시간**: 10분 (600초)
 - **타임아웃**: 10분 경과 시 자동 복원
 - **실패 시**: 재고 부족 에러 메시지 ("상품명 - 옵션명이 품절입니다")
-- **관련 유스케이스**: [UC-ORDER-01](use-cases.md#uc-order-01-주문-생성)
+- **관련 유스케이스**: [UC-ORDER-01](user-stories.md#uc-order-01-주문-생성)
 
 **FR-ORDER-03: 주문 금액 계산**
 - **계산 과정**:
@@ -294,7 +307,7 @@
   할인 금액 = 총 상품 금액 × (할인율 / 100)
   최종 결제 금액 = 총 상품 금액 - 할인 금액
   ```
-- **관련 유스케이스**: [UC-ORDER-01](use-cases.md#uc-order-01-주문-생성)
+- **관련 유스케이스**: [UC-ORDER-01](user-stories.md#uc-order-01-주문-생성)
 
 **FR-ORDER-04: 주문 상태 관리**
 - **상태 목록**:
@@ -308,7 +321,7 @@
   - PENDING → FAILED: 결제 실패 시 (재고 복원)
   - PENDING → EXPIRED: 10분 경과 시 (재고 자동 복원)
   - PENDING/COMPLETED → CANCELLED: 사용자 취소 시 (재고 복원)
-- **관련 유스케이스**: [UC-ORDER-02](use-cases.md#uc-order-02-주문-상태-관리)
+- **관련 유스케이스**: [UC-ORDER-02](user-stories.md#uc-order-02-주문-상태-관리)
 
 **FR-ORDER-05: 주문 내역 조회**
 - **입력**:
@@ -319,7 +332,7 @@
   - 주문 상품 목록
   - 결제 정보
   - 쿠폰 사용 정보
-- **관련 유스케이스**: [UC-ORDER-04](use-cases.md#uc-order-04-주문-조회)
+- **관련 유스케이스**: [UC-ORDER-04](user-stories.md#uc-order-04-주문-조회)
 
 #### 비기능 요구사항
 
@@ -339,10 +352,10 @@
 
 | ID | 요구사항 | 우선순위 | 상태 |
 |----|---------|---------|------|
-| **FR-PAYMENT-01** | 시스템은 결제를 처리할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-PAYMENT-02** | 시스템은 결제 완료 시 재고를 차감해야 함 | MUST | ⏳ 대기 |
+| **FR-PAYMENT-01** | 사용자는 주문에 대한 결제를 진행할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-PAYMENT-02** | 시스템은 결제 완료 시 재고를 차감하고 장바구니를 비워야 함 | MUST | ⏳ 대기 |
 | **FR-PAYMENT-03** | 시스템은 결제 실패/취소/만료 시 확보된 재고를 복원해야 함 | MUST | ⏳ 대기 |
-| **FR-PAYMENT-04** | 시스템은 10분 내 재시도 가능해야 함 | MUST | ⏳ 대기 |
+| **FR-PAYMENT-04** | 사용자는 재고 확보 후 10분 이내 재결제를 시도할 수 있어야 함 | MUST | ⏳ 대기 |
 
 #### 상세 설명
 
@@ -360,16 +373,20 @@
   5. 결제 기록 저장
   6. 결제 실패 시 재고 복원 (FR-PAYMENT-03 참조)
 - **출력**: 결제 완료 상태
-- **관련 유스케이스**: [UC-PAYMENT-01](use-cases.md#uc-payment-01-결제-처리)
+- **관련 유스케이스**: [UC-PAYMENT-01](user-stories.md#uc-payment-01-결제-처리)
 
-**FR-PAYMENT-02: 재고 차감**
+**FR-PAYMENT-02: 재고 차감 및 장바구니 비우기**
 - **트리거**: 결제 완료
 - **처리 과정**:
   1. 확보된 재고를 실제 차감으로 전환
   2. 재고 확보 기록 삭제
   3. 주문 상태 변경 (COMPLETED)
+  4. 사용자의 장바구니 전체 비우기
 - **동시성 제어**: 비관적 락 (이미 확보된 재고에 대한 처리)
-- **관련 유스케이스**: [UC-PAYMENT-01](use-cases.md#uc-payment-01-결제-처리)
+- **비고**:
+  - 결제 완료 시 장바구니가 자동으로 비워짐
+  - 재구매 필요 시 다시 담아야 함
+- **관련 유스케이스**: [UC-PAYMENT-01](user-stories.md#uc-payment-01-결제-처리)
 
 **FR-PAYMENT-03: 재고 복원**
 - **트리거**:
@@ -388,8 +405,8 @@
   - 배치 주기: 1분마다 실행
   - 만료 기준: 재고 확보 후 10분 경과
 - **관련 유스케이스**:
-  - [UC-PAYMENT-02](use-cases.md#uc-payment-02-결제-실패-처리)
-  - [UC-PAYMENT-03](use-cases.md#uc-payment-03-재고-확보-만료)
+  - [UC-PAYMENT-02](user-stories.md#uc-payment-02-결제-실패-처리)
+  - [UC-PAYMENT-03](user-stories.md#uc-payment-03-재고-확보-만료)
 
 **FR-PAYMENT-04: 결제 재시도**
 - **재시도 조건**: 재고 확보 후 10분 이내
@@ -398,7 +415,7 @@
   2. 재고 확보 시간 확인 (10분 이내)
   3. 재고 확보 유효 시 결제 재시도 허용
 - **10분 경과 시**: 재시도 불가, 새로 주문 생성 필요
-- **관련 유스케이스**: [UC-PAYMENT-01](use-cases.md#uc-payment-01-결제-처리)
+- **관련 유스케이스**: [UC-PAYMENT-01](user-stories.md#uc-payment-01-결제-처리)
 
 #### 비기능 요구사항
 
@@ -422,20 +439,20 @@
 
 ### FR-COUPON: 쿠폰 관리 (사용자)
 
-> **참고**: 쿠폰 생성 및 발급 설정 등 Admin 기능은 [Admin 요구사항 분석 - FR-ADMIN-COUPON](requirements_admin.md#fr-admin-coupon-쿠폰-발급-관리)을 참조하세요.
+> **참고**: 쿠폰 생성 및 발급 설정 등 Admin 기능은 [Admin 요구사항 분석 - FR-ADMIN-COUPON](requirements-admin.md#fr-admin-coupon-쿠폰-발급-관리)을 참조하세요.
 
 | ID | 요구사항 | 우선순위 | 상태 |
 |----|---------|---------|------|
-| **FR-COUPON-01** | 시스템은 사용자가 선착순으로 쿠폰을 발급받을 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-COUPON-01** | 사용자는 선착순으로 쿠폰을 발급받을 수 있어야 함 | MUST | ⏳ 대기 |
 | **FR-COUPON-02** | 시스템은 쿠폰 발급 시 수량을 제한해야 함 | MUST | ⏳ 대기 |
 | **FR-COUPON-03** | 시스템은 1인당 1개의 쿠폰만 발급해야 함 | MUST | ⏳ 대기 |
 | **FR-COUPON-04** | 시스템은 쿠폰 유효성을 검증해야 함 | MUST | ⏳ 대기 |
-| **FR-COUPON-05** | 시스템은 보유 쿠폰 목록을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-COUPON-05** | 사용자는 보유한 쿠폰 목록을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
 
 #### 상세 설명
 
 **FR-COUPON-01: 선착순 쿠폰 발급 받기**
-- **전제 조건**: Admin이 쿠폰을 미리 생성해야 함 ([requirements_admin.md](requirements_admin.md#fr-admin-coupon-01-쿠폰-생성) 참조)
+- **전제 조건**: Admin이 쿠폰을 미리 생성해야 함 ([requirements-admin.md](requirements-admin.md#fr-admin-coupon-01-쿠폰-생성) 참조)
 - **입력**: 쿠폰 ID
 - **처리 과정**:
   1. 쿠폰 정보 조회
@@ -444,7 +461,7 @@
   4. 사용자에게 쿠폰 발급
   5. 잔여 수량 차감
 - **출력**: 발급된 쿠폰 정보
-- **관련 유스케이스**: [UC-COUPON-01](use-cases.md#uc-coupon-01-쿠폰-발급)
+- **관련 유스케이스**: [UC-COUPON-01](user-stories.md#uc-coupon-01-쿠폰-발급)
 
 **FR-COUPON-02: 발급 수량 제한**
 - **제한 방식**: 총 발급 수량 관리
@@ -454,13 +471,13 @@
   - 트랜잭션 내에서 쿠폰 행에 배타적 락 획득
   - 락을 획득한 순서대로 발급 처리
   - 수량 소진 시 즉시 실패 반환
-- **관련 유스케이스**: [UC-COUPON-01](use-cases.md#uc-coupon-01-쿠폰-발급)
+- **관련 유스케이스**: [UC-COUPON-01](user-stories.md#uc-coupon-01-쿠폰-발급)
 
 **FR-COUPON-03: 1인 1매 제한**
 - **검증 시점**: 쿠폰 발급 요청 시
 - **확인 방법**: 사용자별 쿠폰 발급 이력 조회
 - **중복 발급 시**: 에러 반환
-- **관련 유스케이스**: [UC-COUPON-01](use-cases.md#uc-coupon-01-쿠폰-발급)
+- **관련 유스케이스**: [UC-COUPON-01](user-stories.md#uc-coupon-01-쿠폰-발급)
 
 **FR-COUPON-04: 쿠폰 유효성 검증**
 - **검증 항목**:
@@ -477,7 +494,7 @@
   - AVAILABLE → EXPIRED: 만료일 경과 (배치 작업)
   - USED, EXPIRED 상태에서는 사용 불가
 - **검증 시점**: 주문 생성 시
-- **관련 유스케이스**: [UC-ORDER-01](use-cases.md#uc-order-01-주문-생성)
+- **관련 유스케이스**: [UC-ORDER-01](user-stories.md#uc-order-01-주문-생성)
 
 **FR-COUPON-05: 보유 쿠폰 조회**
 - **입력**: 없음 (사용자별 조회)
@@ -485,7 +502,7 @@
   - 쿠폰 목록 (쿠폰명, 할인율, 상태, 만료일)
   - 사용 가능한 쿠폰 수
 - **필터**: 사용 가능/사용 완료/만료
-- **관련 유스케이스**: [UC-COUPON-02](use-cases.md#uc-coupon-02-보유-쿠폰-조회)
+- **관련 유스케이스**: [UC-COUPON-02](user-stories.md#uc-coupon-02-보유-쿠폰-조회)
 
 #### 비기능 요구사항
 
@@ -521,7 +538,7 @@
   - 결제 금액
   - 주문 일시
 - **전송 방식**: 비동기 (Outbox Pattern 권장)
-- **관련 유스케이스**: [UC-DATA-01](use-cases.md#uc-data-01-주문-데이터-전송)
+- **관련 유스케이스**: [UC-DATA-01](user-stories.md#uc-data-01-주문-데이터-전송)
 
 **FR-DATA-02: 전송 실패 격리**
 - **요구사항**: 외부 전송 실패가 주문 프로세스를 차단하지 않음
@@ -529,7 +546,7 @@
   1. 주문 트랜잭션과 전송 트랜잭션 분리
   2. Outbox 테이블에 전송 데이터 저장
   3. 별도 Worker가 비동기 전송
-- **관련 유스케이스**: [UC-DATA-01](use-cases.md#uc-data-01-주문-데이터-전송)
+- **관련 유스케이스**: [UC-DATA-01](user-stories.md#uc-data-01-주문-데이터-전송)
 
 **FR-DATA-03: 전송 재시도**
 - **재시도 조건**: 전송 실패 (FAILED 상태)
@@ -537,7 +554,7 @@
   - 최대 재시도 횟수: 3회
   - 재시도 간격: Exponential Backoff
 - **최종 실패 시**: 수동 처리를 위한 알림
-- **관련 유스케이스**: [UC-DATA-02](use-cases.md#uc-data-02-전송-재시도)
+- **관련 유스케이스**: [UC-DATA-02](user-stories.md#uc-data-02-전송-재시도)
 
 **FR-DATA-04: 전송 이력 관리**
 - **기록 정보**:
@@ -549,7 +566,7 @@
 - **활용**:
   - 전송 실패 모니터링
   - 재전송 기준 데이터
-- **관련 유스케이스**: [UC-DATA-01](use-cases.md#uc-data-01-주문-데이터-전송)
+- **관련 유스케이스**: [UC-DATA-01](user-stories.md#uc-data-01-주문-데이터-전송)
 
 #### 비기능 요구사항
 
@@ -613,7 +630,7 @@
 |---------|------|------|
 | **외부 전송 의존성** | 외부 플랫폼 장애가 주문 차단 금지 | Outbox Pattern 등 비동기 처리 필수 |
 | **동시성 처리** | 재고/쿠폰 정확성 필수 | 락 메커니즘 필수 적용 |
-| **Admin 영역 분리** | Admin 기능은 별도 요구사항 문서 관리 | [requirements_admin.md](requirements_admin.md) 참조 |
+| **Admin 영역 분리** | Admin 기능은 별도 요구사항 문서 관리 | [requirements-admin.md](requirements-admin.md) 참조 |
 | **마이크로서비스 분리** | Admin 기능의 추후 분리 가능성 고려 | 도메인 경계 명확히 구분, 느슨한 결합 유지 |
 
 ### 개발 제약사항
@@ -630,26 +647,26 @@
 
 이 표는 각 사용자 기능 요구사항을 유스케이스, 구현까지 추적합니다.
 
-> **참고**: Admin 기능 요구사항 추적은 [Admin 요구사항 분석 문서](requirements_admin.md#요구사항-추적-매트릭스)를 참조하세요.
+> **참고**: Admin 기능 요구사항 추적은 [Admin 요구사항 분석 문서](requirements-admin.md#요구사항-추적-매트릭스)를 참조하세요.
 
 | 요구사항 ID | 카테고리 | 설명 | 우선순위 | 유스케이스 | 구현 | 테스트 |
 |-----------|---------|------|---------|-----------|------|--------|
-| **FR-PROD-01** | 상품 | 상품 목록 조회 | MUST | [UC-PROD-01](use-cases.md) | TBD | ⏳ |
-| **FR-PROD-02** | 상품 | 상품 상세 조회 | MUST | [UC-PROD-02](use-cases.md) | TBD | ⏳ |
-| **FR-PROD-06** | 상품 | 인기 상품 통계 | SHOULD | [UC-PROD-03](use-cases.md) | TBD | ⏳ |
-| **FR-CART-01** | 장바구니 | 상품 추가 | MUST | [UC-CART-01](use-cases.md) | TBD | ⏳ |
-| **FR-CART-04** | 장바구니 | 장바구니 조회 | MUST | [UC-CART-04](use-cases.md) | TBD | ⏳ |
-| **FR-ORDER-01** | 주문 | 주문 생성 | MUST | [UC-ORDER-01](use-cases.md) | TBD | ⏳ |
-| **FR-ORDER-02** | 주문 | 재고 확인 및 확보 | MUST | [UC-ORDER-01](use-cases.md) | TBD | ⏳ |
-| **FR-ORDER-04** | 주문 | 주문 상태 관리 | MUST | [UC-ORDER-02](use-cases.md) | TBD | ⏳ |
-| **FR-PAYMENT-01** | 결제 | 결제 처리 | MUST | [UC-PAYMENT-01](use-cases.md) | TBD | ⏳ |
-| **FR-PAYMENT-02** | 결제 | 재고 차감 | MUST | [UC-PAYMENT-01](use-cases.md) | TBD | ⏳ |
-| **FR-PAYMENT-03** | 결제 | 재고 복원 | MUST | [UC-PAYMENT-02](use-cases.md), [UC-PAYMENT-03](use-cases.md) | TBD | ⏳ |
-| **FR-PAYMENT-04** | 결제 | 결제 재시도 (10분 내) | MUST | [UC-PAYMENT-01](use-cases.md) | TBD | ⏳ |
-| **FR-COUPON-01** | 쿠폰 (사용자) | 쿠폰 발급받기 | MUST | [UC-COUPON-01](use-cases.md) | TBD | ⏳ |
-| **FR-COUPON-02** | 쿠폰 (사용자) | 발급 수량 제한 | MUST | [UC-COUPON-01](use-cases.md) | TBD | ⏳ |
-| **FR-DATA-01** | 연동 | 주문 데이터 전송 | MUST | [UC-DATA-01](use-cases.md) | TBD | ⏳ |
-| **FR-DATA-02** | 연동 | 전송 실패 격리 | MUST | [UC-DATA-01](use-cases.md) | TBD | ⏳ |
+| **FR-PROD-01** | 상품 | 상품 목록 조회 | MUST | [UC-PROD-01](user-stories.md) | TBD | ⏳ |
+| **FR-PROD-02** | 상품 | 상품 상세 조회 | MUST | [UC-PROD-02](user-stories.md) | TBD | ⏳ |
+| **FR-PROD-06** | 상품 | 인기 상품 통계 | SHOULD | [UC-PROD-03](user-stories.md) | TBD | ⏳ |
+| **FR-CART-01** | 장바구니 | 상품 추가 | MUST | [UC-CART-01](user-stories.md) | TBD | ⏳ |
+| **FR-CART-04** | 장바구니 | 장바구니 조회 | MUST | [UC-CART-04](user-stories.md) | TBD | ⏳ |
+| **FR-ORDER-01** | 주문 | 주문 생성 | MUST | [UC-ORDER-01](user-stories.md) | TBD | ⏳ |
+| **FR-ORDER-02** | 주문 | 재고 확인 및 확보 | MUST | [UC-ORDER-01](user-stories.md) | TBD | ⏳ |
+| **FR-ORDER-04** | 주문 | 주문 상태 관리 | MUST | [UC-ORDER-02](user-stories.md) | TBD | ⏳ |
+| **FR-PAYMENT-01** | 결제 | 결제 처리 | MUST | [UC-PAYMENT-01](user-stories.md) | TBD | ⏳ |
+| **FR-PAYMENT-02** | 결제 | 재고 차감 | MUST | [UC-PAYMENT-01](user-stories.md) | TBD | ⏳ |
+| **FR-PAYMENT-03** | 결제 | 재고 복원 | MUST | [UC-PAYMENT-02](user-stories.md), [UC-PAYMENT-03](user-stories.md) | TBD | ⏳ |
+| **FR-PAYMENT-04** | 결제 | 결제 재시도 (10분 내) | MUST | [UC-PAYMENT-01](user-stories.md) | TBD | ⏳ |
+| **FR-COUPON-01** | 쿠폰 (사용자) | 쿠폰 발급받기 | MUST | [UC-COUPON-01](user-stories.md) | TBD | ⏳ |
+| **FR-COUPON-02** | 쿠폰 (사용자) | 발급 수량 제한 | MUST | [UC-COUPON-01](user-stories.md) | TBD | ⏳ |
+| **FR-DATA-01** | 연동 | 주문 데이터 전송 | MUST | [UC-DATA-01](user-stories.md) | TBD | ⏳ |
+| **FR-DATA-02** | 연동 | 전송 실패 격리 | MUST | [UC-DATA-01](user-stories.md) | TBD | ⏳ |
 
 **범례**:
 
@@ -661,8 +678,8 @@
 
 ## 관련 문서
 
-- **다음**: [유스케이스 →](use-cases.md)
-- **Admin 요구사항**: [Admin 요구사항 분석 →](requirements_admin.md)
+- **다음**: [유스케이스 →](user-stories.md)
+- **Admin 요구사항**: [Admin 요구사항 분석 →](requirements-admin.md)
 - **ERD**: [ERD 다이어그램](erd.md)
 - **API 참조**: [API 명세서](api-spec.md)
 - **구현 흐름**: [시퀀스 다이어그램](sequence-diagrams.md)

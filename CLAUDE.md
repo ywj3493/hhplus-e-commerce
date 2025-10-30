@@ -24,7 +24,7 @@ Backend service for an e-commerce platform built with NestJS and Prisma ORM.
 /docs
   /dev              # Development specs (Korean)
     requirements.md # Requirements analysis
-    use-cases.md    # Use case specifications
+    user-stories.md    # Use case specifications
     api-spec.md     # API specifications
     sequence-diagrams.md # Sequence diagrams
   /issue            # Issue tracking (English)

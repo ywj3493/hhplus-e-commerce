@@ -49,7 +49,7 @@ Documents must be created and maintained in this order:
    - Technical constraints
    - Functional specifications
 
-2. **Use Cases** (`/docs/dev/use-cases.md`)
+2. **Use Cases** (`/docs/dev/user-stories.md`)
    - User stories
    - Actor definitions
    - Scenario descriptions
@@ -79,7 +79,7 @@ Documents must be created and maintained in this order:
       policy.md            # This file
       dev/                 # Development documentation (Korean)
          requirements.md
-         use-cases.md
+         user-stories.md
          api-spec.md
          sequence-diagrams.md
       issue/               # Issue tracking (English)

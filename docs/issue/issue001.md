@@ -179,7 +179,7 @@ Enhanced all 25 user stories by separating acceptance criteria into:
   - Document request/response schemas
   - Specify authentication/authorization requirements
 
-- **Issue #004**: Database Schema Design
+- **Issue #003**: Database Schema Design
   - Design entity-relationship model
   - Define tables, columns, and relationships
   - Establish indexing strategy
