@@ -173,7 +173,6 @@ graph TB
 
     EPIC1 --> US01[US-PROD-01<br/>상품 목록 조회]
     EPIC1 --> US02[US-PROD-02<br/>상품 상세 조회]
-    EPIC1 --> US03[US-PROD-03<br/>카테고리 필터링]
     EPIC1 --> US04[US-PROD-04<br/>옵션 정보 확인]
     EPIC1 --> US05[US-PROD-05<br/>정렬 기준 적용]
     EPIC1 --> US06[US-PROD-06<br/>인기 상품 확인]
@@ -226,10 +225,6 @@ mindmap
       상품 상세 조회
       FR-PROD-02
       MUST
-    US-PROD-03
-      카테고리 필터링
-      FR-PROD-03
-      MUST
     US-PROD-04
       옵션 정보 확인
       FR-PROD-04
@@ -260,7 +255,7 @@ mindmap
 #### 스토리
 
 **As a** 고객
-**I want to** 다양한 상품 목록을 한눈에 보고 싶다
+**I want to** 모든 상품 목록을 한눈에 보고 싶다
 **So that** 내가 원하는 상품을 빠르게 찾을 수 있다
 
 #### 인수 조건 (Acceptance Criteria)
@@ -315,35 +310,6 @@ mindmap
 |------|---------|------|
 | **성능** | 평균 응답 시간 | < 200ms |
 | **에러 처리** | 존재하지 않는 상품 | 404 NOT FOUND |
-
----
-
-### US-PROD-03: 카테고리별 필터링
-
-| 항목 | 내용 |
-|------|------|
-| **스토리 ID** | US-PROD-03 |
-| **스토리 명** | 카테고리별 필터링 |
-| **액터** | 고객 (Primary) |
-| **Epic** | EPIC-1: 상품 탐색 |
-| **관련 요구사항** | [FR-PROD-03](requirements.md#fr-prod-03-카테고리별-조회) |
-| **우선순위** | MUST |
-
-#### 스토리
-
-**As a** 고객
-**I want to** 특정 카테고리의 상품만 필터링해서 보고 싶다
-**So that** 관심 있는 상품군만 빠르게 탐색할 수 있다
-
-#### 인수 조건 (Acceptance Criteria)
-
-**정상 케이스:**
-- [ ] **Given** 카테고리 ID를 입력할 때, **When** 상품 조회 시, **Then** 해당 카테고리 상품만 표시된다
-- [ ] **Given** 카테고리에 상품이 없을 때, **When** 조회 시, **Then** 빈 목록을 반환한다
-
-**에러 케이스:**
-- [ ] **Given** 유효하지 않은 카테고리 ID(존재하지 않음)일 때, **When** 조회 시, **Then** "카테고리를 찾을 수 없습니다" (404 Not Found)
-- [ ] **Given** 잘못된 형식의 카테고리 ID일 때, **When** 조회 시, **Then** "유효하지 않은 카테고리 ID 형식입니다" (400 Bad Request)
 
 ---
 
@@ -1245,7 +1211,6 @@ journey
 |----------|-----------|------|------|-----------|---------|------|
 | **US-PROD-01** | 상품 목록 조회 | EPIC-1 | 고객 | FR-PROD-01 | MUST | ⏳ 대기 |
 | **US-PROD-02** | 상품 상세 조회 | EPIC-1 | 고객 | FR-PROD-02 | MUST | ⏳ 대기 |
-| **US-PROD-03** | 카테고리 필터링 | EPIC-1 | 고객 | FR-PROD-03 | MUST | ⏳ 대기 |
 | **US-PROD-04** | 옵션 정보 확인 | EPIC-1 | 고객 | FR-PROD-04 | MUST | ⏳ 대기 |
 | **US-PROD-05** | 정렬 기준 적용 | EPIC-1 | 고객 | FR-PROD-05 | SHOULD | ⏳ 대기 |
 | **US-PROD-06** | 인기 상품 확인 | EPIC-1 | 고객 | FR-PROD-06 | SHOULD | ⏳ 대기 |
@@ -1269,7 +1234,7 @@ journey
 | **US-DATA-01** | 주문 데이터 전송 | EPIC-5 | 시스템, 외부 플랫폼 | FR-DATA-01, 02 | MUST | ⏳ 대기 |
 | **US-DATA-02** | 전송 실패 재시도 | EPIC-5 | 시스템 | FR-DATA-03, 04 | MUST | ⏳ 대기 |
 
-**총 스토리 수**: 25개
+**총 스토리 수**: 24개
 
 **범례**:
 - ⏳ 대기

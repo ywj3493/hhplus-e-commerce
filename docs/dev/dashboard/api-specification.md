@@ -221,7 +221,6 @@ PaginatedResponse<T> {
 
 #### 관련 스토리
 - [US-PROD-01](user-stories.md#us-prod-01-상품-목록-조회): 상품 목록 조회
-- [US-PROD-03](user-stories.md#us-prod-03-카테고리별-필터링): 카테고리별 필터링
 - [US-PROD-05](user-stories.md#us-prod-05-정렬-기준-적용): 정렬 기준 적용
 
 #### 요청
@@ -232,14 +231,13 @@ PaginatedResponse<T> {
 |---------|------|------|--------|------|
 | `page` | integer | ❌ | 1 | 페이지 번호 (1부터 시작) |
 | `limit` | integer | ❌ | 20 | 페이지 크기 (1-100) |
-| `categoryId` | string | ❌ | - | 카테고리 ID 필터 |
 | `sortBy` | string | ❌ | createdAt | 정렬 기준 (`price`, `popularity`, `createdAt`) |
 | `sortOrder` | string | ❌ | desc | 정렬 방향 (`asc`, `desc`) |
 
 **요청 예시**
 
 ```http
-GET /api/v1/products?page=1&limit=20&categoryId=cat-001&sortBy=price&sortOrder=asc
+GET /api/v1/products?page=1&limit=20&sortBy=price&sortOrder=asc
 ```
 
 #### 응답
@@ -282,7 +280,6 @@ GET /api/v1/products?page=1&limit=20&categoryId=cat-001&sortBy=price&sortOrder=a
 | `INVALID_PAGE_SIZE` | 페이지 크기는 1-100 사이여야 합니다 | limit < 1 또는 limit > 100 |
 | `INVALID_SORT_FIELD` | 지원하지 않는 정렬 기준입니다 | sortBy가 유효하지 않음 |
 | `INVALID_SORT_ORDER` | 유효하지 않은 정렬 방향입니다 | sortOrder가 asc, desc가 아님 |
-| `CATEGORY_NOT_FOUND` | 카테고리를 찾을 수 없습니다 | categoryId가 존재하지 않음 |
 
 **에러 응답 예시**
 
@@ -849,6 +846,8 @@ Content-Type: application/json
         "optionId": "opt-001",
         "optionName": "빨강",
         "quantity": 2,
+        "productPrice": 89000,
+        "optionAdditionalPrice": 0,
         "unitPrice": 89000,
         "subtotal": 178000
       }
@@ -935,6 +934,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "optionId": "opt-001",
         "optionName": "빨강",
         "quantity": 2,
+        "productPrice": 89000,
+        "optionAdditionalPrice": 0,
         "unitPrice": 89000,
         "subtotal": 178000
       }
@@ -1627,13 +1628,15 @@ interface Cart {
 
 ```typescript
 interface OrderItem {
-  productId: string       // 상품 ID
-  productName: string     // 상품명
-  optionId: string | null // 옵션 ID
-  optionName: string | null // 옵션명
-  quantity: number        // 수량
-  unitPrice: number       // 단가
-  subtotal: number        // 소계
+  productId: string           // 상품 ID
+  productName: string         // 상품명 (스냅샷)
+  optionId: string | null     // 옵션 ID
+  optionName: string | null   // 옵션명 (스냅샷)
+  quantity: number            // 수량
+  productPrice: number        // 상품 가격 (스냅샷)
+  optionAdditionalPrice: number // 옵션 추가 가격 (스냅샷)
+  unitPrice: number           // 단가 (productPrice + optionAdditionalPrice)
+  subtotal: number            // 소계 (unitPrice × quantity)
 }
 ```
 
@@ -1739,7 +1742,6 @@ enum CouponStatus {
 |------------|----------------|---------------|------------|
 | FR-PROD-01 | US-PROD-01 | `/products` | GET |
 | FR-PROD-02 | US-PROD-02 | `/products/{id}` | GET |
-| FR-PROD-03 | US-PROD-03 | `/products` (with categoryId) | GET |
 | FR-PROD-04 | US-PROD-04 | `/products/{id}/options` | GET |
 | FR-PROD-05 | US-PROD-05 | `/products` (with sortBy) | GET |
 | FR-PROD-06 | US-PROD-06 | `/products/popular` | GET |
