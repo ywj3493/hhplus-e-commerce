@@ -1742,9 +1742,9 @@ enum CouponStatus {
 |------------|----------------|---------------|------------|
 | FR-PROD-01 | US-PROD-01 | `/products` | GET |
 | FR-PROD-02 | US-PROD-02 | `/products/{id}` | GET |
-| FR-PROD-04 | US-PROD-04 | `/products/{id}/options` | GET |
-| FR-PROD-05 | US-PROD-05 | `/products` (with sortBy) | GET |
-| FR-PROD-06 | US-PROD-06 | `/products/popular` | GET |
+| FR-PROD-03 | US-PROD-03 | `/products/{id}/options` | GET |
+| FR-PROD-04 | US-PROD-04 | `/products` (with sortBy) | GET |
+| FR-PROD-05 | US-PROD-05 | `/products/popular` | GET |
 
 ### EPIC-2: 장바구니 관리
 

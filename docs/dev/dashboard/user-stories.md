@@ -173,9 +173,9 @@ graph TB
 
     EPIC1 --> US01[US-PROD-01<br/>상품 목록 조회]
     EPIC1 --> US02[US-PROD-02<br/>상품 상세 조회]
-    EPIC1 --> US04[US-PROD-04<br/>옵션 정보 확인]
-    EPIC1 --> US05[US-PROD-05<br/>정렬 기준 적용]
-    EPIC1 --> US06[US-PROD-06<br/>인기 상품 확인]
+    EPIC1 --> US03[US-PROD-03<br/>옵션 정보 확인]
+    EPIC1 --> US04[US-PROD-04<br/>정렬 기준 적용]
+    EPIC1 --> US05[US-PROD-05<br/>인기 상품 확인]
 
     EPIC2 --> US11[US-CART-01<br/>상품 추가]
     EPIC2 --> US12[US-CART-02<br/>수량 조정]
@@ -225,17 +225,17 @@ mindmap
       상품 상세 조회
       FR-PROD-02
       MUST
-    US-PROD-04
+    US-PROD-03
       옵션 정보 확인
-      FR-PROD-04
+      FR-PROD-03
       MUST
-    US-PROD-05
+    US-PROD-04
       정렬 기준 적용
-      FR-PROD-05
+      FR-PROD-04
       SHOULD
-    US-PROD-06
+    US-PROD-05
       인기 상품 확인
-      FR-PROD-06
+      FR-PROD-05
       SHOULD
 ```
 
@@ -263,7 +263,7 @@ mindmap
 **정상 케이스:**
 - [ ] **Given** 상품이 등록되어 있을 때, **When** 상품 목록 조회 요청 시, **Then** 페이지네이션된 상품 목록을 받는다
 - [ ] **Given** 상품 목록이 50개일 때, **When** 페이지 크기 20으로 조회 시, **Then** 3페이지로 나누어 반환된다
-- [ ] **Given** 각 상품 정보에는, **Then** 상품 ID, 이름, 가격, 카테고리, 재고 유무가 포함된다
+- [ ] **Given** 각 상품 정보에는, **Then** 상품 ID, 이름, 가격, 재고 유무가 포함된다
 - [ ] **Given** 조회 응답 시간은, **Then** 평균 200ms 이내여야 한다
 
 **에러 케이스:**
@@ -313,15 +313,15 @@ mindmap
 
 ---
 
-### US-PROD-04: 옵션 정보 확인
+### US-PROD-03: 옵션 정보 확인
 
 | 항목 | 내용 |
 |------|------|
-| **스토리 ID** | US-PROD-04 |
+| **스토리 ID** | US-PROD-03 |
 | **스토리 명** | 옵션 정보 확인 |
 | **액터** | 고객 (Primary) |
 | **Epic** | EPIC-1: 상품 탐색 |
-| **관련 요구사항** | [FR-PROD-04](requirements.md#fr-prod-04-상품-옵션-조회) |
+| **관련 요구사항** | [FR-PROD-03](requirements.md#fr-prod-03-상품-옵션-조회) |
 | **우선순위** | MUST |
 
 #### 스토리
@@ -344,15 +344,15 @@ mindmap
 
 ---
 
-### US-PROD-05: 정렬 기준 적용
+### US-PROD-04: 정렬 기준 적용
 
 | 항목 | 내용 |
 |------|------|
-| **스토리 ID** | US-PROD-05 |
+| **스토리 ID** | US-PROD-04 |
 | **스토리 명** | 정렬 기준 적용 |
 | **액터** | 고객 (Primary) |
 | **Epic** | EPIC-1: 상품 탐색 |
-| **관련 요구사항** | [FR-PROD-05](requirements.md#fr-prod-05-상품-정렬) |
+| **관련 요구사항** | [FR-PROD-04](requirements.md#fr-prod-04-상품-정렬) |
 | **우선순위** | SHOULD |
 
 #### 스토리
@@ -375,15 +375,15 @@ mindmap
 
 ---
 
-### US-PROD-06: 인기 상품 확인
+### US-PROD-05: 인기 상품 확인
 
 | 항목 | 내용 |
 |------|------|
-| **스토리 ID** | US-PROD-06 |
+| **스토리 ID** | US-PROD-05 |
 | **스토리 명** | 인기 상품 확인 |
 | **액터** | 고객 (Primary) |
 | **Epic** | EPIC-1: 상품 탐색 |
-| **관련 요구사항** | [FR-PROD-06](requirements.md#fr-prod-06-인기-상품-통계) |
+| **관련 요구사항** | [FR-PROD-05](requirements.md#fr-prod-05-인기-상품-통계) |
 | **우선순위** | SHOULD |
 
 #### 스토리
@@ -1184,7 +1184,6 @@ journey
     title 고객 쇼핑 여정
     section 상품 탐색
       상품 목록 조회: 5: 고객
-      카테고리 필터: 4: 고객
       인기 상품 확인: 4: 고객
       상품 상세 조회: 5: 고객
       옵션 확인: 5: 고객
@@ -1211,9 +1210,9 @@ journey
 |----------|-----------|------|------|-----------|---------|------|
 | **US-PROD-01** | 상품 목록 조회 | EPIC-1 | 고객 | FR-PROD-01 | MUST | ⏳ 대기 |
 | **US-PROD-02** | 상품 상세 조회 | EPIC-1 | 고객 | FR-PROD-02 | MUST | ⏳ 대기 |
-| **US-PROD-04** | 옵션 정보 확인 | EPIC-1 | 고객 | FR-PROD-04 | MUST | ⏳ 대기 |
-| **US-PROD-05** | 정렬 기준 적용 | EPIC-1 | 고객 | FR-PROD-05 | SHOULD | ⏳ 대기 |
-| **US-PROD-06** | 인기 상품 확인 | EPIC-1 | 고객 | FR-PROD-06 | SHOULD | ⏳ 대기 |
+| **US-PROD-03** | 옵션 정보 확인 | EPIC-1 | 고객 | FR-PROD-03 | MUST | ⏳ 대기 |
+| **US-PROD-04** | 정렬 기준 적용 | EPIC-1 | 고객 | FR-PROD-04 | SHOULD | ⏳ 대기 |
+| **US-PROD-05** | 인기 상품 확인 | EPIC-1 | 고객 | FR-PROD-05 | SHOULD | ⏳ 대기 |
 | **US-CART-01** | 장바구니에 상품 추가 | EPIC-2 | 고객 | FR-CART-01 | MUST | ⏳ 대기 |
 | **US-CART-02** | 수량 조정 | EPIC-2 | 고객 | FR-CART-02 | MUST | ⏳ 대기 |
 | **US-CART-03** | 상품 제거 | EPIC-2 | 고객 | FR-CART-03 | MUST | ⏳ 대기 |

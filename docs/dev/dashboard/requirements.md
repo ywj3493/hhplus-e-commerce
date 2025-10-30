@@ -80,9 +80,9 @@
 |----|---------|---------|------|
 | **FR-PROD-01** | 사용자는 상품 목록을 조회할 수 있어야 함 | MUST | ⏳ 대기 |
 | **FR-PROD-02** | 사용자는 상품 상세 정보를 조회할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-PROD-04** | 사용자는 상품 옵션 정보를 조회할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-PROD-05** | 사용자는 상품 목록을 가격순/인기순/최신순으로 정렬할 수 있어야 함 | SHOULD | ⏳ 대기 |
-| **FR-PROD-06** | 사용자는 최근 3일간 인기 상품 Top 5를 조회할 수 있어야 함 | SHOULD | ⏳ 대기 |
+| **FR-PROD-03** | 사용자는 상품 옵션 정보를 조회할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-PROD-04** | 사용자는 상품 목록을 가격순/인기순/최신순으로 정렬할 수 있어야 함 | SHOULD | ⏳ 대기 |
+| **FR-PROD-05** | 사용자는 최근 3일간 인기 상품 Top 5를 조회할 수 있어야 함 | SHOULD | ⏳ 대기 |
 
 #### 상세 설명
 
@@ -107,7 +107,7 @@
 - **출력**: 상품 상세 정보 (이름, 가격, 설명, 옵션 목록, 재고 상태)
 - **관련 유스케이스**: [UC-PROD-02](user-stories.md#uc-prod-02-상품-상세-조회)
 
-**FR-PROD-04: 상품 옵션 조회**
+**FR-PROD-03: 상품 옵션 조회**
 - **입력**: 상품 ID
 - **처리 과정**:
   1. 상품에 연결된 옵션 그룹 조회
@@ -119,7 +119,7 @@
   - 사이즈: S(+0원, 품절), M(+0원, 재고있음)
 - **관련 유스케이스**: [UC-PROD-02](user-stories.md#uc-prod-02-상품-상세-조회)
 
-**FR-PROD-05: 상품 정렬**
+**FR-PROD-04: 상품 정렬**
 - **정렬 기준**:
   - 가격순 (오름차순/내림차순)
   - 인기순 (판매량 기준)
@@ -127,7 +127,7 @@
 - **기본값**: 최신순
 - **관련 유스케이스**: [UC-PROD-01](user-stories.md#uc-prod-01-상품-목록-조회)
 
-**FR-PROD-06: 인기 상품 통계**
+**FR-PROD-05: 인기 상품 통계**
 - **입력**: 없음 (최근 3일 고정)
 - **처리 과정**:
   1. 백그라운드 배치 작업으로 통계 계산 및 캐시 갱신
@@ -644,9 +644,9 @@
 |-----------|---------|------|---------|-----------|------|--------|
 | **FR-PROD-01** | 상품 | 상품 목록 조회 | MUST | [UC-PROD-01](user-stories.md) | TBD | ⏳ |
 | **FR-PROD-02** | 상품 | 상품 상세 조회 | MUST | [UC-PROD-02](user-stories.md) | TBD | ⏳ |
-| **FR-PROD-04** | 상품 | 상품 옵션 조회 | MUST | [UC-PROD-04](user-stories.md) | TBD | ⏳ |
-| **FR-PROD-05** | 상품 | 상품 정렬 | SHOULD | [UC-PROD-05](user-stories.md) | TBD | ⏳ |
-| **FR-PROD-06** | 상품 | 인기 상품 통계 | SHOULD | [UC-PROD-06](user-stories.md) | TBD | ⏳ |
+| **FR-PROD-03** | 상품 | 상품 옵션 조회 | MUST | [UC-PROD-03](user-stories.md) | TBD | ⏳ |
+| **FR-PROD-04** | 상품 | 상품 정렬 | SHOULD | [UC-PROD-04](user-stories.md) | TBD | ⏳ |
+| **FR-PROD-05** | 상품 | 인기 상품 통계 | SHOULD | [UC-PROD-05](user-stories.md) | TBD | ⏳ |
 | **FR-CART-01** | 장바구니 | 상품 추가 | MUST | [UC-CART-01](user-stories.md) | TBD | ⏳ |
 | **FR-CART-04** | 장바구니 | 장바구니 조회 | MUST | [UC-CART-04](user-stories.md) | TBD | ⏳ |
 | **FR-ORDER-01** | 주문 | 주문 생성 | MUST | [UC-ORDER-01](user-stories.md) | TBD | ⏳ |
