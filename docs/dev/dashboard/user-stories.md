@@ -134,7 +134,7 @@ graph LR
 - 재고 데이터 제공 (EPIC-2, EPIC-3)
 - 쿠폰 마스터 데이터 제공 (EPIC-4)
 
-> **참고**: Admin 기능의 상세 요구사항은 [requirements_admin.md](requirements_admin.md)를 참조하세요.
+> **참고**: Admin 기능의 상세 요구사항은 [../admin/requirements.md](../admin/requirements.md)를 참조하세요.
 
 ---
 
@@ -1246,7 +1246,7 @@ journey
 
 - **이전**: [← 요구사항 분석](../requirements.md)
 - **다음**: [API 명세서 →](api-specifications.md)
-- **Admin 요구사항**: [Admin 요구사항 분석 (별도 서비스)](../requirements_admin.md)
+- **Admin 요구사항**: [Admin 요구사항 분석 (별도 서비스)](../../admin/requirements.md)
 - **구현 흐름**: [시퀀스 다이어그램](sequence-diagrams.md)
 
 ---

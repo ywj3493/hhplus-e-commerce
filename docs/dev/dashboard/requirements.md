@@ -430,7 +430,7 @@
 
 ### FR-COUPON: 쿠폰 관리 (사용자)
 
-> **참고**: 쿠폰 생성 및 발급 설정 등 Admin 기능은 [Admin 요구사항 분석 - FR-ADMIN-COUPON](requirements-admin.md#fr-admin-coupon-쿠폰-발급-관리)을 참조하세요.
+> **참고**: 쿠폰 생성 및 발급 설정 등 Admin 기능은 [Admin 요구사항 분석 - FR-ADMIN-COUPON](../admin/requirements.md#fr-admin-coupon-쿠폰-발급-관리)을 참조하세요.
 
 | ID | 요구사항 | 우선순위 | 상태 |
 |----|---------|---------|------|
@@ -443,7 +443,7 @@
 #### 상세 설명
 
 **FR-COUPON-01: 선착순 쿠폰 발급 받기**
-- **전제 조건**: Admin이 쿠폰을 미리 생성해야 함 ([requirements-admin.md](requirements-admin.md#fr-admin-coupon-01-쿠폰-생성) 참조)
+- **전제 조건**: Admin이 쿠폰을 미리 생성해야 함 ([../admin/requirements.md](../admin/requirements.md#fr-admin-coupon-01-쿠폰-생성) 참조)
 - **입력**: 쿠폰 ID
 - **처리 과정**:
   1. 쿠폰 정보 조회
@@ -629,7 +629,7 @@
 |---------|------|------|
 | **외부 전송 의존성** | 외부 플랫폼 장애가 주문 차단 금지 | Outbox Pattern 등 비동기 처리 필수 |
 | **동시성 처리** | 재고/쿠폰 정확성 필수 | 락 메커니즘 필수 적용 |
-| **Admin 영역 분리** | Admin 기능은 별도 요구사항 문서 관리 | [requirements-admin.md](requirements-admin.md) 참조 |
+| **Admin 영역 분리** | Admin 기능은 별도 요구사항 문서 관리 | [../admin/requirements.md](../admin/requirements.md) 참조 |
 | **마이크로서비스 분리** | Admin 기능의 추후 분리 가능성 고려 | 도메인 경계 명확히 구분, 느슨한 결합 유지 |
 
 ### 개발 제약사항
@@ -646,7 +646,7 @@
 
 이 표는 각 사용자 기능 요구사항을 유스케이스, 구현까지 추적합니다.
 
-> **참고**: Admin 기능 요구사항 추적은 [Admin 요구사항 분석 문서](requirements-admin.md#요구사항-추적-매트릭스)를 참조하세요.
+> **참고**: Admin 기능 요구사항 추적은 [Admin 요구사항 분석 문서](../admin/requirements.md#요구사항-추적-매트릭스)를 참조하세요.
 
 | 요구사항 ID | 카테고리 | 설명 | 우선순위 | 유스케이스 | 구현 | 테스트 |
 |-----------|---------|------|---------|-----------|------|--------|
@@ -680,7 +680,7 @@
 ## 관련 문서
 
 - **다음**: [유스케이스 →](user-stories.md)
-- **Admin 요구사항**: [Admin 요구사항 분석 →](requirements-admin.md)
+- **Admin 요구사항**: [Admin 요구사항 분석 →](../admin/requirements.md)
 - **ERD**: [ERD 다이어그램](erd.md)
 - **API 참조**: [API 명세서](api-spec.md)
 - **구현 흐름**: [시퀀스 다이어그램](sequence-diagrams.md)
