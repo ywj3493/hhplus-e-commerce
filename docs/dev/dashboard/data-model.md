@@ -57,9 +57,8 @@
 | 엔티티 | 설명 | 관계 |
 |--------|------|------|
 | `Category` | 카테고리 (단일 계층) | Product |
-| `Product` | 상품 정보 | Category, ProductOptionGroup, Stock |
-| `ProductOptionGroup` | 옵션 그룹 (색상, 사이즈 등) | Product, ProductOption |
-| `ProductOption` | 개별 옵션 | ProductOptionGroup, Stock |
+| `Product` | 상품 정보 | Category, ProductOption, Stock |
+| `ProductOption` | 개별 옵션 | Product, Stock |
 | `Stock` | 재고 정보 (상품별/옵션별) | Product, ProductOption |
 
 ### 3. 장바구니
@@ -72,8 +71,7 @@
 | 엔티티 | 설명 | 관계 |
 |--------|------|------|
 | `Order` | 주문 정보 | User, OrderItem, Payment, UserCoupon |
-| `OrderItem` | 주문 항목 | Order, Product, ProductOption |
-| `StockReservation` | 재고 확보 (10분 타임아웃) | Order, Stock |
+| `OrderItem` | 주문 항목 (재고 예약 포함) | Order, Product, ProductOption, Stock |
 | `Payment` | 결제 정보 | Order |
 
 ### 5. 쿠폰
@@ -87,7 +85,7 @@
 |--------|------|------|
 | `DataTransmission` | Outbox 패턴 (외부 전송) | Order |
 
-**총 엔티티 수**: 15개
+**총 엔티티 수**: 13개
 
 ---
 
@@ -112,11 +110,9 @@ erDiagram
 
     Order ||--o{ OrderItem : "contains"
     Order ||--o| Payment : "has"
-    Order ||--o{ StockReservation : "reserves"
     Order }o--o| UserCoupon : "uses"
     OrderItem }o--|| Product : "references"
-
-    StockReservation }o--|| Stock : "reserves"
+    OrderItem }o--|| Stock : "reserves"
 
     Coupon ||--o{ UserCoupon : "issued to"
 
@@ -165,17 +161,10 @@ erDiagram
         timestamp updatedAt
     }
 
-    ProductOptionGroup {
-        string id PK
-        string productId FK
-        string name
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
     ProductOption {
         string id PK
-        string groupId FK
+        string productId FK
+        string type
         string name
         decimal additionalPrice
         timestamp createdAt
@@ -186,20 +175,23 @@ erDiagram
         string id PK
         string productId FK
         string optionId FK
-        int quantity
+        int totalQuantity
+        int availableQuantity
+        int reservedQuantity
+        int soldQuantity
         timestamp updatedAt
     }
 
     Category ||--o{ Product : "contains (1:N)"
-    Product ||--o{ ProductOptionGroup : "has (1:N)"
+    Product ||--o{ ProductOption : "has (1:N)"
     Product ||--o{ Stock : "has (1:N)"
-    ProductOptionGroup ||--o{ ProductOption : "contains (1:N)"
     ProductOption ||--o{ Stock : "has (1:N)"
 ```
 
 **주요 제약조건**:
 
-- `Stock.quantity >= 0` (CHECK)
+- `Stock.totalQuantity = availableQuantity + reservedQuantity + soldQuantity` (CHECK)
+- `Stock.availableQuantity >= 0, reservedQuantity >= 0, soldQuantity >= 0` (CHECK)
 - `Stock (productId, optionId)` UNIQUE
 - `Category.name` UNIQUE
 - 동시성 제어: `SELECT FOR UPDATE` on Stock
@@ -284,6 +276,8 @@ erDiagram
         int quantity
         decimal unitPrice
         decimal subtotal
+        timestamp reservedAt
+        timestamp reservationExpiresAt
         timestamp createdAt
     }
 
@@ -294,15 +288,6 @@ erDiagram
         decimal amount
         timestamp paidAt
         timestamp createdAt
-    }
-
-    StockReservation {
-        string id PK
-        string orderId FK
-        string stockId FK
-        int quantity
-        timestamp reservedAt
-        timestamp expiresAt
     }
 
     Stock {
@@ -324,20 +309,19 @@ erDiagram
     User ||--o{ Order : "places (1:N)"
     Order ||--o{ OrderItem : "contains (1:N)"
     Order ||--o| Payment : "has (1:1)"
-    Order ||--o{ StockReservation : "reserves (1:N)"
     Order }o--o| UserCoupon : "uses (N:1, optional)"
     OrderItem }o--|| Product : "references (N:1)"
     OrderItem }o--o| ProductOption : "references (N:1, optional)"
-    StockReservation }o--|| Stock : "reserves (N:1)"
+    OrderItem }o--|| Stock : "reserves (N:1)"
 ```
 
 **주요 제약조건**:
 
 - `Order.status` ENUM (PENDING, COMPLETED, FAILED, CANCELLED, EXPIRED)
 - `Payment.orderId` UNIQUE (주문당 1개 결제)
-- `StockReservation (orderId, stockId)` UNIQUE (주문-재고 조합 중복 방지)
-- `StockReservation.expiresAt = reservedAt + 10분` (자동 만료)
+- `OrderItem.reservationExpiresAt = reservedAt + 10분` (자동 만료)
 - **스냅샷 패턴**: OrderItem에 상품 정보 저장
+- **재고 예약**: OrderItem에 reservedAt, reservationExpiresAt 필드로 추적
 
 ### 5. 쿠폰 도메인 (Coupon Domain)
 
@@ -510,7 +494,7 @@ INDEX idx_product_category_created (categoryId, createdAt DESC)  -- 카테고리
 #### 관계
 
 - **N:1** → Category (여러 상품은 하나의 카테고리에 속함)
-- **1:N** → ProductOptionGroup (한 상품은 여러 옵션 그룹을 가질 수 있음)
+- **1:N** → ProductOption (한 상품은 여러 옵션을 가질 수 있음)
 - **1:N** → Stock (한 상품은 여러 재고 항목을 가질 수 있음)
 
 #### 비즈니스 로직
@@ -521,47 +505,19 @@ INDEX idx_product_category_created (categoryId, createdAt DESC)  -- 카테고리
   -- 옵션이 없는 상품 (hasOptions = false)
   SELECT EXISTS(
     SELECT 1 FROM Stock
-    WHERE productId = :productId AND optionId IS NULL AND quantity > 0
+    WHERE productId = :productId AND optionId IS NULL AND availableQuantity > 0
   ) AS hasStock;
 
   -- 옵션이 있는 상품 (hasOptions = true)
   SELECT EXISTS(
     SELECT 1 FROM Stock
-    WHERE productId = :productId AND quantity > 0
+    WHERE productId = :productId AND availableQuantity > 0
   ) AS hasStock;
   ```
 
 ---
 
-### 4. ProductOptionGroup (상품 옵션 그룹)
-
-상품의 옵션 그룹(색상, 사이즈 등)을 저장하는 엔티티입니다.
-
-#### 컬럼
-
-| 컬럼명 | 데이터 타입 | 제약조건 | 설명 |
-|--------|------------|---------|------|
-| `id` | VARCHAR(36) | PRIMARY KEY | 옵션 그룹 ID (UUID) |
-| `productId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 상품 ID |
-| `name` | VARCHAR(50) | NOT NULL | 옵션 그룹명 (예: "색상", "사이즈") |
-| `createdAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 생성일시 |
-| `updatedAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 수정일시 |
-
-#### 인덱스
-
-```sql
-PRIMARY KEY (id)
-INDEX idx_option_group_product (productId)
-```
-
-#### 관계
-
-- **N:1** → Product (여러 옵션 그룹은 하나의 상품에 속함)
-- **1:N** → ProductOption (한 옵션 그룹은 여러 옵션을 포함)
-
----
-
-### 5. ProductOption (상품 옵션)
+### 4. ProductOption (상품 옵션)
 
 개별 옵션 정보를 저장하는 엔티티입니다.
 
@@ -570,7 +526,8 @@ INDEX idx_option_group_product (productId)
 | 컬럼명 | 데이터 타입 | 제약조건 | 설명 |
 |--------|------------|---------|------|
 | `id` | VARCHAR(36) | PRIMARY KEY | 옵션 ID (UUID) |
-| `groupId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 옵션 그룹 ID |
+| `productId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 상품 ID |
+| `type` | VARCHAR(50) | NOT NULL | 옵션 타입 (예: "색상", "사이즈") |
 | `name` | VARCHAR(50) | NOT NULL | 옵션명 (예: "빨강", "S") |
 | `additionalPrice` | DECIMAL(10, 2) | NOT NULL, CHECK (additionalPrice >= 0) | 추가 가격 |
 | `createdAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 생성일시 |
@@ -580,19 +537,26 @@ INDEX idx_option_group_product (productId)
 
 ```sql
 PRIMARY KEY (id)
-INDEX idx_option_group (groupId)
+INDEX idx_option_product (productId)
+INDEX idx_option_product_type (productId, type)  -- 타입별 옵션 조회 최적화
 ```
 
 #### 관계
 
-- **N:1** → ProductOptionGroup (여러 옵션은 하나의 옵션 그룹에 속함)
+- **N:1** → Product (여러 옵션은 하나의 상품에 속함)
 - **1:N** → Stock (한 옵션은 여러 재고 항목을 가질 수 있음)
+
+#### 비즈니스 로직
+
+- `type` 필드로 옵션 그룹을 구분 (예: "색상", "사이즈")
+- 동일 상품의 옵션들은 `type` 필드로 그룹화하여 표시
+- 옵션 조회 시 `type`별로 정렬하여 반환
 
 ---
 
-### 6. Stock (재고)
+### 5. Stock (재고)
 
-상품 및 옵션별 재고 수량을 저장하는 엔티티입니다.
+상품 및 옵션별 재고 수량을 저장하는 엔티티입니다. 가용/예약/판매 재고를 분리하여 관리합니다.
 
 #### 컬럼
 
@@ -601,7 +565,10 @@ INDEX idx_option_group (groupId)
 | `id` | VARCHAR(36) | PRIMARY KEY | 재고 ID (UUID) |
 | `productId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 상품 ID |
 | `optionId` | VARCHAR(36) | NULL, FOREIGN KEY | 옵션 ID (NULL 가능) |
-| `quantity` | INT | NOT NULL, CHECK (quantity >= 0) | 재고 수량 |
+| `totalQuantity` | INT | NOT NULL, CHECK (totalQuantity >= 0) | 전체 재고 수량 |
+| `availableQuantity` | INT | NOT NULL, CHECK (availableQuantity >= 0) | 가용 재고 (판매 가능) |
+| `reservedQuantity` | INT | NOT NULL, DEFAULT 0, CHECK (reservedQuantity >= 0) | 예약된 재고 (주문 생성, 미결제) |
+| `soldQuantity` | INT | NOT NULL, DEFAULT 0, CHECK (soldQuantity >= 0) | 판매된 재고 (결제 완료) |
 | `updatedAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 수정일시 |
 
 #### 인덱스
@@ -612,6 +579,23 @@ PRIMARY KEY (id)
 UNIQUE INDEX idx_stock_product_option (productId, COALESCE(optionId, ''))
 -- MySQL의 경우: UNIQUE INDEX idx_stock_product_option (productId, IFNULL(optionId, ''))
 INDEX idx_stock_product (productId)
+```
+
+#### CHECK 제약조건
+
+```sql
+-- 수량 정합성 검증
+ALTER TABLE Stock ADD CONSTRAINT chk_stock_quantities CHECK (
+  totalQuantity = availableQuantity + reservedQuantity + soldQuantity
+);
+
+-- 개별 수량 음수 방지
+ALTER TABLE Stock ADD CONSTRAINT chk_stock_non_negative CHECK (
+  totalQuantity >= 0 AND
+  availableQuantity >= 0 AND
+  reservedQuantity >= 0 AND
+  soldQuantity >= 0
+);
 ```
 
 #### NULL 처리
@@ -630,48 +614,69 @@ INDEX idx_stock_product (productId)
 #### 동시성 제어
 
 ```sql
--- 재고 확보 시 비관적 락 사용
+-- 재고 확보 시 비관적 락 사용 (주문 생성)
 BEGIN;
 SELECT * FROM Stock WHERE id = :stockId FOR UPDATE;
-UPDATE Stock SET quantity = quantity - :quantity WHERE id = :stockId AND quantity >= :quantity;
+
+-- 가용 재고 확인 및 예약
+UPDATE Stock
+SET availableQuantity = availableQuantity - :quantity,
+    reservedQuantity = reservedQuantity + :quantity
+WHERE id = :stockId AND availableQuantity >= :quantity;
+
+IF affected_rows = 0 THEN
+  ROLLBACK;
+  THROW 'OUT_OF_STOCK';
+END IF;
+
 COMMIT;
 ```
 
 #### 비즈니스 로직
 
+**재고 구분**:
+- `totalQuantity`: 전체 재고 (입고 시 증가)
+- `availableQuantity`: 판매 가능한 재고 (주문 시 감소, 취소/만료 시 증가)
+- `reservedQuantity`: 주문 생성되었으나 미결제된 재고 (주문 시 증가, 결제/취소 시 감소)
+- `soldQuantity`: 결제 완료된 재고 (결제 시 증가)
+
+**재고 흐름**:
+1. **주문 생성 시**:
+   - `availableQuantity -= orderQuantity`
+   - `reservedQuantity += orderQuantity`
+
+2. **결제 완료 시**:
+   - `reservedQuantity -= orderQuantity`
+   - `soldQuantity += orderQuantity`
+
+3. **결제 실패/취소 시**:
+   - `reservedQuantity -= orderQuantity`
+   - `availableQuantity += orderQuantity`
+
+4. **재고 확보 만료 시 (10분 경과)**:
+   - `reservedQuantity -= orderQuantity`
+   - `availableQuantity += orderQuantity`
+
+**UNIQUE 제약**: (productId, optionId) 조합은 유일해야 함
+
+**옵션 처리**:
 - `optionId = NULL`: 옵션이 없는 상품의 재고
 - `optionId != NULL`: 특정 옵션의 재고
-- **UNIQUE 제약**: (productId, optionId) 조합은 유일해야 함
 
-#### TODO: 트리거 구현 필요
+#### 애플리케이션 레벨 검증
 
-**Stock 음수 방지 트리거**:
-동시성 제어 실패 시에도 재고가 음수가 되지 않도록 DB 레벨 트리거 구현이 필요합니다.
+재고 음수 방지 및 수량 정합성은 다음 방법으로 보장합니다:
 
-```sql
--- PostgreSQL 예시
-CREATE TRIGGER trg_stock_quantity_check
-BEFORE UPDATE ON Stock
-FOR EACH ROW
-EXECUTE FUNCTION check_stock_quantity();
+1. **CHECK 제약조건**: DB 레벨에서 음수 및 정합성 검증
+2. **애플리케이션 유효성 검증**: 비즈니스 로직에서 재고 변경 전 검증
+3. **비관적 락**: SELECT FOR UPDATE로 동시성 제어
+4. **트랜잭션**: ACID 속성으로 데이터 일관성 보장
 
-CREATE FUNCTION check_stock_quantity()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.quantity < 0 THEN
-    RAISE EXCEPTION 'Stock quantity cannot be negative: productId=%, quantity=%',
-                    NEW.productId, NEW.quantity;
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-```
-
-이 트리거는 애플리케이션 레벨 검증 외에 추가 안전장치로 동작합니다.
+**상태 전이는 애플리케이션에서 FSM 패턴 등을 활용하여 관리합니다.**
 
 ---
 
-### 7. Cart (장바구니)
+### 6. Cart (장바구니)
 
 사용자별 장바구니를 저장하는 엔티티입니다.
 
@@ -698,7 +703,7 @@ UNIQUE INDEX idx_cart_user (userId)  -- 사용자당 1개 장바구니
 
 ---
 
-### 8. CartItem (장바구니 항목)
+### 7. CartItem (장바구니 항목)
 
 장바구니에 담긴 상품 항목을 저장하는 엔티티입니다.
 
@@ -742,7 +747,7 @@ UNIQUE INDEX idx_cart_item_product_option (cartId, productId, COALESCE(optionId,
 
 ---
 
-### 9. Order (주문)
+### 8. Order (주문)
 
 주문 정보를 저장하는 엔티티입니다.
 
@@ -796,7 +801,6 @@ INDEX idx_order_status_paid_at (status, paidAt)   -- 인기 상품 통계
 - **N:1** → User (여러 주문은 하나의 사용자에 속함)
 - **1:N** → OrderItem (한 주문은 여러 항목을 포함)
 - **1:1** → Payment (한 주문은 하나의 결제 정보를 가짐)
-- **1:N** → StockReservation (한 주문은 여러 재고 확보를 가질 수 있음)
 - **N:1** → UserCoupon (여러 주문은 하나의 쿠폰을 사용할 수 있음)
 
 #### 상태 전이
@@ -809,45 +813,36 @@ PENDING → CANCELLED  (사용자 취소)
 COMPLETED → CANCELLED (주문 취소)
 ```
 
-#### TODO: 상태 전이 검증 트리거
+#### 상태 전이 검증
 
-잘못된 상태 전이(예: `COMPLETED → PENDING`)를 방지하기 위한 DB 레벨 트리거 구현이 필요합니다.
+잘못된 상태 전이(예: `COMPLETED → PENDING`)는 **애플리케이션 레벨에서 FSM(Finite State Machine) 패턴**을 사용하여 방지합니다.
 
-```sql
--- PostgreSQL 예시
-CREATE TRIGGER trg_order_status_transition
-BEFORE UPDATE ON "Order"
-FOR EACH ROW
-EXECUTE FUNCTION validate_order_status_transition();
+**구현 예시**:
+```typescript
+// 허용되는 상태 전이 정의
+const ALLOWED_TRANSITIONS = {
+  PENDING: ['COMPLETED', 'FAILED', 'EXPIRED', 'CANCELLED'],
+  FAILED: [],  // 재결제는 PENDING 유지
+  COMPLETED: ['CANCELLED'],
+  CANCELLED: [],
+  EXPIRED: []
+};
 
-CREATE FUNCTION validate_order_status_transition()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- COMPLETED에서 PENDING으로 변경 불가
-  IF OLD.status = 'COMPLETED' AND NEW.status = 'PENDING' THEN
-    RAISE EXCEPTION 'Invalid status transition: COMPLETED -> PENDING';
-  END IF;
-
-  -- EXPIRED에서 다른 상태로 변경 불가
-  IF OLD.status = 'EXPIRED' AND NEW.status != 'EXPIRED' THEN
-    RAISE EXCEPTION 'Cannot change status from EXPIRED';
-  END IF;
-
-  -- FAILED에서 COMPLETED로 직접 변경 불가
-  IF OLD.status = 'FAILED' AND NEW.status = 'COMPLETED' THEN
-    RAISE EXCEPTION 'Invalid status transition: FAILED -> COMPLETED (must retry payment)';
-  END IF;
-
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+function validateStatusTransition(currentStatus, newStatus) {
+  const allowed = ALLOWED_TRANSITIONS[currentStatus] || [];
+  if (!allowed.includes(newStatus)) {
+    throw new Error(`Invalid status transition: ${currentStatus} -> ${newStatus}`);
+  }
+}
 ```
+
+이를 통해 비즈니스 로직을 애플리케이션에서 관리하고, 디버깅과 유지보수가 용이합니다.
 
 ---
 
-### 10. OrderItem (주문 항목)
+### 9. OrderItem (주문 항목)
 
-주문에 포함된 상품 항목을 저장하는 엔티티입니다. **스냅샷 패턴**을 사용하여 주문 시점의 상품 정보를 저장합니다.
+주문에 포함된 상품 항목을 저장하는 엔티티입니다. **스냅샷 패턴**을 사용하여 주문 시점의 상품 정보를 저장하며, **재고 예약 정보**도 함께 관리합니다.
 
 #### 컬럼
 
@@ -857,6 +852,7 @@ $$ LANGUAGE plpgsql;
 | `orderId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 주문 ID |
 | `productId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 상품 ID (참조용) |
 | `optionId` | VARCHAR(36) | NULL, FOREIGN KEY | 옵션 ID (참조용) |
+| `stockId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 재고 ID (재고 예약용) |
 | `productName` | VARCHAR(200) | NOT NULL | 상품명 (스냅샷) |
 | `optionName` | VARCHAR(50) | NULL | 옵션명 (스냅샷) |
 | `quantity` | INT | NOT NULL, CHECK (quantity >= 1) | 수량 |
@@ -864,6 +860,8 @@ $$ LANGUAGE plpgsql;
 | `optionAdditionalPrice` | DECIMAL(10, 2) | NOT NULL, DEFAULT 0, CHECK (optionAdditionalPrice >= 0) | 옵션 추가 가격 (스냅샷) |
 | `unitPrice` | DECIMAL(10, 2) | NOT NULL, CHECK (unitPrice >= 0) | 단가 (productPrice + optionAdditionalPrice) |
 | `subtotal` | DECIMAL(10, 2) | NOT NULL, CHECK (subtotal >= 0) | 소계 (unitPrice × quantity) |
+| `reservedAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 재고 예약 시간 |
+| `reservationExpiresAt` | TIMESTAMP | NOT NULL | 예약 만료 시간 (reservedAt + 10분) |
 | `createdAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 생성일시 |
 
 #### 인덱스
@@ -872,6 +870,8 @@ $$ LANGUAGE plpgsql;
 PRIMARY KEY (id)
 INDEX idx_order_item_order (orderId)
 INDEX idx_order_item_product (productId)  -- 인기 상품 통계
+INDEX idx_order_item_reservation_expires (reservationExpiresAt)  -- 만료 배치 작업
+INDEX idx_order_item_stock (stockId)  -- 재고 관리
 ```
 
 #### 관계
@@ -879,107 +879,35 @@ INDEX idx_order_item_product (productId)  -- 인기 상품 통계
 - **N:1** → Order (여러 항목은 하나의 주문에 속함)
 - **N:1** → Product (여러 항목은 하나의 상품을 참조)
 - **N:1** → ProductOption (여러 항목은 하나의 옵션을 참조)
+- **N:1** → Stock (여러 항목은 하나의 재고를 예약)
 
 #### 비즈니스 로직
 
-- **스냅샷 패턴**: `productName`, `optionName`, `productPrice`, `optionAdditionalPrice` 필드는 주문 시점의 값을 저장
+**스냅샷 패턴**:
+- `productName`, `optionName`, `productPrice`, `optionAdditionalPrice` 필드는 주문 시점의 값을 저장
 - `unitPrice`는 `productPrice + optionAdditionalPrice`로 계산됨
 - 상품 정보가 변경되어도 주문 내역은 영향받지 않음
 - 가격 분석 시 상품 가격과 옵션 가격을 개별적으로 추적 가능
 
----
+**재고 예약 추적**:
+- `stockId`: 예약한 재고 ID 저장
+- `reservedAt`: 재고 예약 시간 기록
+- `reservationExpiresAt`: `reservedAt + 10분`으로 자동 계산
+- 배치 작업이 `reservationExpiresAt`를 기준으로 만료된 예약을 찾아 재고 복원
 
-### 11. StockReservation (재고 확보)
-
-주문 생성 시 10분간 재고를 확보하는 엔티티입니다.
-
-#### 컬럼
-
-| 컬럼명 | 데이터 타입 | 제약조건 | 설명 |
-|--------|------------|---------|------|
-| `id` | VARCHAR(36) | PRIMARY KEY | 재고 확보 ID (UUID) |
-| `orderId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 주문 ID |
-| `stockId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 재고 ID |
-| `quantity` | INT | NOT NULL, CHECK (quantity >= 1) | 확보 수량 |
-| `reservedAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 확보일시 |
-| `expiresAt` | TIMESTAMP | NOT NULL | 만료일시 (reservedAt + 10분) |
-
-#### 인덱스
-
+**재고 예약 만료 처리**:
 ```sql
-PRIMARY KEY (id)
-INDEX idx_reservation_order (orderId)
-UNIQUE INDEX idx_reservation_order_stock (orderId, stockId)  -- 주문-재고 조합 중복 방지
-INDEX idx_reservation_expires_at (expiresAt)  -- 만료 배치 작업
+-- 만료된 주문 항목 조회 (배치 작업)
+SELECT oi.*, o.id as orderId
+FROM OrderItem oi
+JOIN Order o ON oi.orderId = o.id
+WHERE o.status = 'PENDING'
+  AND oi.reservationExpiresAt < NOW();
 ```
-
-#### 관계
-
-- **N:1** → Order (여러 확보는 하나의 주문에 속함)
-- **N:1** → Stock (여러 확보는 하나의 재고를 참조)
-
-#### 비즈니스 로직
-
-- `expiresAt = reservedAt + INTERVAL '10 minutes'`
-- 배치 작업(1분마다): `expiresAt < NOW()`인 확보를 자동 삭제 및 재고 복원
-
-#### 동시성 제어: 배치 작업 vs 결제 경쟁 조건 해결
-
-**문제**: 배치 작업이 재고 복원 중 사용자가 결제 요청 시 충돌 발생 가능
-
-**해결 방안**:
-
-```sql
--- 결제 프로세스에서 StockReservation 락 획득 및 만료 시간 재확인
-BEGIN;
-
--- 1. StockReservation에 배타적 락 획득
-SELECT * FROM StockReservation
-WHERE orderId = :orderId
-FOR UPDATE;
-
--- 2. 만료 시간 재확인 (배치 작업이 삭제하기 전)
-IF expiresAt < NOW() THEN
-  ROLLBACK;
-  THROW 'RESERVATION_EXPIRED';
-END IF;
-
--- 3. 결제 처리 (Payment INSERT, Order status UPDATE)
-INSERT INTO Payment (...) VALUES (...);
-UPDATE "Order" SET status = 'COMPLETED', paidAt = NOW() WHERE id = :orderId;
-
--- 4. 재고 차감 (Stock FOR UPDATE)
-UPDATE Stock SET quantity = quantity - :quantity
-WHERE id = :stockId;
-
--- 5. StockReservation 삭제
-DELETE FROM StockReservation WHERE orderId = :orderId;
-
-COMMIT;
-```
-
-**배치 작업**:
-```sql
--- 배치 작업도 동일하게 FOR UPDATE 사용
-BEGIN;
-
-SELECT * FROM StockReservation
-WHERE expiresAt < NOW()
-FOR UPDATE SKIP LOCKED;  -- 이미 락된 행은 건너뜀
-
--- 재고 복원 및 삭제
-UPDATE Stock SET quantity = quantity + reservation.quantity ...;
-DELETE FROM StockReservation WHERE id IN (...);
-UPDATE "Order" SET status = 'EXPIRED' WHERE id IN (...);
-
-COMMIT;
-```
-
-**핵심**: `SKIP LOCKED`를 사용하여 결제 중인 Reservation은 건너뛰고, 결제는 만료 시간을 재확인합니다.
 
 ---
 
-### 12. Payment (결제)
+### 10. Payment (결제)
 
 결제 정보를 저장하는 엔티티입니다.
 
@@ -1017,7 +945,7 @@ UNIQUE INDEX idx_payment_order (orderId)  -- 주문당 1개 결제
 
 ---
 
-### 13. Coupon (쿠폰 마스터)
+### 11. Coupon (쿠폰 마스터)
 
 쿠폰 마스터 정보를 저장하는 엔티티입니다.
 
@@ -1075,7 +1003,7 @@ COMMIT;
 
 ---
 
-### 14. UserCoupon (사용자 쿠폰)
+### 12. UserCoupon (사용자 쿠폰)
 
 사용자별로 발급된 쿠폰을 저장하는 엔티티입니다.
 
@@ -1131,7 +1059,7 @@ AVAILABLE → EXPIRED (만료일 경과)
 
 ---
 
-### 15. DataTransmission (데이터 전송 - Outbox)
+### 13. DataTransmission (데이터 전송 - Outbox)
 
 외부 데이터 플랫폼으로 전송할 주문 데이터를 저장하는 엔티티입니다. **Outbox Pattern**을 사용합니다.
 
@@ -1208,16 +1136,14 @@ erDiagram
 ```mermaid
 erDiagram
     Category ||--o{ Product : "contains (1:N)"
-    Product ||--o{ ProductOptionGroup : "has (1:N)"
+    Product ||--o{ ProductOption : "has (1:N)"
     Product ||--o{ Stock : "has (1:N)"
-    ProductOptionGroup ||--o{ ProductOption : "contains (1:N)"
     ProductOption ||--o{ Stock : "has (1:N)"
 ```
 
 - **Category → Product (1:N)**: 카테고리는 여러 상품 포함
-- **Product → ProductOptionGroup (1:N)**: 상품은 여러 옵션 그룹 보유
+- **Product → ProductOption (1:N)**: 상품은 여러 옵션 보유
 - **Product → Stock (1:N)**: 상품은 여러 재고 항목 보유 (옵션별)
-- **ProductOptionGroup → ProductOption (1:N)**: 옵션 그룹은 여러 옵션 포함
 - **ProductOption → Stock (1:N)**: 옵션별 재고 관리
 
 ### 3. Cart 관련 관계
@@ -1239,20 +1165,18 @@ erDiagram
 erDiagram
     Order ||--o{ OrderItem : "contains (1:N)"
     Order ||--o| Payment : "has (1:1)"
-    Order ||--o{ StockReservation : "reserves (1:N)"
     Order }o--o| UserCoupon : "uses (N:1, optional)"
     OrderItem }o--|| Product : "references (N:1)"
     OrderItem }o--o| ProductOption : "references (N:1, optional)"
-    StockReservation }o--|| Stock : "reserves (N:1)"
+    OrderItem }o--|| Stock : "reserves (N:1)"
 ```
 
 - **Order → OrderItem (1:N)**: 주문은 여러 항목 포함
 - **Order → Payment (1:1)**: 주문당 하나의 결제
-- **Order → StockReservation (1:N)**: 주문은 여러 재고 확보
 - **Order → UserCoupon (N:1, optional)**: 주문은 쿠폰 사용 가능
 - **OrderItem → Product (N:1)**: 주문 항목은 하나의 상품 참조
 - **OrderItem → ProductOption (N:1, optional)**: 주문 항목은 옵션 참조 (선택)
-- **StockReservation → Stock (N:1)**: 재고 확보는 하나의 재고 참조
+- **OrderItem → Stock (N:1)**: 주문 항목은 하나의 재고를 예약
 
 ### 5. Coupon 관련 관계
 
@@ -1350,11 +1274,13 @@ UNIQUE INDEX idx_user_coupon_user_coupon (userId, couponId)
 
 #### 재고 확보 만료
 ```sql
-INDEX idx_reservation_expires_at (expiresAt)
+INDEX idx_order_item_reservation_expires (reservationExpiresAt)
 
--- 배치 쿼리
-SELECT * FROM StockReservation
-WHERE expiresAt < NOW();
+-- 배치 쿼리: 만료된 주문 항목 조회
+SELECT oi.*, o.id as orderId, o.status
+FROM OrderItem oi
+JOIN "Order" o ON oi.orderId = o.id
+WHERE o.status = 'PENDING' AND oi.reservationExpiresAt < NOW();
 ```
 
 #### 쿠폰 만료
@@ -1383,7 +1309,7 @@ ORDER BY createdAt ASC;
 
 ### 1. 비관적 락 (Pessimistic Lock)
 
-#### 재고 차감/확보
+#### 재고 예약 (주문 생성)
 
 ```sql
 -- 트랜잭션 시작
@@ -1394,20 +1320,31 @@ SELECT * FROM Stock
 WHERE id = :stockId
 FOR UPDATE;
 
--- 재고 확인 및 차감
+-- 가용 재고 확인 및 예약
 UPDATE Stock
-SET quantity = quantity - :quantity
-WHERE id = :stockId AND quantity >= :quantity;
+SET availableQuantity = availableQuantity - :quantity,
+    reservedQuantity = reservedQuantity + :quantity
+WHERE id = :stockId AND availableQuantity >= :quantity;
 
--- 결과 확인: affected rows = 0 → 재고 부족
+-- 결과 확인: affected rows = 0 → 가용 재고 부족
 IF affected_rows = 0 THEN
   ROLLBACK;
   THROW 'OUT_OF_STOCK';
 END IF;
 
--- 재고 확보 기록
-INSERT INTO StockReservation (orderId, stockId, quantity, reservedAt, expiresAt)
-VALUES (:orderId, :stockId, :quantity, NOW(), NOW() + INTERVAL '10 minutes');
+-- 주문 항목 생성 (재고 예약 정보 포함)
+INSERT INTO OrderItem (
+  orderId, stockId, productId, optionId,
+  productName, optionName, quantity,
+  productPrice, optionAdditionalPrice, unitPrice, subtotal,
+  reservedAt, reservationExpiresAt
+)
+VALUES (
+  :orderId, :stockId, :productId, :optionId,
+  :productName, :optionName, :quantity,
+  :productPrice, :optionAdditionalPrice, :unitPrice, :subtotal,
+  NOW(), NOW() + INTERVAL '10 minutes'
+);
 
 -- 트랜잭션 커밋
 COMMIT;
@@ -1415,7 +1352,8 @@ COMMIT;
 
 **효과**:
 - 다른 트랜잭션은 `SELECT FOR UPDATE`가 완료될 때까지 대기
-- 100명이 동시 요청 시 순차적으로 처리되어 정확한 재고 수량 보장
+- 100명이 동시 요청 시 순차적으로 처리되어 정확한 가용 재고 수량 보장
+- StockReservation 테이블 불필요, OrderItem에서 예약 정보 관리
 
 #### 쿠폰 발급
 
@@ -1490,10 +1428,14 @@ COMMIT;
 -- Stock 테이블에 version 컬럼 추가 (선택적)
 ALTER TABLE Stock ADD COLUMN version INT NOT NULL DEFAULT 1;
 
--- 재고 차감 시 버전 확인
+-- 재고 예약 시 버전 확인
 UPDATE Stock
-SET quantity = quantity - :quantity, version = version + 1
-WHERE id = :stockId AND version = :expectedVersion AND quantity >= :quantity;
+SET availableQuantity = availableQuantity - :quantity,
+    reservedQuantity = reservedQuantity + :quantity,
+    version = version + 1
+WHERE id = :stockId
+  AND version = :expectedVersion
+  AND availableQuantity >= :quantity;
 
 IF affected_rows = 0 THEN
   THROW 'CONFLICT or OUT_OF_STOCK';
@@ -1652,27 +1594,43 @@ VALUES
 #### 배치 작업 최적화
 
 ```typescript
-// 재고 확보 만료 배치 (1분마다)
+// 재고 예약 만료 배치 (1분마다)
 async function expireStockReservations() {
-  const expired = await db.stockReservation.findMany({
-    where: { expiresAt: { lt: new Date() } },
-    include: { stock: true }
+  // 만료된 OrderItem 조회
+  const expiredItems = await db.orderItem.findMany({
+    where: {
+      order: { status: 'PENDING' },
+      reservationExpiresAt: { lt: new Date() }
+    },
+    include: { order: true }
   });
+
+  // OrderItem별로 재고 복원 수량 계산
+  const stockUpdates = expiredItems.reduce((acc, item) => {
+    if (!acc[item.stockId]) {
+      acc[item.stockId] = 0;
+    }
+    acc[item.stockId] += item.quantity;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const expiredOrderIds = [...new Set(expiredItems.map(item => item.orderId))];
 
   // 벌크 업데이트
   await db.$transaction([
-    // 재고 복원
-    db.stock.updateMany({
-      where: { id: { in: expired.map(r => r.stockId) } },
-      data: { quantity: { increment: /* 복원 수량 */ } }
-    }),
-    // 확보 삭제
-    db.stockReservation.deleteMany({
-      where: { expiresAt: { lt: new Date() } }
-    }),
+    // 재고 복원 (각 Stock별로)
+    ...Object.entries(stockUpdates).map(([stockId, quantity]) =>
+      db.stock.update({
+        where: { id: stockId },
+        data: {
+          availableQuantity: { increment: quantity },
+          reservedQuantity: { decrement: quantity }
+        }
+      })
+    ),
     // 주문 상태 변경
     db.order.updateMany({
-      where: { id: { in: expired.map(r => r.orderId) } },
+      where: { id: { in: expiredOrderIds } },
       data: { status: 'EXPIRED' }
     })
   ]);
@@ -1712,6 +1670,12 @@ const prisma = new PrismaClient({
 ---
 
 **버전 이력**:
+- 1.1.0 (2025-11-02): 피드백 반영 - 데이터 모델 간소화
+  - ProductOptionGroup 제거 → ProductOption에 `type` 필드 추가
+  - StockReservation 제거 → OrderItem에서 예약 관리
+  - Stock 재고 분리 (available/reserved/sold)
+  - DB 트리거 제거 → FSM 패턴 적용
+  - 엔티티 수: 15개 → 13개
 - 1.0.0 (2025-10-31): 초기 데이터 모델 문서 작성
   - 15개 엔티티 정의
   - Mermaid ERD 다이어그램 작성

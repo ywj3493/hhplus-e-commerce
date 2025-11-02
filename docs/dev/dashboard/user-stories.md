@@ -184,7 +184,7 @@ graph TB
     EPIC2 --> US15[US-CART-05<br/>총 금액 확인]
 
     EPIC3 --> US21[US-ORDER-01<br/>주문 생성]
-    EPIC3 --> US22[US-ORDER-02<br/>재고 확보 보장]
+    EPIC3 --> US22[US-ORDER-02<br/>재고 예약 보장]
     EPIC3 --> US23[US-ORDER-03<br/>쿠폰 적용]
     EPIC3 --> US24[US-ORDER-04<br/>주문 상태 확인]
     EPIC3 --> US25[US-PAY-01<br/>결제 처리]
@@ -333,10 +333,10 @@ mindmap
 #### 인수 조건 (Acceptance Criteria)
 
 **정상 케이스:**
-- [ ] **Given** 상품 ID를 입력할 때, **When** 옵션 조회 시, **Then** 옵션 그룹별 옵션 목록을 받는다
-- [ ] **Given** 각 옵션 정보에는, **Then** 옵션명, 옵션값, 추가 가격, 재고 상태가 포함된다
-- [ ] **Given** 옵션 예시로, **Then** "색상: 빨강(+0원, 재고있음), 파랑(+0원, 재고있음)" 형식으로 표시된다
-- [ ] **Given** 옵션이 품절일 때, **Then** 재고 상태가 "품절"로 표시된다
+- [ ] **Given** 상품 ID를 입력할 때, **When** 옵션 조회 시, **Then** type별로 그룹화된 옵션 목록을 받는다
+- [ ] **Given** 각 옵션 정보에는, **Then** type(옵션 타입), name(옵션명), 추가 가격, 재고 상태가 포함된다
+- [ ] **Given** 옵션 예시로, **Then** "색상(type): 빨강(name, +0원, 재고있음), 파랑(name, +0원, 재고있음)" 형식으로 표시된다
+- [ ] **Given** 옵션이 품절일 때, **Then** 재고 상태가 "품절"로 표시된다 (availableQuantity = 0)
 
 **에러 케이스:**
 - [ ] **Given** 존재하지 않는 상품 ID일 때, **When** 옵션 조회 시, **Then** "상품을 찾을 수 없습니다" (404 Not Found)
@@ -652,7 +652,7 @@ mindmap
   root((EPIC-3: 주문 및 결제))
     주문 생성
       US-ORDER-01: 주문 생성
-      US-ORDER-02: 재고 확보 보장
+      US-ORDER-02: 재고 예약 보장
       US-ORDER-03: 쿠폰 적용
       US-ORDER-04: 주문 상태 확인
     결제 처리
@@ -685,7 +685,7 @@ mindmap
 
 **정상 케이스:**
 - [ ] **Given** 장바구니에 상품이 담겨 있을 때, **When** 주문 생성 요청 시, **Then** 장바구니 전체 항목으로 주문이 생성되고 주문 ID를 받는다
-- [ ] **Given** 주문 생성 시, **Then** 재고가 확인되고 확보된다 (US-ORDER-02 참조)
+- [ ] **Given** 주문 생성 시, **Then** 재고가 확인되고 예약된다 (US-ORDER-02 참조)
 - [ ] **Given** 주문 생성 시, **Then** 주문 상태는 PENDING으로 설정된다
 - [ ] **Given** 주문 생성 후, **Then** 장바구니는 유지된다 (결제 완료 시 비워짐)
 - [ ] **Given** 응답 시간은, **Then** 평균 500ms 이내여야 한다
@@ -695,30 +695,30 @@ mindmap
 
 ---
 
-### US-ORDER-02: 재고 확보 보장
+### US-ORDER-02: 재고 예약 보장
 
 | 항목 | 내용 |
 |------|------|
 | **스토리 ID** | US-ORDER-02 |
-| **스토리 명** | 재고 확보 보장 |
+| **스토리 명** | 재고 예약 보장 |
 | **액터** | 고객 (Primary) |
 | **Epic** | EPIC-3: 주문 및 결제 |
-| **관련 요구사항** | [FR-ORDER-02](requirements.md#fr-order-02-재고-확인-및-확보) |
+| **관련 요구사항** | [FR-ORDER-02](requirements.md#fr-order-02-재고-확인-및-예약) |
 | **우선순위** | MUST |
 
 #### 스토리
 
 **As a** 고객
-**I want to** 주문 생성 시 내 주문 수량만큼 재고가 확보되기를 원한다
+**I want to** 주문 생성 시 내 주문 수량만큼 재고가 예약되기를 원한다
 **So that** 결제 전까지 다른 사람이 구매하지 못하도록 보장받을 수 있다
 
 #### 인수 조건 (Acceptance Criteria)
 
 - [ ] **Given** 주문 생성 시, **When** 재고 확인 시, **Then** 비관적 락(SELECT FOR UPDATE)으로 동시성을 제어한다
-- [ ] **Given** 재고가 충분할 때, **When** 확보 요청 시, **Then** 재고가 확보 상태로 표시되고 10분 타이머가 시작된다
-- [ ] **Given** 재고가 부족할 때, **When** 확보 요청 시, **Then** "상품명 - 옵션명이 품절입니다" 에러를 반환한다
-- [ ] **Given** 재고가 확보되면, **Then** 다른 사용자에게는 해당 재고가 품절로 표시된다
-- [ ] **Given** 재고 확보 후 10분이 경과하면, **Then** 시스템이 자동으로 재고를 복원한다 (1분마다 만료 확인)
+- [ ] **Given** 재고가 충분할 때 (availableQuantity >= 요청 수량), **When** 예약 요청 시, **Then** Stock이 업데이트되고 (available 감소, reserved 증가) OrderItem에 예약 시간이 기록된다 (reservedAt, reservationExpiresAt)
+- [ ] **Given** 재고가 부족할 때, **When** 예약 요청 시, **Then** "상품명 - 옵션명이 품절입니다" 에러를 반환한다
+- [ ] **Given** 재고가 예약되면, **Then** 다른 사용자에게는 해당 재고가 품절로 표시된다 (availableQuantity 감소)
+- [ ] **Given** 재고 예약 후 10분이 경과하면, **Then** 배치 작업이 자동으로 재고를 복원한다 (1분마다 만료 확인)
 
 ---
 
@@ -778,7 +778,7 @@ mindmap
 
 **정상 케이스:**
 - [ ] **Given** 주문 ID를 입력할 때, **When** 주문 조회 시, **Then** 주문 상태와 상세 정보를 받는다
-- [ ] **Given** 주문 상태는, **Then** PENDING(결제 대기), COMPLETED(결제 완료), FAILED(결제 실패), CANCELLED(주문 취소), EXPIRED(재고 확보 만료) 중 하나다
+- [ ] **Given** 주문 상태는, **Then** PENDING(결제 대기), COMPLETED(결제 완료), FAILED(결제 실패), CANCELLED(주문 취소), EXPIRED(재고 예약 만료) 중 하나다
 - [ ] **Given** 주문 상세 정보에는, **Then** 주문 상품 목록, 결제 정보, 쿠폰 사용 정보가 포함된다
 - [ ] **Given** 날짜 범위를 지정할 때, **When** 주문 목록 조회 시, **Then** 해당 기간의 주문 목록을 받는다
 - [ ] **Given** 응답 시간은, **Then** 평균 200ms 이내여야 한다
@@ -812,11 +812,11 @@ mindmap
 **정상 케이스:**
 - [ ] **Given** 주문 ID를 입력할 때, **When** 결제 요청 시, **Then** 결제가 처리되고 결제 완료 상태를 받는다
 - [ ] **Given** 주문 상태가 PENDING일 때, **When** 결제 요청 시, **Then** 결제가 진행된다
-- [ ] **Given** 재고 확보 후 10분 이내일 때, **When** 결제 요청 시, **Then** 결제가 허용된다
-- [ ] **Given** 결제 성공 시, **Then** 확보된 재고가 실제 차감되고 주문 상태가 COMPLETED로 변경된다
+- [ ] **Given** 재고 예약 후 10분 이내일 때 (OrderItem.reservationExpiresAt > NOW()), **When** 결제 요청 시, **Then** 결제가 허용된다
+- [ ] **Given** 결제 성공 시, **Then** Stock이 업데이트되고 (reserved 감소, sold 증가) 주문 상태가 COMPLETED로 변경된다
 - [ ] **Given** 결제 완료 시, **Then** 사용자의 장바구니가 자동으로 비워진다
 - [ ] **Given** 결제 완료 시, **Then** 주문 데이터가 외부 데이터 플랫폼으로 비동기 전송된다 (Outbox Pattern)
-- [ ] **Given** 결제 실패 시, **Then** 확보된 재고가 복원되고 주문 상태가 FAILED로 변경된다
+- [ ] **Given** 결제 실패 시, **Then** Stock이 업데이트되고 (reserved 감소, available 증가) 주문 상태가 FAILED로 변경된다
 - [ ] **Given** 결제 실패 시, **Then** 장바구니는 유지된다 (재주문 가능)
 - [ ] **Given** 응답 시간은, **Then** 평균 1초 이내여야 한다
 
@@ -824,7 +824,7 @@ mindmap
 - [ ] **Given** 주문 상태가 이미 COMPLETED일 때, **When** 결제 요청 시, **Then** "이미 결제 완료된 주문입니다" (400 Bad Request)
 - [ ] **Given** 주문 상태가 CANCELLED일 때, **When** 결제 요청 시, **Then** "취소된 주문은 결제할 수 없습니다" (400 Bad Request)
 - [ ] **Given** 주문 상태가 EXPIRED일 때, **When** 결제 요청 시, **Then** "주문이 만료되었습니다" (400 Bad Request)
-- [ ] **Given** 재고 확보가 만료되었을 때, **When** 결제 요청 시, **Then** "재고 확보가 만료되었습니다" (400 Bad Request)
+- [ ] **Given** 재고 예약이 만료되었을 때 (OrderItem.reservationExpiresAt < NOW()), **When** 결제 요청 시, **Then** "재고 예약이 만료되었습니다" (400 Bad Request)
 - [ ] **Given** 다른 사용자의 주문일 때, **When** 결제 요청 시, **Then** "권한이 없습니다" (403 Forbidden)
 
 #### 시스템 액터 참여
@@ -847,14 +847,14 @@ mindmap
 #### 스토리
 
 **As a** 고객
-**I want to** 결제에 실패하거나 취소했을 때 확보된 재고가 자동으로 복원되기를 원한다
+**I want to** 결제에 실패하거나 취소했을 때 예약된 재고가 자동으로 복원되기를 원한다
 **So that** 다른 고객이 해당 상품을 구매할 수 있다
 
 #### 인수 조건 (Acceptance Criteria)
 
-- [ ] **Given** 결제 실패 시, **When** 프로세스 완료 후, **Then** 확보된 재고가 즉시 복원된다
-- [ ] **Given** 사용자가 결제를 취소할 때, **When** 취소 요청 시, **Then** 확보된 재고가 복원되고 주문 상태가 CANCELLED로 변경된다
-- [ ] **Given** 재고 복원 후, **Then** 다른 사용자가 해당 재고를 구매할 수 있다
+- [ ] **Given** 결제 실패 시, **When** 프로세스 완료 후, **Then** Stock이 업데이트되고 (reserved 감소, available 증가) 즉시 복원된다
+- [ ] **Given** 사용자가 결제를 취소할 때, **When** 취소 요청 시, **Then** Stock이 복원되고 주문 상태가 CANCELLED로 변경된다
+- [ ] **Given** 재고 복원 후, **Then** 다른 사용자가 해당 재고를 구매할 수 있다 (availableQuantity 증가)
 - [ ] **Given** 재고 복원 응답 시간은, **Then** 평균 100ms 이내여야 한다
 
 ---
@@ -874,17 +874,17 @@ mindmap
 
 **As a** 고객
 **I want to** 결제 실패 후 10분 이내에 재결제를 시도하고 싶다
-**So that** 재고를 다시 확보하지 않고 바로 결제할 수 있다
+**So that** 재고를 다시 예약하지 않고 바로 결제할 수 있다
 
 #### 인수 조건 (Acceptance Criteria)
 
 **정상 케이스:**
-- [ ] **Given** 주문 상태가 FAILED일 때, **When** 재고 확보 후 10분 이내에 재결제 요청 시, **Then** 재결제가 허용된다
-- [ ] **Given** 주문 상태가 PENDING일 때, **When** 재고 확보 후 10분 이내에 재결제 요청 시, **Then** 재결제가 허용된다
+- [ ] **Given** 주문 상태가 FAILED일 때, **When** 재고 예약 후 10분 이내에 (OrderItem.reservationExpiresAt > NOW()) 재결제 요청 시, **Then** 재결제가 허용된다
+- [ ] **Given** 주문 상태가 PENDING일 때, **When** 재고 예약 후 10분 이내에 재결제 요청 시, **Then** 재결제가 허용된다
 
 **에러 케이스:**
 - [ ] **Given** 주문 상태가 이미 COMPLETED일 때, **When** 재결제 요청 시, **Then** "이미 결제 완료된 주문입니다" (400 Bad Request)
-- [ ] **Given** 재고 확보 후 10분이 경과했을 때, **When** 재결제 요청 시, **Then** "재고 확보가 만료되었습니다. 새로 주문을 생성해주세요" (400 Bad Request)
+- [ ] **Given** 재고 예약 후 10분이 경과했을 때 (OrderItem.reservationExpiresAt < NOW()), **When** 재결제 요청 시, **Then** "재고 예약이 만료되었습니다. 새로 주문을 생성해주세요" (400 Bad Request)
 
 ---
 
@@ -902,22 +902,22 @@ mindmap
 #### 스토리
 
 **As a** 시스템
-**I want to** 재고 확보 후 10분이 지난 주문을 자동으로 만료시키고 싶다
+**I want to** 재고 예약 후 10분이 지난 주문을 자동으로 만료시키고 싶다
 **So that** 재고가 무한정 점유되지 않고 다른 고객에게 기회가 돌아간다
 
 #### 인수 조건 (Acceptance Criteria)
 
-- [ ] **Given** 재고 확보 후 10분이 경과하면, **When** 배치 작업 실행 시, **Then** 주문 상태가 EXPIRED로 변경된다
-- [ ] **Given** 주문이 만료되면, **Then** 확보된 재고가 자동으로 복원된다
-- [ ] **Given** 배치 작업은, **Then** 1분마다 실행되어 만료된 주문을 확인한다
-- [ ] **Given** 만료 기준은, **Then** 재고 확보 시간으로부터 10분(600초) 경과 여부다
+- [ ] **Given** 재고 예약 후 10분이 경과하면 (OrderItem.reservationExpiresAt < NOW()), **When** 배치 작업 실행 시, **Then** 주문 상태가 EXPIRED로 변경된다
+- [ ] **Given** 주문이 만료되면, **Then** Stock이 업데이트되고 (reserved 감소, available 증가) 자동으로 복원된다
+- [ ] **Given** 배치 작업은, **Then** 1분마다 실행되어 만료된 OrderItem을 확인한다 (Order.status = 'PENDING' AND OrderItem.reservationExpiresAt < NOW())
+- [ ] **Given** 만료 기준은, **Then** OrderItem.reservationExpiresAt 시간 경과 여부다 (reservedAt + 10분)
 
 #### 비기능 요구사항
 
 | 항목 | 요구사항 | 목표 |
 |------|---------|------|
 | **배치 주기** | 만료 확인 주기 | 1분마다 (시스템 자동 실행) |
-| **만료 기준** | 재고 확보 유지 시간 | 10분 (600초) |
+| **만료 기준** | 재고 예약 유지 시간 | 10분 (600초) |
 
 ---
 
@@ -1197,7 +1197,7 @@ journey
     section 주문 및 결제
       주문 생성: 5: 고객
       쿠폰 적용: 5: 고객
-      재고 확보 확인: 5: 고객
+      재고 예약 확인: 5: 고객
       결제 처리: 5: 고객
       주문 상태 확인: 4: 고객
 ```
@@ -1219,7 +1219,7 @@ journey
 | **US-CART-04** | 장바구니 확인 | EPIC-2 | 고객 | FR-CART-04 | MUST | ⏳ 대기 |
 | **US-CART-05** | 총 금액 확인 | EPIC-2 | 고객 | FR-CART-05 | MUST | ⏳ 대기 |
 | **US-ORDER-01** | 주문 생성 | EPIC-3 | 고객 | FR-ORDER-01 | MUST | ⏳ 대기 |
-| **US-ORDER-02** | 재고 확보 보장 | EPIC-3 | 고객 | FR-ORDER-02 | MUST | ⏳ 대기 |
+| **US-ORDER-02** | 재고 예약 보장 | EPIC-3 | 고객 | FR-ORDER-02 | MUST | ⏳ 대기 |
 | **US-ORDER-03** | 쿠폰 적용 | EPIC-3 | 고객 | FR-ORDER-03 | MUST | ⏳ 대기 |
 | **US-ORDER-04** | 주문 상태 확인 | EPIC-3 | 고객 | FR-ORDER-04, 05 | MUST | ⏳ 대기 |
 | **US-PAY-01** | 결제 처리 | EPIC-3 | 고객, 외부 플랫폼 | FR-PAYMENT-01, 02 | MUST | ⏳ 대기 |
@@ -1252,4 +1252,11 @@ journey
 ---
 
 **버전 이력**:
+
+- 1.1.0 (2025-11-02): 피드백 반영 - 재고 및 옵션 관련 스토리 업데이트
+  - 재고 "확보" → "예약"으로 용어 변경
+  - 옵션 조회 스토리 업데이트 (type 필드 기반 그룹화)
+  - US-ORDER-02: 재고 예약 보장으로 제목 변경
+  - 재고 분리 정책 반영 (available/reserved/sold)
+  - OrderItem 기반 예약 관리 및 만료 조건 업데이트
 - 1.0.0 (2025-10-30): 초기 사용자 스토리 문서 작성
