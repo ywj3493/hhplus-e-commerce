@@ -8,8 +8,8 @@
 
 ## 문서 네비게이션
 
-**이전**: [← 요구사항 분석](../requirements.md)
-**다음**: [API 명세서 →](api-specifications.md)
+**이전**: [← 요구사항 분석](requirements.md)
+**다음**: [API 명세서 →](api-specification.md)
 
 ---
 

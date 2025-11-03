@@ -1,0 +1,134 @@
+{
+  "productList": [
+    {
+      "id": "prod-001",
+      "name": "무선 이어폰",
+      "price": 89000,
+      "categoryId": "cat-001",
+      "categoryName": "전자기기",
+      "hasStock": true,
+      "createdAt": "2025-10-25T10:00:00Z"
+    },
+    {
+      "id": "prod-002",
+      "name": "블루투스 스피커",
+      "price": 125000,
+      "categoryId": "cat-001",
+      "categoryName": "전자기기",
+      "hasStock": true,
+      "createdAt": "2025-10-24T14:30:00Z"
+    },
+    {
+      "id": "prod-003",
+      "name": "노트북 거치대",
+      "price": 35000,
+      "categoryId": "cat-002",
+      "categoryName": "액세서리",
+      "hasStock": true,
+      "createdAt": "2025-10-23T09:15:00Z"
+    },
+    {
+      "id": "prod-004",
+      "name": "무선 마우스",
+      "price": 45000,
+      "categoryId": "cat-001",
+      "categoryName": "전자기기",
+      "hasStock": false,
+      "createdAt": "2025-10-22T16:45:00Z"
+    },
+    {
+      "id": "prod-005",
+      "name": "USB-C 케이블",
+      "price": 15000,
+      "categoryId": "cat-002",
+      "categoryName": "액세서리",
+      "hasStock": true,
+      "createdAt": "2025-10-21T11:20:00Z"
+    }
+  ],
+  "productDetail": {
+    "id": "prod-001",
+    "name": "무선 이어폰",
+    "price": 89000,
+    "description": "고품질 노이즈 캔슬링 무선 이어폰",
+    "categoryId": "cat-001",
+    "categoryName": "전자기기",
+    "hasStock": true,
+    "hasOptions": true,
+    "createdAt": "2025-10-25T10:00:00Z",
+    "updatedAt": "2025-10-28T15:30:00Z"
+  },
+  "productOptions": [
+    {
+      "id": "opt-001",
+      "productId": "prod-001",
+      "type": "색상",
+      "name": "블랙",
+      "additionalPrice": 0,
+      "hasStock": true
+    },
+    {
+      "id": "opt-002",
+      "productId": "prod-001",
+      "type": "색상",
+      "name": "화이트",
+      "additionalPrice": 0,
+      "hasStock": true
+    },
+    {
+      "id": "opt-003",
+      "productId": "prod-001",
+      "type": "색상",
+      "name": "네이비",
+      "additionalPrice": 5000,
+      "hasStock": false
+    }
+  ],
+  "popularProducts": [
+    {
+      "id": "prod-001",
+      "name": "무선 이어폰",
+      "price": 89000,
+      "categoryId": "cat-001",
+      "categoryName": "전자기기",
+      "salesCount": 1250,
+      "rank": 1
+    },
+    {
+      "id": "prod-002",
+      "name": "블루투스 스피커",
+      "price": 125000,
+      "categoryId": "cat-001",
+      "categoryName": "전자기기",
+      "salesCount": 980,
+      "rank": 2
+    },
+    {
+      "id": "prod-005",
+      "name": "USB-C 케이블",
+      "price": 15000,
+      "categoryId": "cat-002",
+      "categoryName": "액세서리",
+      "salesCount": 875,
+      "rank": 3
+    },
+    {
+      "id": "prod-003",
+      "name": "노트북 거치대",
+      "price": 35000,
+      "categoryId": "cat-002",
+      "categoryName": "액세서리",
+      "salesCount": 720,
+      "rank": 4
+    },
+    {
+      "id": "prod-004",
+      "name": "무선 마우스",
+      "price": 45000,
+      "categoryId": "cat-001",
+      "categoryName": "전자기기",
+      "salesCount": 650,
+      "rank": 5
+    }
+  ]
+}

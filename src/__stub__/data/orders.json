@@ -1,0 +1,99 @@
+{
+  "createOrderSuccess": {
+    "id": "order-001",
+    "userId": "user-001",
+    "status": "PENDING",
+    "totalAmount": 213000,
+    "discountAmount": 0,
+    "finalAmount": 213000,
+    "items": [
+      {
+        "id": "order-item-001",
+        "productId": "prod-001",
+        "productName": "무선 이어폰",
+        "optionId": "opt-001",
+        "optionName": "블랙",
+        "quantity": 2,
+        "price": 89000,
+        "totalPrice": 178000
+      },
+      {
+        "id": "order-item-002",
+        "productId": "prod-003",
+        "productName": "노트북 거치대",
+        "optionId": null,
+        "optionName": null,
+        "quantity": 1,
+        "price": 35000,
+        "totalPrice": 35000
+      }
+    ],
+    "reservationExpiresAt": "2025-10-30T10:10:00Z",
+    "createdAt": "2025-10-30T10:00:00Z"
+  },
+  "orderHistory": [
+    {
+      "id": "order-001",
+      "status": "PENDING",
+      "totalAmount": 213000,
+      "finalAmount": 213000,
+      "createdAt": "2025-10-30T10:00:00Z"
+    },
+    {
+      "id": "order-002",
+      "status": "COMPLETED",
+      "totalAmount": 125000,
+      "finalAmount": 115000,
+      "createdAt": "2025-10-29T14:30:00Z"
+    },
+    {
+      "id": "order-003",
+      "status": "CANCELLED",
+      "totalAmount": 89000,
+      "finalAmount": 89000,
+      "createdAt": "2025-10-28T09:15:00Z"
+    }
+  ],
+  "orderDetail": {
+    "id": "order-001",
+    "userId": "user-001",
+    "status": "PENDING",
+    "totalAmount": 213000,
+    "discountAmount": 0,
+    "finalAmount": 213000,
+    "items": [
+      {
+        "id": "order-item-001",
+        "productId": "prod-001",
+        "productName": "무선 이어폰",
+        "optionId": "opt-001",
+        "optionName": "블랙",
+        "quantity": 2,
+        "price": 89000,
+        "totalPrice": 178000
+      },
+      {
+        "id": "order-item-002",
+        "productId": "prod-003",
+        "productName": "노트북 거치대",
+        "optionId": null,
+        "optionName": null,
+        "quantity": 1,
+        "price": 35000,
+        "totalPrice": 35000
+      }
+    ],
+    "couponId": null,
+    "reservationExpiresAt": "2025-10-30T10:10:00Z",
+    "createdAt": "2025-10-30T10:00:00Z",
+    "updatedAt": "2025-10-30T10:00:00Z"
+  },
+  "paymentSuccess": {
+    "orderId": "order-001",
+    "status": "COMPLETED",
+    "paymentAmount": 213000,
+    "paymentMethod": "CARD",
+    "paymentId": "payment-001",
+    "paidAt": "2025-10-30T10:05:00Z"
+  }
+}
