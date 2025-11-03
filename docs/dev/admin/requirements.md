@@ -1,7 +1,7 @@
 # Admin 요구사항 분석
 
-**버전**: 1.0.0
-**최종 수정**: 2025-10-30
+**버전**: 1.1.0
+**최종 수정**: 2025-11-02
 **상태**: Active
 
 ---
@@ -187,79 +187,61 @@
 
 ### FR-ADMIN-OPT: 상품 옵션 관리
 
+> **Note**: Issue #004에서 데이터 모델이 간소화되었습니다. ProductOptionGroup 엔티티가 제거되고 ProductOption에 `type` 필드가 추가되었습니다.
+
 | ID | 요구사항 | 우선순위 | 상태 |
 |----|---------|---------|------|
-| **FR-ADMIN-OPT-01** | 시스템은 옵션 그룹을 생성할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-ADMIN-OPT-02** | 시스템은 옵션 그룹을 수정/삭제할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-ADMIN-OPT-03** | 시스템은 옵션값을 생성할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-ADMIN-OPT-04** | 시스템은 옵션값을 수정/삭제할 수 있어야 함 | MUST | ⏳ 대기 |
-| **FR-ADMIN-OPT-05** | 시스템은 상품에 옵션을 연결할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-ADMIN-OPT-01** | 시스템은 상품 옵션을 생성할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-ADMIN-OPT-02** | 시스템은 상품 옵션을 수정/삭제할 수 있어야 함 | MUST | ⏳ 대기 |
+| **FR-ADMIN-OPT-03** | 시스템은 옵션별 재고를 설정할 수 있어야 함 | MUST | ⏳ 대기 |
 
 #### 상세 설명
 
-**FR-ADMIN-OPT-01: 옵션 그룹 생성**
-- **입력**:
-  - 옵션 그룹명 (예: "색상", "사이즈")
-  - 설명 (선택)
-- **처리 과정**:
-  1. 입력 데이터 유효성 검증
-  2. 중복 옵션 그룹명 확인
-  3. 옵션 그룹 생성
-- **출력**: 생성된 옵션 그룹 ID 및 정보
-- **예시**: 색상, 사이즈, 용량, 재질 등
-- **관련 유스케이스**: [UC-ADMIN-OPT-01](user-stories.md#uc-admin-opt-01-옵션-그룹-생성)
-
-**FR-ADMIN-OPT-02: 옵션 그룹 수정/삭제**
-- **수정 입력**:
-  - 옵션 그룹 ID
-  - 수정할 필드 (그룹명, 설명)
-- **삭제 입력**: 옵션 그룹 ID
-- **처리 과정**:
-  1. 옵션 그룹 존재 여부 확인
-  2. 연결된 옵션값 확인 (삭제 시)
-  3. 업데이트 또는 삭제
-- **출력**: 수정된 정보 또는 삭제 확인
-- **제약사항**: 옵션값이 연결된 그룹은 삭제 불가
-- **관련 유스케이스**: [UC-ADMIN-OPT-02](user-stories.md#uc-admin-opt-02-옵션-그룹-수정)
-
-**FR-ADMIN-OPT-03: 옵션값 생성**
-- **입력**:
-  - 옵션 그룹 ID
-  - 옵션값 (예: "빨강", "파랑", "S", "M", "L")
-  - 추가 가격 (기본값: 0)
-- **처리 과정**:
-  1. 옵션 그룹 존재 여부 확인
-  2. 입력 데이터 유효성 검증
-  3. 중복 옵션값 확인 (동일 그룹 내)
-  4. 옵션값 생성
-- **출력**: 생성된 옵션값 ID 및 정보
-- **관련 유스케이스**: [UC-ADMIN-OPT-03](user-stories.md#uc-admin-opt-03-옵션값-생성)
-
-**FR-ADMIN-OPT-04: 옵션값 수정/삭제**
-- **수정 입력**:
-  - 옵션값 ID
-  - 수정할 필드 (옵션값, 추가 가격)
-- **삭제 입력**: 옵션값 ID
-- **처리 과정**:
-  1. 옵션값 존재 여부 확인
-  2. 주문 내역 확인 (삭제 시)
-  3. 업데이트 또는 삭제
-- **출력**: 수정된 정보 또는 삭제 확인
-- **제약사항**: 주문 내역이 있는 옵션값은 소프트 삭제 권장
-- **관련 유스케이스**: [UC-ADMIN-OPT-04](user-stories.md#uc-admin-opt-04-옵션값-수정)
-
-**FR-ADMIN-OPT-05: 상품-옵션 연결**
+**FR-ADMIN-OPT-01: 상품 옵션 생성**
 - **입력**:
   - 상품 ID
-  - 옵션 그룹 ID 목록
+  - 옵션 타입 (예: "색상", "사이즈")
+  - 옵션명 (예: "빨강", "파랑", "S", "M", "L")
+  - 추가 가격 (기본값: 0)
 - **처리 과정**:
   1. 상품 존재 여부 확인
-  2. 옵션 그룹 존재 여부 확인
-  3. 상품에 옵션 그룹 연결
-  4. 옵션 조합별 초기 재고 0 설정
-- **출력**: 연결된 옵션 정보
-- **예시**: 티셔츠 상품에 "색상" + "사이즈" 옵션 그룹 연결
-- **관련 유스케이스**: [UC-ADMIN-OPT-05](user-stories.md#uc-admin-opt-05-상품-옵션-연결)
+  2. 입력 데이터 유효성 검증
+  3. 중복 옵션 확인 (동일 상품 내 type + name 조합)
+  4. 옵션 생성
+  5. 해당 옵션에 대한 초기 재고 생성 (availableQuantity: 0)
+- **출력**: 생성된 옵션 ID 및 정보
+- **예시**:
+  - 티셔츠에 {type: "색상", name: "빨강"} 추가
+  - 티셔츠에 {type: "사이즈", name: "M"} 추가
+- **관련 유스케이스**: [UC-ADMIN-OPT-01](user-stories.md#uc-admin-opt-01-상품-옵션-생성)
+
+**FR-ADMIN-OPT-02: 상품 옵션 수정/삭제**
+- **수정 입력**:
+  - 옵션 ID
+  - 수정할 필드 (type, name, additionalPrice)
+- **삭제 입력**: 옵션 ID
+- **처리 과정**:
+  1. 옵션 존재 여부 확인
+  2. 주문 내역 확인 (삭제 시)
+  3. 재고 확인 (삭제 시)
+  4. 업데이트 또는 삭제
+- **출력**: 수정된 정보 또는 삭제 확인
+- **제약사항**:
+  - 주문 내역이 있는 옵션은 소프트 삭제 권장
+  - 재고가 있는 옵션 삭제 시 경고
+- **관련 유스케이스**: [UC-ADMIN-OPT-02](user-stories.md#uc-admin-opt-02-상품-옵션-수정)
+
+**FR-ADMIN-OPT-03: 옵션별 재고 설정**
+- **입력**:
+  - 상품 ID
+  - 옵션 ID
+  - 초기 재고 수량
+- **처리 과정**:
+  1. 상품 및 옵션 존재 여부 확인
+  2. Stock 레코드 생성 또는 업데이트
+  3. totalQuantity, availableQuantity 설정
+- **출력**: 설정된 재고 정보
+- **관련 유스케이스**: [UC-ADMIN-STOCK-01](user-stories.md#uc-admin-stock-01-재고-입고)
 
 #### 비기능 요구사항
 
@@ -293,7 +275,7 @@
 - **처리 과정**:
   1. 필터 조건에 맞는 재고 조회
   2. 상품/옵션 정보와 함께 반환
-- **출력**: 재고 목록 (상품명, 옵션, 현재 수량, 확보 수량, 가용 수량)
+- **출력**: 재고 목록 (상품명, 옵션, 전체 수량, 예약 수량, 가용 수량, 판매 수량)
 - **관련 유스케이스**: [UC-ADMIN-INV-01](user-stories.md#uc-admin-inv-01-재고-조회)
 
 **FR-ADMIN-INV-02: 재고 입고**
@@ -305,9 +287,10 @@
 - **처리 과정**:
   1. 상품/옵션 존재 여부 확인
   2. 입고 수량 유효성 검증 (양수)
-  3. 재고 수량 증가
+  3. Stock 업데이트: totalQuantity, availableQuantity 증가
   4. 재고 이력 기록
 - **출력**: 업데이트된 재고 정보
+- **비고**: Issue #004 이후 totalQuantity = availableQuantity + reservedQuantity + soldQuantity 유지
 - **관련 유스케이스**: [UC-ADMIN-INV-02](user-stories.md#uc-admin-inv-02-재고-입고)
 
 **FR-ADMIN-INV-03: 재고 조정**
@@ -330,7 +313,7 @@
   - 상품 ID (선택)
   - 옵션 ID (선택)
   - 기간 (시작일, 종료일)
-  - 이력 유형 (입고/출고/조정/확보/복원)
+  - 이력 유형 (입고/출고/조정/예약/복원)
 - **처리 과정**:
   1. 필터 조건에 맞는 이력 조회
   2. 페이지네이션 처리
@@ -569,11 +552,9 @@
 | **FR-ADMIN-CAT-01** | 카테고리 관리 | 카테고리 생성 | MUST | [UC-ADMIN-CAT-01](user-stories.md) | TBD | ⏳ |
 | **FR-ADMIN-CAT-02** | 카테고리 관리 | 카테고리 수정 | MUST | [UC-ADMIN-CAT-02](user-stories.md) | TBD | ⏳ |
 | **FR-ADMIN-CAT-03** | 카테고리 관리 | 카테고리 삭제 | MUST | [UC-ADMIN-CAT-03](user-stories.md) | TBD | ⏳ |
-| **FR-ADMIN-OPT-01** | 옵션 관리 | 옵션 그룹 생성 | MUST | [UC-ADMIN-OPT-01](user-stories.md) | TBD | ⏳ |
-| **FR-ADMIN-OPT-02** | 옵션 관리 | 옵션 그룹 수정/삭제 | MUST | [UC-ADMIN-OPT-02](user-stories.md) | TBD | ⏳ |
-| **FR-ADMIN-OPT-03** | 옵션 관리 | 옵션값 생성 | MUST | [UC-ADMIN-OPT-03](user-stories.md) | TBD | ⏳ |
-| **FR-ADMIN-OPT-04** | 옵션 관리 | 옵션값 수정/삭제 | MUST | [UC-ADMIN-OPT-04](user-stories.md) | TBD | ⏳ |
-| **FR-ADMIN-OPT-05** | 옵션 관리 | 상품-옵션 연결 | MUST | [UC-ADMIN-OPT-05](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-OPT-01** | 옵션 관리 | 상품 옵션 생성 (type + name) | MUST | [UC-ADMIN-OPT-01](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-OPT-02** | 옵션 관리 | 상품 옵션 수정/삭제 | MUST | [UC-ADMIN-OPT-02](user-stories.md) | TBD | ⏳ |
+| **FR-ADMIN-OPT-03** | 옵션 관리 | 옵션별 재고 설정 | MUST | [UC-ADMIN-STOCK-01](user-stories.md) | TBD | ⏳ |
 | **FR-ADMIN-INV-01** | 재고 관리 | 재고 조회 | MUST | [UC-ADMIN-INV-01](user-stories.md) | TBD | ⏳ |
 | **FR-ADMIN-INV-02** | 재고 관리 | 재고 입고 | MUST | [UC-ADMIN-INV-02](user-stories.md) | TBD | ⏳ |
 | **FR-ADMIN-INV-03** | 재고 관리 | 재고 조정 | MUST | [UC-ADMIN-INV-03](user-stories.md) | TBD | ⏳ |
@@ -604,4 +585,11 @@
 ---
 
 **버전 이력**:
+
+- 1.1.0 (2025-11-02): Issue #004 반영 - 옵션 및 재고 모델 간소화
+  - FR-ADMIN-OPT: ProductOptionGroup 제거, ProductOption with type field로 변경
+  - 옵션 관리 요구사항 단순화 (5개 → 3개)
+  - 재고 조회 출력 필드 업데이트 (확보 → 예약, 수량 분리)
+  - 재고 입고 처리 로직 업데이트 (totalQuantity, availableQuantity)
+  - 재고 이력 유형 용어 변경 (확보 → 예약)
 - 1.0.0 (2025-10-30): Admin 요구사항 분석 문서 초안 작성

@@ -1,0 +1,54 @@
+{
+  "cart": {
+    "userId": "user-001",
+    "items": [
+      {
+        "id": "cart-item-001",
+        "productId": "prod-001",
+        "productName": "무선 이어폰",
+        "optionId": "opt-001",
+        "optionName": "블랙",
+        "quantity": 2,
+        "price": 89000,
+        "totalPrice": 178000,
+        "addedAt": "2025-10-30T10:00:00Z"
+      },
+      {
+        "id": "cart-item-002",
+        "productId": "prod-003",
+        "productName": "노트북 거치대",
+        "optionId": null,
+        "optionName": null,
+        "quantity": 1,
+        "price": 35000,
+        "totalPrice": 35000,
+        "addedAt": "2025-10-30T11:30:00Z"
+      }
+    ],
+    "totalItems": 2,
+    "totalQuantity": 3,
+    "totalPrice": 213000
+  },
+  "addToCartSuccess": {
+    "id": "cart-item-003",
+    "productId": "prod-002",
+    "productName": "블루투스 스피커",
+    "optionId": null,
+    "optionName": null,
+    "quantity": 1,
+    "price": 125000,
+    "totalPrice": 125000,
+    "addedAt": "2025-10-30T12:00:00Z"
+  },
+  "updateCartItemSuccess": {
+    "id": "cart-item-001",
+    "productId": "prod-001",
+    "productName": "무선 이어폰",
+    "optionId": "opt-001",
+    "optionName": "블랙",
+    "quantity": 3,
+    "price": 89000,
+    "totalPrice": 267000,
+    "updatedAt": "2025-10-30T12:30:00Z"
+  }
+}

@@ -368,48 +368,38 @@ GET /api/v1/products?page=1&limit=20&sortBy=price&sortOrder=asc
   "success": true,
   "data": {
     "productId": "prod-001",
-    "optionGroups": [
+    "options": [
       {
-        "id": "group-001",
+        "id": "opt-001",
         "productId": "prod-001",
-        "name": "색상",
-        "options": [
-          {
-            "id": "opt-001",
-            "groupId": "group-001",
-            "name": "빨강",
-            "additionalPrice": 0,
-            "hasStock": true
-          },
-          {
-            "id": "opt-002",
-            "groupId": "group-001",
-            "name": "파랑",
-            "additionalPrice": 0,
-            "hasStock": false
-          }
-        ]
+        "type": "색상",
+        "name": "빨강",
+        "additionalPrice": 0,
+        "hasStock": true
       },
       {
-        "id": "group-002",
+        "id": "opt-002",
         "productId": "prod-001",
-        "name": "사이즈",
-        "options": [
-          {
-            "id": "opt-003",
-            "groupId": "group-002",
-            "name": "S",
-            "additionalPrice": 0,
-            "hasStock": false
-          },
-          {
-            "id": "opt-004",
-            "groupId": "group-002",
-            "name": "M",
-            "additionalPrice": 0,
-            "hasStock": true
-          }
-        ]
+        "type": "색상",
+        "name": "파랑",
+        "additionalPrice": 0,
+        "hasStock": false
+      },
+      {
+        "id": "opt-003",
+        "productId": "prod-001",
+        "type": "사이즈",
+        "name": "S",
+        "additionalPrice": 0,
+        "hasStock": false
+      },
+      {
+        "id": "opt-004",
+        "productId": "prod-001",
+        "type": "사이즈",
+        "name": "M",
+        "additionalPrice": 0,
+        "hasStock": true
       }
     ]
   },
@@ -424,7 +414,7 @@ GET /api/v1/products?page=1&limit=20&sortBy=price&sortOrder=asc
   "success": true,
   "data": {
     "productId": "prod-001",
-    "optionGroups": []
+    "options": []
   },
   "timestamp": "2025-10-30T10:00:00Z"
 }
@@ -799,13 +789,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### POST /orders
 
-사용자의 장바구니 전체 항목으로 주문을 생성하고 재고를 확보합니다.
+사용자의 장바구니 전체 항목으로 주문을 생성하고 재고를 예약합니다.
 
 > **참고**: 장바구니의 모든 항목으로 주문이 생성됩니다 (부분 주문 불가). 결제 완료 시 장바구니가 자동으로 비워집니다.
 
 #### 관련 스토리
 - [US-ORDER-01](user-stories.md#us-order-01-주문-생성): 주문 생성
-- [US-ORDER-02](user-stories.md#us-order-02-재고-확보-보장): 재고 확보 보장
+- [US-ORDER-02](user-stories.md#us-order-02-재고-예약-보장): 재고 예약 보장
 - [US-ORDER-03](user-stories.md#us-order-03-쿠폰-적용): 쿠폰 적용
 
 #### 요청
@@ -1108,7 +1098,7 @@ Content-Type: application/json
   "success": false,
   "error": {
     "code": "RESERVATION_EXPIRED",
-    "message": "재고 확보가 만료되었습니다"
+    "message": "재고 예약이 만료되었습니다"
   },
   "timestamp": "2025-10-30T10:15:00Z"
 }
@@ -1119,7 +1109,7 @@ Content-Type: application/json
 
 ### POST /orders/{id}/cancel
 
-주문을 취소하고 확보된 재고를 복원합니다.
+주문을 취소하고 예약된 재고를 복원합니다.
 
 #### 관련 스토리
 - [US-PAY-02](user-stories.md#us-pay-02-결제-실패-시-재고-복원): 결제 실패 시 재고 복원
@@ -1558,23 +1548,15 @@ interface ProductDetail {
 ```typescript
 interface ProductOption {
   id: string              // 옵션 ID
-  groupId: string         // 옵션 그룹 ID
-  name: string            // 옵션명
+  productId: string       // 상품 ID
+  type: string            // 옵션 타입 (예: "색상", "사이즈")
+  name: string            // 옵션명 (예: "빨강", "S")
   additionalPrice: number // 추가 가격
   hasStock: boolean       // 재고 유무
 }
 ```
 
-#### ProductOptionGroup
-
-```typescript
-interface ProductOptionGroup {
-  id: string              // 옵션 그룹 ID
-  productId: string       // 상품 ID
-  name: string            // 옵션 그룹명 (예: "색상", "사이즈")
-  options: ProductOption[] // 옵션 목록
-}
-```
+> **Note**: 옵션은 `type` 필드로 그룹화됩니다. UI에서는 동일한 `type`을 가진 옵션들을 함께 표시합니다.
 
 #### PopularProductItem
 
@@ -1671,7 +1653,7 @@ interface Order {
     paidAt: string            // 결제 일시
     method: string            // 결제 수단
   }
-  reservationExpiresAt?: string // 재고 확보 만료 시간 (PENDING 상태)
+  reservationExpiresAt?: string // 재고 예약 만료 시간 (PENDING 상태)
   createdAt: string           // 주문 생성일
   updatedAt: string           // 주문 수정일
 }
@@ -1685,7 +1667,7 @@ enum OrderStatus {
   COMPLETED = "COMPLETED",   // 결제 완료
   FAILED = "FAILED",         // 결제 실패
   CANCELLED = "CANCELLED",   // 주문 취소
-  EXPIRED = "EXPIRED"        // 재고 확보 만료
+  EXPIRED = "EXPIRED"        // 재고 예약 만료
 }
 ```
 
@@ -1762,7 +1744,7 @@ enum CouponStatus {
 | 요구사항 ID | 사용자 스토리 ID | API 엔드포인트 | HTTP 메서드 |
 |------------|----------------|---------------|------------|
 | FR-ORDER-01 | US-ORDER-01 | `/orders` | POST |
-| FR-ORDER-02 | US-ORDER-02 | `/orders` (재고 확보 포함) | POST |
+| FR-ORDER-02 | US-ORDER-02 | `/orders` (재고 예약 포함) | POST |
 | FR-ORDER-03 | US-ORDER-03 | `/orders` (쿠폰 적용 포함) | POST |
 | FR-ORDER-04 | US-ORDER-04 | `/orders/{id}`, `/orders` | GET |
 | FR-ORDER-05 | US-ORDER-04 | `/orders`, `/orders/{id}` | GET |
@@ -1802,6 +1784,13 @@ enum CouponStatus {
 ---
 
 **버전 이력**:
+
+- 1.1.0 (2025-11-02): 피드백 반영 - API 응답 구조 및 DTO 업데이트
+  - 옵션 API 응답 구조 변경 (optionGroups → options with type field)
+  - ProductOption DTO 업데이트 (type 필드 추가, groupId 제거)
+  - ProductOptionGroup DTO 제거
+  - 재고 "확보" → "예약" 용어 변경
+  - OrderStatus EXPIRED 설명 업데이트
 - 1.0.0 (2025-10-30): 초기 API 명세서 작성
   - 15개 API 엔드포인트 정의
   - 25개 사용자 스토리 매핑 완료

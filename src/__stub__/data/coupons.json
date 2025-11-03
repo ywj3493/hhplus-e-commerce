@@ -1,0 +1,54 @@
+{
+  "issueCouponSuccess": {
+    "id": "user-coupon-001",
+    "couponId": "coupon-001",
+    "userId": "user-001",
+    "name": "신규 회원 환영 쿠폰",
+    "discountType": "PERCENTAGE",
+    "discountValue": 10,
+    "minPurchaseAmount": 50000,
+    "maxDiscountAmount": 10000,
+    "expiresAt": "2025-11-30T23:59:59Z",
+    "isUsed": false,
+    "issuedAt": "2025-10-30T10:00:00Z"
+  },
+  "ownedCoupons": [
+    {
+      "id": "user-coupon-001",
+      "couponId": "coupon-001",
+      "name": "신규 회원 환영 쿠폰",
+      "discountType": "PERCENTAGE",
+      "discountValue": 10,
+      "minPurchaseAmount": 50000,
+      "maxDiscountAmount": 10000,
+      "expiresAt": "2025-11-30T23:59:59Z",
+      "isUsed": false,
+      "issuedAt": "2025-10-30T10:00:00Z"
+    },
+    {
+      "id": "user-coupon-002",
+      "couponId": "coupon-002",
+      "name": "월간 특가 쿠폰",
+      "discountType": "FIXED",
+      "discountValue": 5000,
+      "minPurchaseAmount": 30000,
+      "maxDiscountAmount": null,
+      "expiresAt": "2025-11-15T23:59:59Z",
+      "isUsed": false,
+      "issuedAt": "2025-10-25T08:00:00Z"
+    },
+    {
+      "id": "user-coupon-003",
+      "couponId": "coupon-003",
+      "name": "VIP 회원 전용 쿠폰",
+      "discountType": "PERCENTAGE",
+      "discountValue": 15,
+      "minPurchaseAmount": 100000,
+      "maxDiscountAmount": 20000,
+      "expiresAt": "2025-12-31T23:59:59Z",
+      "isUsed": true,
+      "issuedAt": "2025-10-20T12:00:00Z",
+      "usedAt": "2025-10-29T14:30:00Z"
+    }
+  ]
+}
