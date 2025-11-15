@@ -1,8 +1,8 @@
 import { StockStatus, StockStatusType } from './stock-status.vo';
 
 describe('StockStatus', () => {
-  describe('fromAvailableQuantity', () => {
-    it('should return IN_STOCK when quantity is greater than 0', () => {
+  describe('가용 수량으로부터 생성', () => {
+    it('수량이 0보다 클 때 재고 있음 상태를 반환해야 함', () => {
       // Given
       const availableQuantity = 10;
 
@@ -15,7 +15,7 @@ describe('StockStatus', () => {
       expect(status.isOutOfStock()).toBe(false);
     });
 
-    it('should return OUT_OF_STOCK when quantity is 0', () => {
+    it('수량이 0일 때 품절 상태를 반환해야 함', () => {
       // Given
       const availableQuantity = 0;
 
@@ -28,7 +28,7 @@ describe('StockStatus', () => {
       expect(status.isOutOfStock()).toBe(true);
     });
 
-    it('should throw error for negative quantity', () => {
+    it('음수 수량에 대해 에러를 발생시켜야 함', () => {
       // Given
       const negativeQuantity = -1;
 
@@ -39,8 +39,8 @@ describe('StockStatus', () => {
     });
   });
 
-  describe('inStock', () => {
-    it('should create IN_STOCK status', () => {
+  describe('재고 있음 상태 생성', () => {
+    it('재고 있음 상태를 생성해야 함', () => {
       // When
       const status = StockStatus.inStock();
 
@@ -50,8 +50,8 @@ describe('StockStatus', () => {
     });
   });
 
-  describe('outOfStock', () => {
-    it('should create OUT_OF_STOCK status', () => {
+  describe('품절 상태 생성', () => {
+    it('품절 상태를 생성해야 함', () => {
       // When
       const status = StockStatus.outOfStock();
 
@@ -61,8 +61,8 @@ describe('StockStatus', () => {
     });
   });
 
-  describe('equals', () => {
-    it('should return true for same status', () => {
+  describe('동등성 비교', () => {
+    it('같은 상태일 때 true를 반환해야 함', () => {
       // Given
       const status1 = StockStatus.inStock();
       const status2 = StockStatus.inStock();
@@ -74,7 +74,7 @@ describe('StockStatus', () => {
       expect(result).toBe(true);
     });
 
-    it('should return false for different status', () => {
+    it('다른 상태일 때 false를 반환해야 함', () => {
       // Given
       const status1 = StockStatus.inStock();
       const status2 = StockStatus.outOfStock();
@@ -87,8 +87,8 @@ describe('StockStatus', () => {
     });
   });
 
-  describe('toString', () => {
-    it('should return "재고 있음" for IN_STOCK status', () => {
+  describe('문자열 변환', () => {
+    it('재고 있음 상태일 때 "재고 있음"을 반환해야 함', () => {
       // Given
       const status = StockStatus.inStock();
 
@@ -99,7 +99,7 @@ describe('StockStatus', () => {
       expect(result).toBe('재고 있음');
     });
 
-    it('should return "품절" for OUT_OF_STOCK status', () => {
+    it('품절 상태일 때 "품절"을 반환해야 함', () => {
       // Given
       const status = StockStatus.outOfStock();
 

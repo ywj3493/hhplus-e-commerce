@@ -39,7 +39,7 @@ describe('GetProductDetailUseCase', () => {
         'Color',
         'Blue',
         Money.from(0),
-        Stock.create('stock-blue', 'opt-color-blue', 50, 0, 30, 20), // Out of stock
+        Stock.create('stock-blue', 'opt-color-blue', 50, 0, 30, 20), // 품절
       ),
     ];
 
@@ -50,7 +50,7 @@ describe('GetProductDetailUseCase', () => {
         'Size',
         'S',
         Money.from(0),
-        Stock.create('stock-s', 'opt-size-s', 30, 0, 10, 20), // Out of stock
+        Stock.create('stock-s', 'opt-size-s', 30, 0, 10, 20), // 품절
       ),
       ProductOption.create(
         'opt-size-m',
@@ -82,8 +82,8 @@ describe('GetProductDetailUseCase', () => {
     );
   };
 
-  describe('execute', () => {
-    it('should return product detail with grouped options (BR-PROD-05)', async () => {
+  describe('실행', () => {
+    it('그룹화된 옵션이 포함된 상품 상세 정보를 반환해야 함 (BR-PROD-05)', async () => {
       // Given
       const input = new GetProductDetailInput('product-1');
       const product = createProductWithOptions();
@@ -102,7 +102,7 @@ describe('GetProductDetailUseCase', () => {
       expect(output.optionGroups).toHaveLength(2);
     });
 
-    it('should group options by type correctly (BR-PROD-05)', async () => {
+    it('옵션을 타입별로 올바르게 그룹화해야 함 (BR-PROD-05)', async () => {
       // Given
       const input = new GetProductDetailInput('product-1');
       const product = createProductWithOptions();
@@ -124,7 +124,7 @@ describe('GetProductDetailUseCase', () => {
       expect(sizeGroup?.options.map((o) => o.name)).toEqual(['S', 'M', 'L']);
     });
 
-    it('should include stock status for each option (BR-PROD-06)', async () => {
+    it('각 옵션의 재고 상태를 포함해야 함 (BR-PROD-06)', async () => {
       // Given
       const input = new GetProductDetailInput('product-1');
       const product = createProductWithOptions();
@@ -144,7 +144,7 @@ describe('GetProductDetailUseCase', () => {
       expect(sizeGroup?.options[2].stockStatus.status).toBe(StockStatusType.IN_STOCK); // L
     });
 
-    it('should mark out-of-stock options as not selectable (BR-PROD-08)', async () => {
+    it('품절된 옵션을 선택 불가로 표시해야 함 (BR-PROD-08)', async () => {
       // Given
       const input = new GetProductDetailInput('product-1');
       const product = createProductWithOptions();
@@ -155,16 +155,16 @@ describe('GetProductDetailUseCase', () => {
 
       // Then
       const colorGroup = output.optionGroups.find((g) => g.type === 'Color');
-      expect(colorGroup?.options[0].isSelectable).toBe(true); // Red - in stock
-      expect(colorGroup?.options[1].isSelectable).toBe(false); // Blue - out of stock
+      expect(colorGroup?.options[0].isSelectable).toBe(true); // Red - 재고 있음
+      expect(colorGroup?.options[1].isSelectable).toBe(false); // Blue - 품절
 
       const sizeGroup = output.optionGroups.find((g) => g.type === 'Size');
-      expect(sizeGroup?.options[0].isSelectable).toBe(false); // S - out of stock
-      expect(sizeGroup?.options[1].isSelectable).toBe(true); // M - in stock
-      expect(sizeGroup?.options[2].isSelectable).toBe(true); // L - in stock
+      expect(sizeGroup?.options[0].isSelectable).toBe(false); // S - 품절
+      expect(sizeGroup?.options[1].isSelectable).toBe(true); // M - 재고 있음
+      expect(sizeGroup?.options[2].isSelectable).toBe(true); // L - 재고 있음
     });
 
-    it('should include additional price for each option', async () => {
+    it('각 옵션의 추가 금액을 포함해야 함', async () => {
       // Given
       const input = new GetProductDetailInput('product-1');
       const product = createProductWithOptions();
@@ -180,7 +180,7 @@ describe('GetProductDetailUseCase', () => {
       expect(sizeGroup?.options[2].additionalPrice.amount).toBe(2000); // L
     });
 
-    it('should throw ProductNotFoundException when product not found', async () => {
+    it('상품을 찾을 수 없을 때 ProductNotFoundException을 발생시켜야 함', async () => {
       // Given
       const input = new GetProductDetailInput('non-existent');
       mockRepository.findById.mockResolvedValue(undefined);
@@ -190,7 +190,7 @@ describe('GetProductDetailUseCase', () => {
       await expect(useCase.execute(input)).rejects.toThrow('상품을 찾을 수 없습니다: non-existent');
     });
 
-    it('should handle product with no options', async () => {
+    it('옵션이 없는 상품을 처리해야 함', async () => {
       // Given
       const input = new GetProductDetailInput('product-1');
       const product = Product.create(
@@ -199,7 +199,7 @@ describe('GetProductDetailUseCase', () => {
         Money.from(10000),
         'Description',
         'https://example.com/product.jpg',
-        [], // No options
+        [], // 옵션 없음
         new Date(),
         new Date(),
       );
@@ -212,7 +212,7 @@ describe('GetProductDetailUseCase', () => {
       expect(output.optionGroups).toHaveLength(0);
     });
 
-    it('should handle product with single option type', async () => {
+    it('단일 옵션 타입만 있는 상품을 처리해야 함', async () => {
       // Given
       const input = new GetProductDetailInput('product-1');
       const option = ProductOption.create(
@@ -245,18 +245,18 @@ describe('GetProductDetailUseCase', () => {
     });
   });
 
-  describe('input validation', () => {
-    it('should validate product ID is required', () => {
+  describe('입력 검증', () => {
+    it('상품 ID가 필수임을 검증해야 함', () => {
       // When & Then
       expect(() => new GetProductDetailInput('')).toThrow('상품 ID는 필수입니다');
     });
 
-    it('should validate product ID is not whitespace only', () => {
+    it('상품 ID가 공백만 있을 수 없음을 검증해야 함', () => {
       // When & Then
       expect(() => new GetProductDetailInput('   ')).toThrow('상품 ID는 필수입니다');
     });
 
-    it('should accept valid product ID', () => {
+    it('유효한 상품 ID를 허용해야 함', () => {
       // When & Then
       expect(() => new GetProductDetailInput('product-1')).not.toThrow();
     });

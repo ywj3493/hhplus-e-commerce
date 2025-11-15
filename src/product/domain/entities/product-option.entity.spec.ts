@@ -4,8 +4,8 @@ import { Money } from './money.vo';
 import { StockStatusType } from './stock-status.vo';
 
 describe('ProductOption', () => {
-  describe('create', () => {
-    it('should create ProductOption with valid parameters', () => {
+  describe('생성', () => {
+    it('유효한 파라미터로 ProductOption 인스턴스를 생성해야 함', () => {
       // Given
       const id = 'option-1';
       const productId = 'product-1';
@@ -26,7 +26,7 @@ describe('ProductOption', () => {
       expect(option.stock).toBe(stock);
     });
 
-    it('should throw error when option ID is empty', () => {
+    it('옵션 ID가 비어있을 때 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.initialize('stock-1', 'option-1', 100);
       const additionalPrice = Money.from(0);
@@ -37,7 +37,7 @@ describe('ProductOption', () => {
       ).toThrow('옵션 ID는 필수입니다');
     });
 
-    it('should throw error when product ID is empty', () => {
+    it('상품 ID가 비어있을 때 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.initialize('stock-1', 'option-1', 100);
       const additionalPrice = Money.from(0);
@@ -48,7 +48,7 @@ describe('ProductOption', () => {
       ).toThrow('상품 ID는 필수입니다');
     });
 
-    it('should throw error when type is empty', () => {
+    it('옵션 타입이 비어있을 때 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.initialize('stock-1', 'option-1', 100);
       const additionalPrice = Money.from(0);
@@ -59,7 +59,7 @@ describe('ProductOption', () => {
       ).toThrow('옵션 타입은 필수입니다');
     });
 
-    it('should throw error when name is empty', () => {
+    it('옵션명이 비어있을 때 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.initialize('stock-1', 'option-1', 100);
       const additionalPrice = Money.from(0);
@@ -71,8 +71,8 @@ describe('ProductOption', () => {
     });
   });
 
-  describe('calculatePrice', () => {
-    it('should calculate price with no additional price', () => {
+  describe('가격 계산', () => {
+    it('추가 금액이 없을 때 기본 가격을 반환해야 함', () => {
       // Given
       const basePrice = Money.from(10000);
       const additionalPrice = Money.from(0);
@@ -93,7 +93,7 @@ describe('ProductOption', () => {
       expect(totalPrice.amount).toBe(10000);
     });
 
-    it('should calculate price with additional price', () => {
+    it('추가 금액이 있을 때 기본 가격과 추가 금액을 합산해야 함', () => {
       // Given
       const basePrice = Money.from(10000);
       const additionalPrice = Money.from(1000);
@@ -115,8 +115,8 @@ describe('ProductOption', () => {
     });
   });
 
-  describe('getStockStatus', () => {
-    it('should return IN_STOCK when stock is available', () => {
+  describe('재고 상태 조회', () => {
+    it('재고가 있을 때 재고 있음 상태를 반환해야 함', () => {
       // Given
       const additionalPrice = Money.from(0);
       const stock = Stock.initialize('stock-1', 'option-1', 100);
@@ -136,7 +136,7 @@ describe('ProductOption', () => {
       expect(status.status).toBe(StockStatusType.IN_STOCK);
     });
 
-    it('should return OUT_OF_STOCK when stock is not available', () => {
+    it('재고가 없을 때 품절 상태를 반환해야 함', () => {
       // Given
       const additionalPrice = Money.from(0);
       const stock = Stock.create('stock-1', 'option-1', 100, 0, 50, 50);
@@ -157,8 +157,8 @@ describe('ProductOption', () => {
     });
   });
 
-  describe('isSelectable', () => {
-    it('should return true when stock is available (BR-PROD-08)', () => {
+  describe('선택 가능 여부', () => {
+    it('재고가 있을 때 true를 반환해야 함 (BR-PROD-08)', () => {
       // Given
       const additionalPrice = Money.from(0);
       const stock = Stock.initialize('stock-1', 'option-1', 100);
@@ -178,7 +178,7 @@ describe('ProductOption', () => {
       expect(selectable).toBe(true);
     });
 
-    it('should return false when stock is not available (BR-PROD-08)', () => {
+    it('재고가 없을 때 false를 반환해야 함 (BR-PROD-08)', () => {
       // Given
       const additionalPrice = Money.from(0);
       const stock = Stock.create('stock-1', 'option-1', 100, 0, 50, 50);
@@ -199,8 +199,8 @@ describe('ProductOption', () => {
     });
   });
 
-  describe('option variations', () => {
-    it('should create color option without additional price', () => {
+  describe('옵션 종류별 생성', () => {
+    it('추가 금액 없이 색상 옵션을 생성해야 함', () => {
       // Given
       const additionalPrice = Money.from(0);
       const stock = Stock.initialize('stock-1', 'option-1', 50);
@@ -221,7 +221,7 @@ describe('ProductOption', () => {
       expect(option.additionalPrice.amount).toBe(0);
     });
 
-    it('should create size option with additional price', () => {
+    it('추가 금액과 함께 사이즈 옵션을 생성해야 함', () => {
       // Given
       const additionalPrice = Money.from(1000);
       const stock = Stock.initialize('stock-1', 'option-1', 30);

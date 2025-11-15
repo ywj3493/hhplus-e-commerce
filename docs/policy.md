@@ -96,11 +96,69 @@ Documents must be created and maintained in this order:
 ### Current Stack
 - **Framework**: NestJS
 - **ORM**: Prisma
-- **Language**: TypeScript (assumed)
+- **Language**: TypeScript
+- **Package Manager**: pnpm (REQUIRED)
 
 ### Architecture
 - Architecture pattern: TBD (To Be Decided)
 - Will be documented as decisions are made
+
+## Package Management
+
+### pnpm Usage (REQUIRED)
+This project **exclusively uses pnpm** as the package manager.
+
+**Common Commands:**
+```bash
+pnpm install          # Install dependencies
+pnpm test             # Run all tests
+pnpm test:watch       # Run tests in watch mode
+pnpm run start:dev    # Start development server
+pnpm run build        # Build the project
+pnpm run lint         # Run linter
+```
+
+**DO NOT use npm or yarn** - all team members must use pnpm to ensure consistency in lock files and dependency resolution.
+
+## Testing Standards
+
+### Test File Structure
+- Test files must be colocated with source files: `*.spec.ts`
+- Integration tests: `/test/{module}/integration/*.integration.spec.ts`
+- E2E tests: `/test/{module}/e2e/*.e2e.spec.ts`
+
+### Test Language Conventions
+All test files must follow Korean language conventions:
+
+**describe blocks**: Use Korean to describe the test subject
+```typescript
+describe('생성', () => {})           // For creation tests
+describe('실행', () => {})           // For execution tests
+describe('입력 검증', () => {})      // For input validation tests
+describe('재고 상태 조회', () => {}) // For specific domain operations
+```
+
+**it blocks**: Use Korean action-oriented sentences ending in "해야 함"
+```typescript
+it('유효한 파라미터로 인스턴스를 생성해야 함', () => {})
+it('재고가 있을 때 true를 반환해야 함', () => {})
+it('음수 금액에 대해 에러를 발생시켜야 함', () => {})
+```
+
+**Comments**:
+- Given-When-Then keywords: Keep in English (`// Given`, `// When`, `// Then`, `// When & Then`)
+- Inline comments: Use Korean (e.g., `// 품절`, `// 재고 있음`, `// 초기 재고`)
+- Business requirement references: Keep as-is (e.g., `BR-PROD-01`)
+
+**Code elements**: Keep in English
+- Variable names, function names, class names
+- Error messages are in Korean (already implemented)
+
+### Test Coverage
+- Unit tests for all business logic
+- Integration tests for layer interactions
+- E2E tests for API endpoints
+- Maintain >80% code coverage
 
 ## Version Control
 

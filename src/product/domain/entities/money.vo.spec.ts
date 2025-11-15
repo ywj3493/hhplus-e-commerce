@@ -1,8 +1,8 @@
 import { Money } from './money.vo';
 
 describe('Money', () => {
-  describe('from', () => {
-    it('should create Money with valid amount', () => {
+  describe('생성', () => {
+    it('유효한 금액으로 Money 인스턴스를 생성해야 함', () => {
       // Given
       const amount = 10000;
 
@@ -13,7 +13,7 @@ describe('Money', () => {
       expect(money.amount).toBe(10000);
     });
 
-    it('should throw error for negative amount', () => {
+    it('음수 금액에 대해 에러를 발생시켜야 함', () => {
       // Given
       const negativeAmount = -1000;
 
@@ -21,7 +21,7 @@ describe('Money', () => {
       expect(() => Money.from(negativeAmount)).toThrow('금액은 음수일 수 없습니다');
     });
 
-    it('should create Money with zero amount', () => {
+    it('0원으로 Money 인스턴스를 생성해야 함', () => {
       // Given
       const zeroAmount = 0;
 
@@ -33,8 +33,8 @@ describe('Money', () => {
     });
   });
 
-  describe('add', () => {
-    it('should add two money values', () => {
+  describe('덧셈', () => {
+    it('두 금액을 더해야 함', () => {
       // Given
       const money1 = Money.from(10000);
       const money2 = Money.from(5000);
@@ -46,7 +46,7 @@ describe('Money', () => {
       expect(result.amount).toBe(15000);
     });
 
-    it('should not modify original values', () => {
+    it('원본 값을 수정하지 않아야 함', () => {
       // Given
       const money1 = Money.from(10000);
       const money2 = Money.from(5000);
@@ -60,8 +60,8 @@ describe('Money', () => {
     });
   });
 
-  describe('multiply', () => {
-    it('should multiply money by quantity', () => {
+  describe('곱셈', () => {
+    it('금액에 수량을 곱해야 함', () => {
       // Given
       const money = Money.from(10000);
       const quantity = 3;
@@ -73,7 +73,7 @@ describe('Money', () => {
       expect(result.amount).toBe(30000);
     });
 
-    it('should throw error for negative quantity', () => {
+    it('음수 수량에 대해 에러를 발생시켜야 함', () => {
       // Given
       const money = Money.from(10000);
       const negativeQuantity = -1;
@@ -82,7 +82,7 @@ describe('Money', () => {
       expect(() => money.multiply(negativeQuantity)).toThrow('수량은 음수일 수 없습니다');
     });
 
-    it('should return zero for zero quantity', () => {
+    it('수량이 0일 때 0원을 반환해야 함', () => {
       // Given
       const money = Money.from(10000);
       const zeroQuantity = 0;
@@ -95,8 +95,8 @@ describe('Money', () => {
     });
   });
 
-  describe('equals', () => {
-    it('should return true for equal amounts', () => {
+  describe('동등성 비교', () => {
+    it('같은 금액일 때 true를 반환해야 함', () => {
       // Given
       const money1 = Money.from(10000);
       const money2 = Money.from(10000);
@@ -108,7 +108,7 @@ describe('Money', () => {
       expect(result).toBe(true);
     });
 
-    it('should return false for different amounts', () => {
+    it('다른 금액일 때 false를 반환해야 함', () => {
       // Given
       const money1 = Money.from(10000);
       const money2 = Money.from(5000);
@@ -121,8 +121,8 @@ describe('Money', () => {
     });
   });
 
-  describe('toString', () => {
-    it('should format as KRW string', () => {
+  describe('문자열 변환', () => {
+    it('한국 원화 형식으로 포맷해야 함', () => {
       // Given
       const money = Money.from(10000);
 

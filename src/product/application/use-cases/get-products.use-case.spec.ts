@@ -48,14 +48,14 @@ describe('GetProductsUseCase', () => {
     );
   };
 
-  describe('execute', () => {
-    it('should return paginated product list with stock status', async () => {
+  describe('실행', () => {
+    it('재고 상태가 포함된 페이지네이션 상품 목록을 반환해야 함', async () => {
       // Given
       const input = new GetProductsInput(1, 10);
       const products = [
         createTestProduct('prod-1', 'Product 1', 10000, 50),
         createTestProduct('prod-2', 'Product 2', 20000, 30),
-        createTestProduct('prod-3', 'Product 3', 30000, 0), // Out of stock
+        createTestProduct('prod-3', 'Product 3', 30000, 0), // 품절
       ];
       const paginationResult: PaginationResult<Product> = {
         items: products,
@@ -83,8 +83,8 @@ describe('GetProductsUseCase', () => {
       expect(output.totalPages).toBe(1);
     });
 
-    it('should handle default pagination values (BR-PROD-02)', async () => {
-      // Given: Default page=1, limit=10
+    it('기본 페이지네이션 값을 처리해야 함 (BR-PROD-02)', async () => {
+      // Given: 기본값 page=1, limit=10
       const input = new GetProductsInput();
       const paginationResult: PaginationResult<Product> = {
         items: [],
@@ -102,7 +102,7 @@ describe('GetProductsUseCase', () => {
       expect(mockRepository.findAll).toHaveBeenCalledWith(1, 10);
     });
 
-    it('should handle custom pagination values', async () => {
+    it('커스텀 페이지네이션 값을 처리해야 함', async () => {
       // Given
       const input = new GetProductsInput(2, 20);
       const paginationResult: PaginationResult<Product> = {
@@ -121,7 +121,7 @@ describe('GetProductsUseCase', () => {
       expect(mockRepository.findAll).toHaveBeenCalledWith(2, 20);
     });
 
-    it('should return empty list when no products exist', async () => {
+    it('상품이 없을 때 빈 목록을 반환해야 함', async () => {
       // Given
       const input = new GetProductsInput(1, 10);
       const paginationResult: PaginationResult<Product> = {
@@ -141,7 +141,7 @@ describe('GetProductsUseCase', () => {
       expect(output.total).toBe(0);
     });
 
-    it('should map product imageUrl correctly', async () => {
+    it('상품 이미지 URL을 올바르게 매핑해야 함', async () => {
       // Given
       const input = new GetProductsInput(1, 10);
       const products = [createTestProduct('prod-1', 'Product 1', 10000, 50)];
@@ -162,23 +162,23 @@ describe('GetProductsUseCase', () => {
     });
   });
 
-  describe('input validation', () => {
-    it('should validate page must be 1 or greater', () => {
+  describe('입력 검증', () => {
+    it('페이지는 1 이상이어야 함', () => {
       // When & Then
       expect(() => new GetProductsInput(0, 10)).toThrow('페이지는 1 이상이어야 합니다');
     });
 
-    it('should validate page size minimum (BR-PROD-03)', () => {
+    it('페이지 크기 최소값을 검증해야 함 (BR-PROD-03)', () => {
       // When & Then
       expect(() => new GetProductsInput(1, 0)).toThrow('페이지 크기는 1-100 사이여야 합니다');
     });
 
-    it('should validate page size maximum (BR-PROD-03)', () => {
+    it('페이지 크기 최대값을 검증해야 함 (BR-PROD-03)', () => {
       // When & Then
       expect(() => new GetProductsInput(1, 101)).toThrow('페이지 크기는 1-100 사이여야 합니다');
     });
 
-    it('should accept page size at boundary values', () => {
+    it('경계값의 페이지 크기를 허용해야 함', () => {
       // When & Then
       expect(() => new GetProductsInput(1, 1)).not.toThrow();
       expect(() => new GetProductsInput(1, 100)).not.toThrow();

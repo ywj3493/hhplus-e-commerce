@@ -2,8 +2,8 @@ import { Stock } from './stock.entity';
 import { StockStatusType } from './stock-status.vo';
 
 describe('Stock', () => {
-  describe('create', () => {
-    it('should create Stock with valid parameters', () => {
+  describe('생성', () => {
+    it('유효한 파라미터로 Stock 인스턴스를 생성해야 함', () => {
       // Given
       const id = 'stock-1';
       const productOptionId = 'option-1';
@@ -31,7 +31,7 @@ describe('Stock', () => {
       expect(stock.soldQuantity).toBe(10);
     });
 
-    it('should throw error when quantities sum exceeds total', () => {
+    it('각 재고 수량의 합이 총 재고를 초과할 때 에러를 발생시켜야 함', () => {
       // Given
       const id = 'stock-1';
       const productOptionId = 'option-1';
@@ -53,7 +53,7 @@ describe('Stock', () => {
       ).toThrow('가용, 예약, 판매 재고의 합은 총 재고를 초과할 수 없습니다');
     });
 
-    it('should throw error for negative total quantity', () => {
+    it('음수 총 재고 수량에 대해 에러를 발생시켜야 함', () => {
       // Given
       const id = 'stock-1';
       const productOptionId = 'option-1';
@@ -65,7 +65,7 @@ describe('Stock', () => {
       ).toThrow('총 재고 수량은 음수일 수 없습니다');
     });
 
-    it('should throw error for negative available quantity', () => {
+    it('음수 가용 재고 수량에 대해 에러를 발생시켜야 함', () => {
       // Given
       const id = 'stock-1';
       const productOptionId = 'option-1';
@@ -77,8 +77,8 @@ describe('Stock', () => {
     });
   });
 
-  describe('initialize', () => {
-    it('should create initial stock with all quantity available', () => {
+  describe('초기화', () => {
+    it('모든 수량이 가용 상태인 초기 재고를 생성해야 함', () => {
       // Given
       const id = 'stock-1';
       const productOptionId = 'option-1';
@@ -95,8 +95,8 @@ describe('Stock', () => {
     });
   });
 
-  describe('getStatus', () => {
-    it('should return IN_STOCK when available quantity > 0', () => {
+  describe('재고 상태 조회', () => {
+    it('가용 수량이 0보다 클 때 재고 있음 상태를 반환해야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 50, 0, 0);
 
@@ -107,7 +107,7 @@ describe('Stock', () => {
       expect(status.status).toBe(StockStatusType.IN_STOCK);
     });
 
-    it('should return OUT_OF_STOCK when available quantity is 0', () => {
+    it('가용 수량이 0일 때 품절 상태를 반환해야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 0, 50, 50);
 
@@ -119,8 +119,8 @@ describe('Stock', () => {
     });
   });
 
-  describe('isAvailable', () => {
-    it('should return true when available quantity > 0', () => {
+  describe('가용 여부 확인', () => {
+    it('가용 수량이 0보다 클 때 true를 반환해야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 50, 0, 0);
 
@@ -131,7 +131,7 @@ describe('Stock', () => {
       expect(result).toBe(true);
     });
 
-    it('should return false when available quantity is 0', () => {
+    it('가용 수량이 0일 때 false를 반환해야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 0, 50, 50);
 
@@ -143,8 +143,8 @@ describe('Stock', () => {
     });
   });
 
-  describe('reserve', () => {
-    it('should reserve stock successfully', () => {
+  describe('재고 예약', () => {
+    it('재고를 성공적으로 예약해야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 100, 0, 0);
       const reserveQuantity = 10;
@@ -157,7 +157,7 @@ describe('Stock', () => {
       expect(stock.reservedQuantity).toBe(10);
     });
 
-    it('should throw error when reserve quantity exceeds available', () => {
+    it('예약 수량이 가용 수량을 초과할 때 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 50, 0, 0);
       const reserveQuantity = 60;
@@ -166,7 +166,7 @@ describe('Stock', () => {
       expect(() => stock.reserve(reserveQuantity)).toThrow('가용 재고가 부족합니다');
     });
 
-    it('should throw error for zero quantity', () => {
+    it('0 수량에 대해 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 50, 0, 0);
 
@@ -174,7 +174,7 @@ describe('Stock', () => {
       expect(() => stock.reserve(0)).toThrow('예약 수량은 양수여야 합니다');
     });
 
-    it('should throw error for negative quantity', () => {
+    it('음수 수량에 대해 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 50, 0, 0);
 
@@ -183,8 +183,8 @@ describe('Stock', () => {
     });
   });
 
-  describe('restoreReserved', () => {
-    it('should restore reserved stock successfully', () => {
+  describe('예약 복원', () => {
+    it('예약된 재고를 성공적으로 복원해야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 80, 20, 0);
       const restoreQuantity = 10;
@@ -197,7 +197,7 @@ describe('Stock', () => {
       expect(stock.reservedQuantity).toBe(10);
     });
 
-    it('should throw error when restore quantity exceeds reserved', () => {
+    it('복원 수량이 예약 수량을 초과할 때 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 80, 20, 0);
       const restoreQuantity = 30;
@@ -208,7 +208,7 @@ describe('Stock', () => {
       );
     });
 
-    it('should throw error for zero quantity', () => {
+    it('0 수량에 대해 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 80, 20, 0);
 
@@ -217,8 +217,8 @@ describe('Stock', () => {
     });
   });
 
-  describe('sell', () => {
-    it('should convert reserved to sold successfully', () => {
+  describe('판매 처리', () => {
+    it('예약된 재고를 판매 완료 상태로 성공적으로 전환해야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 80, 20, 0);
       const sellQuantity = 10;
@@ -232,7 +232,7 @@ describe('Stock', () => {
       expect(stock.availableQuantity).toBe(80);
     });
 
-    it('should throw error when sell quantity exceeds reserved', () => {
+    it('판매 수량이 예약 수량을 초과할 때 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 80, 20, 0);
       const sellQuantity = 30;
@@ -241,7 +241,7 @@ describe('Stock', () => {
       expect(() => stock.sell(sellQuantity)).toThrow('판매 수량이 예약 수량을 초과합니다');
     });
 
-    it('should throw error for zero quantity', () => {
+    it('0 수량에 대해 에러를 발생시켜야 함', () => {
       // Given
       const stock = Stock.create('stock-1', 'option-1', 100, 80, 20, 0);
 
@@ -250,41 +250,41 @@ describe('Stock', () => {
     });
   });
 
-  describe('stock flow scenario', () => {
-    it('should handle complete order flow: reserve -> sell', () => {
-      // Given: Initial stock
+  describe('재고 흐름 시나리오', () => {
+    it('완전한 주문 흐름을 처리해야 함: 예약 -> 판매', () => {
+      // Given: 초기 재고
       const stock = Stock.initialize('stock-1', 'option-1', 100);
       expect(stock.availableQuantity).toBe(100);
 
-      // When: Customer reserves 10 items
+      // When: 고객이 10개 예약
       stock.reserve(10);
 
-      // Then: Available decreased, reserved increased
+      // Then: 가용 재고 감소, 예약 재고 증가
       expect(stock.availableQuantity).toBe(90);
       expect(stock.reservedQuantity).toBe(10);
 
-      // When: Payment completes, convert to sold
+      // When: 결제 완료, 판매로 전환
       stock.sell(10);
 
-      // Then: Reserved converted to sold
+      // Then: 예약이 판매로 전환됨
       expect(stock.availableQuantity).toBe(90);
       expect(stock.reservedQuantity).toBe(0);
       expect(stock.soldQuantity).toBe(10);
     });
 
-    it('should handle order cancellation: reserve -> restore', () => {
-      // Given: Initial stock
+    it('주문 취소를 처리해야 함: 예약 -> 복원', () => {
+      // Given: 초기 재고
       const stock = Stock.initialize('stock-1', 'option-1', 100);
 
-      // When: Customer reserves 10 items
+      // When: 고객이 10개 예약
       stock.reserve(10);
       expect(stock.availableQuantity).toBe(90);
       expect(stock.reservedQuantity).toBe(10);
 
-      // When: Order is cancelled, restore reserved
+      // When: 주문 취소, 예약 복원
       stock.restoreReserved(10);
 
-      // Then: Stock restored to available
+      // Then: 재고가 가용 상태로 복원됨
       expect(stock.availableQuantity).toBe(100);
       expect(stock.reservedQuantity).toBe(0);
       expect(stock.soldQuantity).toBe(0);

@@ -43,8 +43,8 @@ describe('Product', () => {
     );
   };
 
-  describe('create', () => {
-    it('should create Product with valid parameters', () => {
+  describe('생성', () => {
+    it('유효한 파라미터로 Product 인스턴스를 생성해야 함', () => {
       // Given
       const id = 'product-1';
       const name = 'Test Product';
@@ -77,7 +77,7 @@ describe('Product', () => {
       expect(product.updatedAt).toEqual(updatedAt);
     });
 
-    it('should throw error when product ID is empty', () => {
+    it('상품 ID가 비어있을 때 에러를 발생시켜야 함', () => {
       // When & Then
       expect(() =>
         Product.create(
@@ -93,7 +93,7 @@ describe('Product', () => {
       ).toThrow('상품 ID는 필수입니다');
     });
 
-    it('should throw error when product name is empty', () => {
+    it('상품명이 비어있을 때 에러를 발생시켜야 함', () => {
       // When & Then
       expect(() =>
         Product.create(
@@ -109,7 +109,7 @@ describe('Product', () => {
       ).toThrow('상품명은 필수입니다');
     });
 
-    it('should throw error when image URL is empty', () => {
+    it('이미지 URL이 비어있을 때 에러를 발생시켜야 함', () => {
       // When & Then
       expect(() =>
         Product.create(
@@ -126,12 +126,12 @@ describe('Product', () => {
     });
   });
 
-  describe('getStockStatus', () => {
-    it('should return IN_STOCK when at least one option is available (BR-PROD-04)', () => {
+  describe('재고 상태 조회', () => {
+    it('최소 하나의 옵션이 구매 가능할 때 재고 있음 상태를 반환해야 함 (BR-PROD-04)', () => {
       // Given
       const options = [
-        createTestOption('option-1', 'Color', 'Red', 0, 10), // Available
-        createTestOption('option-2', 'Color', 'Blue', 0, 0), // Out of stock
+        createTestOption('option-1', 'Color', 'Red', 0, 10), // 구매 가능
+        createTestOption('option-2', 'Color', 'Blue', 0, 0), // 품절
       ];
       const product = createTestProduct(options);
 
@@ -142,7 +142,7 @@ describe('Product', () => {
       expect(status.status).toBe(StockStatusType.IN_STOCK);
     });
 
-    it('should return OUT_OF_STOCK when all options are unavailable', () => {
+    it('모든 옵션이 품절일 때 품절 상태를 반환해야 함', () => {
       // Given
       const options = [
         createTestOption('option-1', 'Color', 'Red', 0, 0),
@@ -157,7 +157,7 @@ describe('Product', () => {
       expect(status.status).toBe(StockStatusType.OUT_OF_STOCK);
     });
 
-    it('should return OUT_OF_STOCK when product has no options', () => {
+    it('상품에 옵션이 없을 때 품절 상태를 반환해야 함', () => {
       // Given
       const product = createTestProduct([]);
 
@@ -169,8 +169,8 @@ describe('Product', () => {
     });
   });
 
-  describe('getGroupedOptions', () => {
-    it('should group options by type (BR-PROD-05)', () => {
+  describe('옵션 그룹화 조회', () => {
+    it('옵션을 타입별로 그룹화해야 함 (BR-PROD-05)', () => {
       // Given
       const options = [
         createTestOption('option-1', 'Color', 'Red', 0, 10),
@@ -198,11 +198,11 @@ describe('Product', () => {
       expect(sizeGroup?.options.map((o) => o.name)).toEqual(['S', 'M', 'L']);
     });
 
-    it('should include stock status for each option (BR-PROD-06)', () => {
+    it('각 옵션의 재고 상태를 포함해야 함 (BR-PROD-06)', () => {
       // Given
       const options = [
-        createTestOption('option-1', 'Color', 'Red', 0, 10), // In stock
-        createTestOption('option-2', 'Color', 'Blue', 0, 0), // Out of stock
+        createTestOption('option-1', 'Color', 'Red', 0, 10), // 재고 있음
+        createTestOption('option-2', 'Color', 'Blue', 0, 0), // 품절
       ];
       const product = createTestProduct(options);
 
@@ -215,7 +215,7 @@ describe('Product', () => {
       expect(colorGroup?.options[1].stockStatus.status).toBe(StockStatusType.OUT_OF_STOCK);
     });
 
-    it('should include additional price for each option', () => {
+    it('각 옵션의 추가 금액을 포함해야 함', () => {
       // Given
       const options = [
         createTestOption('option-1', 'Size', 'S', 0, 10),
@@ -234,11 +234,11 @@ describe('Product', () => {
       expect(sizeGroup?.options[2].additionalPrice.amount).toBe(1000);
     });
 
-    it('should mark out-of-stock options as not selectable (BR-PROD-08)', () => {
+    it('품절된 옵션을 선택 불가로 표시해야 함 (BR-PROD-08)', () => {
       // Given
       const options = [
-        createTestOption('option-1', 'Size', 'S', 0, 0), // Out of stock
-        createTestOption('option-2', 'Size', 'M', 0, 10), // In stock
+        createTestOption('option-1', 'Size', 'S', 0, 0), // 품절
+        createTestOption('option-2', 'Size', 'M', 0, 10), // 재고 있음
       ];
       const product = createTestProduct(options);
 
@@ -251,7 +251,7 @@ describe('Product', () => {
       expect(sizeGroup?.options[1].isSelectable).toBe(true);
     });
 
-    it('should return empty array when product has no options', () => {
+    it('상품에 옵션이 없을 때 빈 배열을 반환해야 함', () => {
       // Given
       const product = createTestProduct([]);
 
@@ -263,8 +263,8 @@ describe('Product', () => {
     });
   });
 
-  describe('findOption', () => {
-    it('should find option by ID', () => {
+  describe('옵션 검색', () => {
+    it('ID로 옵션을 찾아야 함', () => {
       // Given
       const options = [
         createTestOption('option-1', 'Color', 'Red', 0, 10),
@@ -280,7 +280,7 @@ describe('Product', () => {
       expect(found?.name).toBe('Blue');
     });
 
-    it('should return undefined when option not found', () => {
+    it('옵션을 찾지 못했을 때 undefined를 반환해야 함', () => {
       // Given
       const options = [createTestOption('option-1', 'Color', 'Red', 0, 10)];
       const product = createTestProduct(options);
@@ -293,11 +293,11 @@ describe('Product', () => {
     });
   });
 
-  describe('calculateTotalPrice', () => {
-    it('should calculate total price correctly (BR-PROD-07)', () => {
-      // Given: Product price 10,000 KRW
+  describe('총 가격 계산', () => {
+    it('총 가격을 올바르게 계산해야 함 (BR-PROD-07)', () => {
+      // Given: 상품 가격 10,000원
       const options = [
-        createTestOption('option-1', 'Size', 'L', 1000, 10), // +1,000 KRW
+        createTestOption('option-1', 'Size', 'L', 1000, 10), // +1,000원
       ];
       const product = createTestProduct(options);
       const quantity = 3;
@@ -305,14 +305,14 @@ describe('Product', () => {
       // When: (10,000 + 1,000) × 3
       const totalPrice = product.calculateTotalPrice('option-1', quantity);
 
-      // Then: = 33,000 KRW
+      // Then: = 33,000원
       expect(totalPrice.amount).toBe(33000);
     });
 
-    it('should calculate with no additional price', () => {
+    it('추가 금액이 없을 때 올바르게 계산해야 함', () => {
       // Given
       const options = [
-        createTestOption('option-1', 'Color', 'Red', 0, 10), // +0 KRW
+        createTestOption('option-1', 'Color', 'Red', 0, 10), // +0원
       ];
       const product = createTestProduct(options);
       const quantity = 2;
@@ -320,11 +320,11 @@ describe('Product', () => {
       // When: (10,000 + 0) × 2
       const totalPrice = product.calculateTotalPrice('option-1', quantity);
 
-      // Then: = 20,000 KRW
+      // Then: = 20,000원
       expect(totalPrice.amount).toBe(20000);
     });
 
-    it('should throw error for non-existent option', () => {
+    it('존재하지 않는 옵션에 대해 에러를 발생시켜야 함', () => {
       // Given
       const product = createTestProduct([]);
 
@@ -334,7 +334,7 @@ describe('Product', () => {
       );
     });
 
-    it('should throw error for zero quantity', () => {
+    it('0 수량에 대해 에러를 발생시켜야 함', () => {
       // Given
       const options = [createTestOption('option-1', 'Color', 'Red', 0, 10)];
       const product = createTestProduct(options);
@@ -345,7 +345,7 @@ describe('Product', () => {
       );
     });
 
-    it('should throw error for negative quantity', () => {
+    it('음수 수량에 대해 에러를 발생시켜야 함', () => {
       // Given
       const options = [createTestOption('option-1', 'Color', 'Red', 0, 10)];
       const product = createTestProduct(options);
@@ -357,8 +357,8 @@ describe('Product', () => {
     });
   });
 
-  describe('options immutability', () => {
-    it('should return copy of options to maintain immutability', () => {
+  describe('옵션 불변성', () => {
+    it('불변성 유지를 위해 옵션의 복사본을 반환해야 함', () => {
       // Given
       const options = [createTestOption('option-1', 'Color', 'Red', 0, 10)];
       const product = createTestProduct(options);
@@ -367,7 +367,7 @@ describe('Product', () => {
       const retrievedOptions = product.options;
       retrievedOptions.push(createTestOption('option-2', 'Color', 'Blue', 0, 5));
 
-      // Then: Original product options should not be modified
+      // Then: 원본 상품 옵션은 수정되지 않아야 함
       expect(product.options).toHaveLength(1);
     });
   });
