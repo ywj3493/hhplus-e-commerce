@@ -1,8 +1,8 @@
-import { Money } from '../../domain/value-objects/money.vo';
-import { StockStatus } from '../../domain/value-objects/stock-status.vo';
+import { Money } from '../../domain/entities/money.vo';
+import { StockStatus } from '../../domain/entities/stock-status.vo';
 
 /**
- * Product option in detail
+ * 상품 상세의 옵션 정보
  */
 export class ProductOptionDetail {
   constructor(
@@ -15,7 +15,7 @@ export class ProductOptionDetail {
 }
 
 /**
- * Grouped options by type
+ * 타입별로 그룹화된 옵션
  */
 export class ProductOptionGroup {
   constructor(
@@ -25,7 +25,7 @@ export class ProductOptionGroup {
 }
 
 /**
- * Get Product Detail Use Case Output DTO
+ * 상품 상세 조회 Use Case Output DTO
  */
 export class GetProductDetailOutput {
   constructor(

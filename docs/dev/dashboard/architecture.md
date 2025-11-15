@@ -2113,9 +2113,188 @@ export class Order {
 
 ---
 
-## 11. 관련 문서
+## 11. 코딩 컨벤션
 
-### 11.1 도메인별 문서
+### 11.1 주석 작성 규칙
+
+**모든 주석은 한글로 작성합니다.**
+
+✅ **GOOD**
+```typescript
+/**
+ * 상품 엔티티
+ * Product 도메인의 메인 애그리거트 루트
+ */
+export class Product {
+  /**
+   * 재고 상태 조회
+   * BR-PROD-04: availableQuantity > 0이면 "재고 있음", 아니면 "품절"
+   */
+  getStockStatus(): StockStatus {
+    // 하나 이상의 옵션이 재고 있으면 재고 있음으로 표시
+    return this.hasAvailableOption ? StockStatus.inStock() : StockStatus.outOfStock();
+  }
+}
+```
+
+❌ **BAD**
+```typescript
+/**
+ * Product Entity
+ * Main aggregate root for product domain
+ */
+export class Product {
+  /**
+   * Get stock status
+   * BR-PROD-04: "In Stock" if availableQuantity > 0, else "Out of Stock"
+   */
+  getStockStatus(): StockStatus {
+    // Return in stock if at least one option is available
+    return this.hasAvailableOption ? StockStatus.inStock() : StockStatus.outOfStock();
+  }
+}
+```
+
+### 11.2 예외(Exceptions) 관리
+
+**도메인별로 하나의 예외 파일로 통합합니다.**
+
+✅ **GOOD**
+```
+src/product/domain/
+└── product.exceptions.ts   # 모든 Product 도메인 예외
+```
+
+```typescript
+// src/product/domain/product.exceptions.ts
+export class ProductNotFoundException extends Error { ... }
+export class InvalidProductIdException extends Error { ... }
+export class InsufficientStockException extends Error { ... }
+```
+
+❌ **BAD**
+```
+src/product/domain/exceptions/
+├── product-not-found.exception.ts
+├── invalid-product-id.exception.ts
+└── insufficient-stock.exception.ts
+```
+
+### 11.3 Value Objects 위치
+
+**Value Objects는 `entities/` 폴더 안에 배치합니다.**
+
+✅ **GOOD**
+```
+src/product/domain/entities/
+├── product.entity.ts
+├── product-option.entity.ts
+├── stock.entity.ts
+├── money.vo.ts            # Value Object
+└── stock-status.vo.ts     # Value Object
+```
+
+❌ **BAD**
+```
+src/product/domain/
+├── entities/
+│   ├── product.entity.ts
+│   ├── product-option.entity.ts
+│   └── stock.entity.ts
+└── value-objects/
+    ├── money.vo.ts
+    └── stock-status.vo.ts
+```
+
+**이유**: Value Objects는 Entity와 밀접하게 관련되어 있으며, 함께 배치하면 응집도가 높아집니다.
+
+### 11.4 도메인 서비스
+
+**Entity 이상의 복잡한 비즈니스 로직은 Domain Service로 분리합니다.**
+
+✅ **GOOD: Entity 메서드**
+```typescript
+// 단일 Entity의 상태 변경
+export class Stock {
+  reserve(quantity: number): void {
+    if (quantity > this.availableQuantity) {
+      throw new Error('재고 부족');
+    }
+    this.availableQuantity -= quantity;
+    this.reservedQuantity += quantity;
+  }
+}
+```
+
+✅ **GOOD: Domain Service**
+```typescript
+// 여러 Entity를 조율하는 복잡한 로직
+export class StockService {
+  async reserveMultipleStocks(
+    items: { productId: string; quantity: number }[],
+    em: EntityManager,
+  ): Promise<void> {
+    for (const item of items) {
+      const stock = await this.stockRepository.findByProductIdForUpdate(item.productId, em);
+      stock.reserve(item.quantity);
+      await this.stockRepository.save(stock, em);
+    }
+  }
+}
+```
+
+**Domain Service를 사용하는 경우**:
+- 여러 Entity를 조율해야 할 때
+- 트랜잭션 내에서 여러 Repository를 사용해야 할 때
+- 단일 Entity로 표현하기 어려운 비즈니스 로직일 때
+
+### 11.5 폴더 구조 예시
+
+**표준 도메인 폴더 구조**:
+```
+src/{domain}/
+├── domain/
+│   ├── entities/
+│   │   ├── {entity}.entity.ts
+│   │   ├── {entity}.entity.spec.ts
+│   │   ├── {vo}.vo.ts
+│   │   └── {vo}.vo.spec.ts
+│   ├── services/              # 필요시
+│   │   ├── {service}.service.ts
+│   │   └── {service}.service.spec.ts
+│   ├── repositories/
+│   │   └── {repository}.repository.ts
+│   └── {domain}.exceptions.ts  # 도메인별 통합 예외
+├── application/
+│   ├── use-cases/
+│   │   ├── {usecase}.use-case.ts
+│   │   └── {usecase}.use-case.spec.ts
+│   ├── dtos/
+│   │   ├── {name}.input.ts
+│   │   └── {name}.output.ts
+│   └── event-handlers/         # 필요시
+│       └── {handler}.handler.ts
+├── infrastructure/
+│   ├── repositories/
+│   │   ├── {implementation}.repository.ts
+│   │   └── {implementation}.repository.spec.ts
+│   └── fixtures/               # 테스트용
+│       └── {domain}.fixtures.ts
+├── presentation/
+│   ├── controllers/
+│   │   ├── {controller}.controller.ts
+│   │   └── {controller}.controller.spec.ts
+│   └── dtos/
+│       ├── {request}.dto.ts
+│       └── {response}.dto.ts
+└── {domain}.module.ts
+```
+
+---
+
+## 12. 관련 문서
+
+### 12.1 도메인별 문서
 
 #### 비즈니스 관점 (Use Cases)
 - [Product 유스케이스](./product/use-cases.md)
@@ -2133,7 +2312,7 @@ export class Order {
 - [Coupon 시퀀스 다이어그램](./coupon/sequence-diagrams.md)
 - [Data 시퀀스 다이어그램](./data/sequence-diagrams.md)
 
-### 11.2 기타 문서
+### 12.2 기타 문서
 - [요구사항 분석](./requirements.md)
 - [사용자 스토리](./user-stories.md)
 - [API 명세서](./api-specification.md)
@@ -2141,12 +2320,13 @@ export class Order {
 
 ---
 
-## 12. 버전 히스토리
+## 13. 버전 히스토리
 
 | 버전 | 날짜 | 작성자 | 변경 내역 |
 |------|------|--------|-----------|
 | 1.0.0 | 2025-11-03 | Development Team | 초기 문서 작성 |
 | 2.0.0 | 2025-11-04 | Development Team | 도메인 우선 아키텍처로 재구성, 테스트 조직화 섹션 추가, 도메인 간 통신 패턴 명확화 |
+| 2.1.0 | 2025-11-15 | Development Team | 코딩 컨벤션 섹션 추가 (주석 한글화, Exceptions 통합, VO 위치, Domain Service) |
 
 ---
 

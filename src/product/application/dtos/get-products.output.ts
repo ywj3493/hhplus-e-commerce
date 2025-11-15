@@ -1,7 +1,7 @@
-import { StockStatus } from '../../domain/value-objects/stock-status.vo';
+import { StockStatus } from '../../domain/entities/stock-status.vo';
 
 /**
- * Product item in list
+ * 상품 목록의 상품 아이템
  */
 export class ProductListItem {
   constructor(
@@ -14,7 +14,7 @@ export class ProductListItem {
 }
 
 /**
- * Get Products Use Case Output DTO
+ * 상품 목록 조회 Use Case Output DTO
  */
 export class GetProductsOutput {
   constructor(

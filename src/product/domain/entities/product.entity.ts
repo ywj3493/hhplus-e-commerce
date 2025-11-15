@@ -1,10 +1,10 @@
-import { Money } from '../value-objects/money.vo';
-import { StockStatus } from '../value-objects/stock-status.vo';
+import { Money } from './money.vo';
+import { StockStatus } from './stock-status.vo';
 import { ProductOption } from './product-option.entity';
 
 /**
- * Grouped options by type
- * BR-PROD-05: Options grouped by type field
+ * 타입별로 그룹화된 옵션
+ * BR-PROD-05: type 필드 기준으로 옵션 그룹화
  */
 export interface GroupedOptions {
   type: string;
@@ -19,8 +19,8 @@ export interface GroupedOptions {
 
 /**
  * Product Entity
- * Main aggregate root for product domain
- * BR-PROD-05: Options grouped by type
+ * Product 도메인의 메인 애그리거트 루트
+ * BR-PROD-05: 옵션은 타입별로 그룹화됨
  */
 export class Product {
   private readonly _id: string;
@@ -55,7 +55,7 @@ export class Product {
   }
 
   /**
-   * Factory method to create Product instance
+   * Product 인스턴스를 생성하는 팩토리 메서드
    */
   static create(
     id: string,
@@ -72,20 +72,20 @@ export class Product {
 
   private validate(): void {
     if (!this._id || this._id.trim() === '') {
-      throw new Error('Product ID is required');
+      throw new Error('상품 ID는 필수입니다');
     }
     if (!this._name || this._name.trim() === '') {
-      throw new Error('Product name is required');
+      throw new Error('상품명은 필수입니다');
     }
     if (!this._imageUrl || this._imageUrl.trim() === '') {
-      throw new Error('Product image URL is required');
+      throw new Error('상품 이미지 URL은 필수입니다');
     }
   }
 
   /**
-   * Get overall stock status
-   * Product is in stock if at least one option is available
-   * BR-PROD-04: Stock status calculation
+   * 전체 재고 상태 조회
+   * 하나 이상의 옵션이 재고 있으면 재고 있음으로 표시
+   * BR-PROD-04: 재고 상태 계산
    */
   getStockStatus(): StockStatus {
     if (this._options.length === 0) {
@@ -97,20 +97,20 @@ export class Product {
   }
 
   /**
-   * Group options by type
-   * BR-PROD-05: Options grouped by type field
+   * 타입별로 옵션 그룹화
+   * BR-PROD-05: type 필드 기준으로 옵션 그룹화
    */
   getGroupedOptions(): GroupedOptions[] {
     const grouped = new Map<string, ProductOption[]>();
 
-    // Group options by type
+    // 타입별로 옵션 그룹화
     for (const option of this._options) {
       const existing = grouped.get(option.type) || [];
       existing.push(option);
       grouped.set(option.type, existing);
     }
 
-    // Convert to GroupedOptions array
+    // GroupedOptions 배열로 변환
     return Array.from(grouped.entries()).map(([type, options]) => ({
       type,
       options: options.map((opt) => ({
@@ -124,24 +124,24 @@ export class Product {
   }
 
   /**
-   * Find option by ID
+   * ID로 옵션 찾기
    */
   findOption(optionId: string): ProductOption | undefined {
     return this._options.find((opt) => opt.id === optionId);
   }
 
   /**
-   * Calculate total price with option
-   * BR-PROD-07: Total amount calculation = (Product price + Option additional price) × Quantity
+   * 옵션을 포함한 총 가격 계산
+   * BR-PROD-07: 총 금액 계산 = (상품 가격 + 옵션 추가 가격) × 수량
    */
   calculateTotalPrice(optionId: string, quantity: number): Money {
     if (quantity <= 0) {
-      throw new Error('Quantity must be positive');
+      throw new Error('수량은 양수여야 합니다');
     }
 
     const option = this.findOption(optionId);
     if (!option) {
-      throw new Error(`Option not found: ${optionId}`);
+      throw new Error(`옵션을 찾을 수 없습니다: ${optionId}`);
     }
 
     const unitPrice = option.calculatePrice(this._price);
@@ -170,7 +170,7 @@ export class Product {
   }
 
   get options(): ProductOption[] {
-    return [...this._options]; // Return copy to maintain immutability
+    return [...this._options]; // 불변성 유지를 위해 복사본 반환
   }
 
   get createdAt(): Date {

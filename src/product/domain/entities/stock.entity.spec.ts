@@ -1,5 +1,5 @@
 import { Stock } from './stock.entity';
-import { StockStatusType } from '../value-objects/stock-status.vo';
+import { StockStatusType } from './stock-status.vo';
 
 describe('Stock', () => {
   describe('create', () => {

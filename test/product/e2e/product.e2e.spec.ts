@@ -78,7 +78,7 @@ describe('Product API (e2e)', () => {
             expect(typeof product.name).toBe('string');
             expect(typeof product.price).toBe('number');
             expect(typeof product.imageUrl).toBe('string');
-            expect(['In Stock', 'Out of Stock']).toContain(product.stockStatus);
+            expect(['재고 있음', '품절']).toContain(product.stockStatus);
           }
         });
     });
@@ -203,7 +203,7 @@ describe('Product API (e2e)', () => {
           expect(firstOption).toHaveProperty('additionalPrice');
           expect(firstOption).toHaveProperty('stockStatus');
           expect(firstOption).toHaveProperty('isSelectable');
-          expect(['In Stock', 'Out of Stock']).toContain(firstOption.stockStatus);
+          expect(['재고 있음', '품절']).toContain(firstOption.stockStatus);
           expect(typeof firstOption.isSelectable).toBe('boolean');
         });
     });
@@ -218,7 +218,7 @@ describe('Product API (e2e)', () => {
           if (colorGroup) {
             const navyOption = colorGroup.options.find((o: any) => o.name === 'Navy');
             if (navyOption) {
-              expect(navyOption.stockStatus).toBe('Out of Stock');
+              expect(navyOption.stockStatus).toBe('품절');
               expect(navyOption.isSelectable).toBe(false);
             }
           }
@@ -302,9 +302,9 @@ describe('Product API (e2e)', () => {
         // Stock status in list is overall product status
         // Detail has per-option status
         // At least one option should match the overall status if in stock
-        if (listProduct.stockStatus === 'In Stock') {
+        if (listProduct.stockStatus === '재고 있음') {
           const hasInStockOption = detailResponse.body.optionGroups.some((group: any) =>
-            group.options.some((opt: any) => opt.stockStatus === 'In Stock'),
+            group.options.some((opt: any) => opt.stockStatus === '재고 있음'),
           );
           expect(hasInStockOption).toBe(true);
         }

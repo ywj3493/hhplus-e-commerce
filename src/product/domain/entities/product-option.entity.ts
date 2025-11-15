@@ -1,12 +1,12 @@
-import { Money } from '../value-objects/money.vo';
-import { StockStatus } from '../value-objects/stock-status.vo';
+import { Money } from './money.vo';
+import { StockStatus } from './stock-status.vo';
 import { Stock } from './stock.entity';
 
 /**
  * ProductOption Entity
- * Represents a product option with type, name, price, and stock
- * BR-PROD-05: Options are grouped by type field
- * BR-PROD-06: Stock status is displayed per option
+ * 타입, 이름, 가격, 재고를 가진 상품 옵션을 나타냄
+ * BR-PROD-05: 옵션은 type 필드로 그룹화됨
+ * BR-PROD-06: 재고 상태는 옵션별로 표시됨
  */
 export class ProductOption {
   private readonly _id: string;
@@ -35,7 +35,7 @@ export class ProductOption {
   }
 
   /**
-   * Factory method to create ProductOption instance
+   * ProductOption 인스턴스를 생성하는 팩토리 메서드
    */
   static create(
     id: string,
@@ -50,38 +50,38 @@ export class ProductOption {
 
   private validate(): void {
     if (!this._id || this._id.trim() === '') {
-      throw new Error('Option ID is required');
+      throw new Error('옵션 ID는 필수입니다');
     }
     if (!this._productId || this._productId.trim() === '') {
-      throw new Error('Product ID is required');
+      throw new Error('상품 ID는 필수입니다');
     }
     if (!this._type || this._type.trim() === '') {
-      throw new Error('Option type is required');
+      throw new Error('옵션 타입은 필수입니다');
     }
     if (!this._name || this._name.trim() === '') {
-      throw new Error('Option name is required');
+      throw new Error('옵션명은 필수입니다');
     }
   }
 
   /**
-   * Calculate total price (base + additional)
-   * Used in BR-PROD-07: Total amount calculation
+   * 총 가격 계산 (기본 가격 + 추가 가격)
+   * BR-PROD-07: 총 금액 계산에 사용됨
    */
   calculatePrice(basePrice: Money): Money {
     return basePrice.add(this._additionalPrice);
   }
 
   /**
-   * Get stock status
-   * BR-PROD-06: Stock status displayed per option
+   * 재고 상태 조회
+   * BR-PROD-06: 옵션별로 재고 상태 표시
    */
   getStockStatus(): StockStatus {
     return this._stock.getStatus();
   }
 
   /**
-   * Check if option is selectable
-   * BR-PROD-08: Out-of-stock options cannot be selected
+   * 옵션 선택 가능 여부 확인
+   * BR-PROD-08: 품절된 옵션은 선택 불가
    */
   isSelectable(): boolean {
     return this._stock.isAvailable();

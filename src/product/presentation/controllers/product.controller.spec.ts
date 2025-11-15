@@ -9,9 +9,9 @@ import {
   ProductOptionGroup,
   ProductOptionDetail,
 } from '../../application/dtos/get-product-detail.output';
-import { Money } from '../../domain/value-objects/money.vo';
-import { StockStatus } from '../../domain/value-objects/stock-status.vo';
-import { ProductNotFoundException } from '../../domain/exceptions/product-not-found.exception';
+import { Money } from '../../domain/entities/money.vo';
+import { StockStatus } from '../../domain/entities/stock-status.vo';
+import { ProductNotFoundException } from '../../domain/product.exceptions';
 
 describe('ProductController', () => {
   let controller: ProductController;

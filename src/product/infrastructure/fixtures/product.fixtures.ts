@@ -1,18 +1,18 @@
 import { Product } from '../../domain/entities/product.entity';
 import { ProductOption } from '../../domain/entities/product-option.entity';
 import { Stock } from '../../domain/entities/stock.entity';
-import { Money } from '../../domain/value-objects/money.vo';
+import { Money } from '../../domain/entities/money.vo';
 
 /**
- * Product fixtures for testing and initial data
+ * 테스트 및 초기 데이터를 위한 Product 픽스처
  */
 export class ProductFixtures {
   /**
-   * Create sample products with options and stock
+   * 옵션과 재고가 포함된 샘플 상품 생성
    */
   static createSampleProducts(): Product[] {
     return [
-      // Product 1: Basic T-Shirt
+      // 상품 1: 기본 티셔츠
       Product.create(
         '550e8400-e29b-41d4-a716-446655440001',
         'Basic T-Shirt',
@@ -49,7 +49,7 @@ export class ProductFixtures {
         new Date('2024-01-01T00:00:00Z'),
       ),
 
-      // Product 2: Premium Hoodie
+      // 상품 2: 프리미엄 후디
       Product.create(
         '550e8400-e29b-41d4-a716-446655440002',
         'Premium Hoodie',
@@ -94,7 +94,7 @@ export class ProductFixtures {
         new Date('2024-01-02T00:00:00Z'),
       ),
 
-      // Product 3: Denim Jeans
+      // 상품 3: 클래식 데님 진
       Product.create(
         '550e8400-e29b-41d4-a716-446655440003',
         'Classic Denim Jeans',
@@ -131,7 +131,7 @@ export class ProductFixtures {
         new Date('2024-01-03T00:00:00Z'),
       ),
 
-      // Product 4: Sneakers
+      // 상품 4: 캐주얼 스니커즈
       Product.create(
         '550e8400-e29b-41d4-a716-446655440004',
         'Casual Sneakers',
@@ -168,7 +168,7 @@ export class ProductFixtures {
         new Date('2024-01-04T00:00:00Z'),
       ),
 
-      // Product 5: Baseball Cap
+      // 상품 5: 야구 모자
       Product.create(
         '550e8400-e29b-41d4-a716-446655440005',
         'Baseball Cap',
@@ -197,7 +197,7 @@ export class ProductFixtures {
         new Date('2024-01-05T00:00:00Z'),
       ),
 
-      // Product 6-15: Additional products for pagination testing
+      // 상품 6-15: 페이지네이션 테스트를 위한 추가 상품
       ...Array.from({ length: 10 }, (_, i) => {
         const idx = i + 6;
         const productId = `550e8400-e29b-41d4-a716-4466554400${idx.toString().padStart(2, '0')}`;

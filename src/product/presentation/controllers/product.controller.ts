@@ -17,11 +17,11 @@ import { GetProductsQueryDto } from '../dtos/get-products-query.dto';
 import { ProductListResponseDto } from '../dtos/product-list-response.dto';
 import { GetProductDetailParamDto } from '../dtos/get-product-detail-param.dto';
 import { ProductDetailResponseDto } from '../dtos/product-detail-response.dto';
-import { ProductNotFoundException } from '../../domain/exceptions/product-not-found.exception';
+import { ProductNotFoundException } from '../../domain/product.exceptions';
 
 /**
  * Product Controller
- * Handles HTTP requests for product operations
+ * 상품 관련 HTTP 요청을 처리
  */
 @ApiTags('products')
 @Controller('products')
@@ -32,8 +32,8 @@ export class ProductController {
   ) {}
 
   /**
-   * Get product list with pagination
-   * UC-PROD-01: Product List Retrieval
+   * 페이지네이션을 사용한 상품 목록 조회
+   * UC-PROD-01: 상품 목록 조회
    */
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -52,13 +52,13 @@ export class ProductController {
   })
   async getProducts(@Query() query: GetProductsQueryDto): Promise<ProductListResponseDto> {
     try {
-      // Map HTTP DTO to Use Case input
+      // HTTP DTO를 Use Case input으로 매핑
       const input = new GetProductsInput(query.page, query.limit);
 
-      // Execute use case
+      // Use case 실행
       const output = await this.getProductsUseCase.execute(input);
 
-      // Map Use Case output to HTTP response
+      // Use Case output을 HTTP response로 매핑
       return {
         items: output.items.map((item) => ({
           id: item.id,
@@ -81,8 +81,8 @@ export class ProductController {
   }
 
   /**
-   * Get product detail by ID
-   * UC-PROD-02: Product Detail Retrieval
+   * ID로 상품 상세 조회
+   * UC-PROD-02: 상품 상세 조회
    */
   @Get(':id')
   @HttpCode(HttpStatus.OK)
@@ -107,13 +107,13 @@ export class ProductController {
     @Param() param: GetProductDetailParamDto,
   ): Promise<ProductDetailResponseDto> {
     try {
-      // Map HTTP DTO to Use Case input
+      // HTTP DTO를 Use Case input으로 매핑
       const input = new GetProductDetailInput(param.id);
 
-      // Execute use case
+      // Use case 실행
       const output = await this.getProductDetailUseCase.execute(input);
 
-      // Map Use Case output to HTTP response
+      // Use Case output을 HTTP response로 매핑
       return {
         id: output.id,
         name: output.name,

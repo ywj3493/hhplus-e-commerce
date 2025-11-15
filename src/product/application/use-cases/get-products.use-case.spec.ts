@@ -4,8 +4,8 @@ import { IProductRepository, PaginationResult } from '../../domain/repositories/
 import { Product } from '../../domain/entities/product.entity';
 import { ProductOption } from '../../domain/entities/product-option.entity';
 import { Stock } from '../../domain/entities/stock.entity';
-import { Money } from '../../domain/value-objects/money.vo';
-import { StockStatusType } from '../../domain/value-objects/stock-status.vo';
+import { Money } from '../../domain/entities/money.vo';
+import { StockStatusType } from '../../domain/entities/stock-status.vo';
 
 describe('GetProductsUseCase', () => {
   let useCase: GetProductsUseCase;

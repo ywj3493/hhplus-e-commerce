@@ -1,8 +1,8 @@
 import { Product } from './product.entity';
 import { ProductOption } from './product-option.entity';
 import { Stock } from './stock.entity';
-import { Money } from '../value-objects/money.vo';
-import { StockStatusType } from '../value-objects/stock-status.vo';
+import { Money } from './money.vo';
+import { StockStatusType } from './stock-status.vo';
 
 describe('Product', () => {
   const createTestProduct = (options: ProductOption[] = []): Product => {

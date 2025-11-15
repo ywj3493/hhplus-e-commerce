@@ -1,9 +1,9 @@
-import { StockStatus } from '../value-objects/stock-status.vo';
+import { StockStatus } from './stock-status.vo';
 
 /**
  * Stock Entity
- * Manages product option inventory
- * BR-PROD-04: Stock status calculation based on availableQuantity
+ * 상품 옵션의 재고를 관리
+ * BR-PROD-04: availableQuantity를 기반으로 재고 상태 계산
  */
 export class Stock {
   private readonly _id: string;
@@ -32,7 +32,7 @@ export class Stock {
   }
 
   /**
-   * Factory method to create Stock instance
+   * Stock 인스턴스를 생성하는 팩토리 메서드
    */
   static create(
     id: string,
@@ -53,7 +53,7 @@ export class Stock {
   }
 
   /**
-   * Factory method for initial stock
+   * 초기 재고를 생성하는 팩토리 메서드
    */
   static initialize(id: string, productOptionId: string, totalQuantity: number): Stock {
     return new Stock(id, productOptionId, totalQuantity, totalQuantity, 0, 0);
@@ -61,74 +61,74 @@ export class Stock {
 
   private validate(): void {
     if (this._totalQuantity < 0) {
-      throw new Error('Total quantity cannot be negative');
+      throw new Error('총 재고 수량은 음수일 수 없습니다');
     }
     if (this._availableQuantity < 0) {
-      throw new Error('Available quantity cannot be negative');
+      throw new Error('가용 재고 수량은 음수일 수 없습니다');
     }
     if (this._reservedQuantity < 0) {
-      throw new Error('Reserved quantity cannot be negative');
+      throw new Error('예약 재고 수량은 음수일 수 없습니다');
     }
     if (this._soldQuantity < 0) {
-      throw new Error('Sold quantity cannot be negative');
+      throw new Error('판매 재고 수량은 음수일 수 없습니다');
     }
     if (this._availableQuantity + this._reservedQuantity + this._soldQuantity > this._totalQuantity) {
-      throw new Error('Sum of available, reserved, and sold quantity cannot exceed total quantity');
+      throw new Error('가용, 예약, 판매 재고의 합은 총 재고를 초과할 수 없습니다');
     }
   }
 
   /**
-   * Get stock status based on available quantity
-   * BR-PROD-04: "In Stock" if availableQuantity > 0, else "Out of Stock"
+   * 가용 재고 수량을 기반으로 재고 상태 조회
+   * BR-PROD-04: availableQuantity > 0이면 "재고 있음", 아니면 "품절"
    */
   getStatus(): StockStatus {
     return StockStatus.fromAvailableQuantity(this._availableQuantity);
   }
 
   /**
-   * Check if stock is available
+   * 재고 가용 여부 확인
    */
   isAvailable(): boolean {
     return this._availableQuantity > 0;
   }
 
   /**
-   * Reserve stock for order
+   * 주문을 위한 재고 예약
    */
   reserve(quantity: number): void {
     if (quantity <= 0) {
-      throw new Error('Reserve quantity must be positive');
+      throw new Error('예약 수량은 양수여야 합니다');
     }
     if (quantity > this._availableQuantity) {
-      throw new Error('Insufficient available quantity');
+      throw new Error('가용 재고가 부족합니다');
     }
     this._availableQuantity -= quantity;
     this._reservedQuantity += quantity;
   }
 
   /**
-   * Restore reserved stock (e.g., on order cancellation)
+   * 예약된 재고 복원 (예: 주문 취소 시)
    */
   restoreReserved(quantity: number): void {
     if (quantity <= 0) {
-      throw new Error('Restore quantity must be positive');
+      throw new Error('복원 수량은 양수여야 합니다');
     }
     if (quantity > this._reservedQuantity) {
-      throw new Error('Restore quantity exceeds reserved quantity');
+      throw new Error('복원 수량이 예약 수량을 초과합니다');
     }
     this._reservedQuantity -= quantity;
     this._availableQuantity += quantity;
   }
 
   /**
-   * Convert reserved stock to sold (e.g., on payment completion)
+   * 예약된 재고를 판매로 전환 (예: 결제 완료 시)
    */
   sell(quantity: number): void {
     if (quantity <= 0) {
-      throw new Error('Sell quantity must be positive');
+      throw new Error('판매 수량은 양수여야 합니다');
     }
     if (quantity > this._reservedQuantity) {
-      throw new Error('Sell quantity exceeds reserved quantity');
+      throw new Error('판매 수량이 예약 수량을 초과합니다');
     }
     this._reservedQuantity -= quantity;
     this._soldQuantity += quantity;
