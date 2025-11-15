@@ -187,7 +187,7 @@ describe('GetProductDetailUseCase', () => {
 
       // When & Then
       await expect(useCase.execute(input)).rejects.toThrow(ProductNotFoundException);
-      await expect(useCase.execute(input)).rejects.toThrow('Product not found: non-existent');
+      await expect(useCase.execute(input)).rejects.toThrow('상품을 찾을 수 없습니다: non-existent');
     });
 
     it('should handle product with no options', async () => {
@@ -248,12 +248,12 @@ describe('GetProductDetailUseCase', () => {
   describe('input validation', () => {
     it('should validate product ID is required', () => {
       // When & Then
-      expect(() => new GetProductDetailInput('')).toThrow('Product ID is required');
+      expect(() => new GetProductDetailInput('')).toThrow('상품 ID는 필수입니다');
     });
 
     it('should validate product ID is not whitespace only', () => {
       // When & Then
-      expect(() => new GetProductDetailInput('   ')).toThrow('Product ID is required');
+      expect(() => new GetProductDetailInput('   ')).toThrow('상품 ID는 필수입니다');
     });
 
     it('should accept valid product ID', () => {

@@ -76,9 +76,9 @@ describe('ProductController', () => {
         name: 'Product 1',
         price: 10000,
         imageUrl: 'https://example.com/1.jpg',
-        stockStatus: 'In Stock',
+        stockStatus: '재고 있음',
       });
-      expect(response.items[1].stockStatus).toBe('Out of Stock');
+      expect(response.items[1].stockStatus).toBe('품절');
       expect(response.total).toBe(2);
       expect(response.page).toBe(1);
       expect(response.limit).toBe(10);
@@ -215,7 +215,7 @@ describe('ProductController', () => {
         id: 'opt-1',
         name: 'Red',
         additionalPrice: 0,
-        stockStatus: 'In Stock',
+        stockStatus: '재고 있음',
         isSelectable: true,
       });
     });
@@ -299,8 +299,8 @@ describe('ProductController', () => {
       const response = await controller.getProductDetail(param);
 
       // Then
-      expect(response.optionGroups[0].options[0].stockStatus).toBe('In Stock');
-      expect(response.optionGroups[0].options[1].stockStatus).toBe('Out of Stock');
+      expect(response.optionGroups[0].options[0].stockStatus).toBe('재고 있음');
+      expect(response.optionGroups[0].options[1].stockStatus).toBe('품절');
     });
 
     it('should include isSelectable field', async () => {

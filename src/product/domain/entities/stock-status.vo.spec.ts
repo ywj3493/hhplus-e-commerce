@@ -34,7 +34,7 @@ describe('StockStatus', () => {
 
       // When & Then
       expect(() => StockStatus.fromAvailableQuantity(negativeQuantity)).toThrow(
-        'Available quantity cannot be negative',
+        '가용 재고 수량은 음수일 수 없습니다',
       );
     });
   });
@@ -88,7 +88,7 @@ describe('StockStatus', () => {
   });
 
   describe('toString', () => {
-    it('should return "In Stock" for IN_STOCK status', () => {
+    it('should return "재고 있음" for IN_STOCK status', () => {
       // Given
       const status = StockStatus.inStock();
 
@@ -96,10 +96,10 @@ describe('StockStatus', () => {
       const result = status.toString();
 
       // Then
-      expect(result).toBe('In Stock');
+      expect(result).toBe('재고 있음');
     });
 
-    it('should return "Out of Stock" for OUT_OF_STOCK status', () => {
+    it('should return "품절" for OUT_OF_STOCK status', () => {
       // Given
       const status = StockStatus.outOfStock();
 
@@ -107,7 +107,7 @@ describe('StockStatus', () => {
       const result = status.toString();
 
       // Then
-      expect(result).toBe('Out of Stock');
+      expect(result).toBe('품절');
     });
   });
 });

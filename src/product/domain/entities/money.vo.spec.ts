@@ -18,7 +18,7 @@ describe('Money', () => {
       const negativeAmount = -1000;
 
       // When & Then
-      expect(() => Money.from(negativeAmount)).toThrow('Amount cannot be negative');
+      expect(() => Money.from(negativeAmount)).toThrow('금액은 음수일 수 없습니다');
     });
 
     it('should create Money with zero amount', () => {
@@ -79,7 +79,7 @@ describe('Money', () => {
       const negativeQuantity = -1;
 
       // When & Then
-      expect(() => money.multiply(negativeQuantity)).toThrow('Quantity cannot be negative');
+      expect(() => money.multiply(negativeQuantity)).toThrow('수량은 음수일 수 없습니다');
     });
 
     it('should return zero for zero quantity', () => {
@@ -130,7 +130,7 @@ describe('Money', () => {
       const result = money.toString();
 
       // Then
-      expect(result).toBe('10,000 KRW');
+      expect(result).toBe('10,000 원');
     });
   });
 });

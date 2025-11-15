@@ -34,7 +34,7 @@ describe('ProductOption', () => {
       // When & Then
       expect(() =>
         ProductOption.create('', 'product-1', 'Color', 'Red', additionalPrice, stock),
-      ).toThrow('Option ID is required');
+      ).toThrow('옵션 ID는 필수입니다');
     });
 
     it('should throw error when product ID is empty', () => {
@@ -45,7 +45,7 @@ describe('ProductOption', () => {
       // When & Then
       expect(() =>
         ProductOption.create('option-1', '', 'Color', 'Red', additionalPrice, stock),
-      ).toThrow('Product ID is required');
+      ).toThrow('상품 ID는 필수입니다');
     });
 
     it('should throw error when type is empty', () => {
@@ -56,7 +56,7 @@ describe('ProductOption', () => {
       // When & Then
       expect(() =>
         ProductOption.create('option-1', 'product-1', '', 'Red', additionalPrice, stock),
-      ).toThrow('Option type is required');
+      ).toThrow('옵션 타입은 필수입니다');
     });
 
     it('should throw error when name is empty', () => {
@@ -67,7 +67,7 @@ describe('ProductOption', () => {
       // When & Then
       expect(() =>
         ProductOption.create('option-1', 'product-1', 'Color', '', additionalPrice, stock),
-      ).toThrow('Option name is required');
+      ).toThrow('옵션명은 필수입니다');
     });
   });
 

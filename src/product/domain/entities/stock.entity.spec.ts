@@ -50,7 +50,7 @@ describe('Stock', () => {
           reservedQuantity,
           soldQuantity,
         ),
-      ).toThrow('Sum of available, reserved, and sold quantity cannot exceed total quantity');
+      ).toThrow('가용, 예약, 판매 재고의 합은 총 재고를 초과할 수 없습니다');
     });
 
     it('should throw error for negative total quantity', () => {
@@ -62,7 +62,7 @@ describe('Stock', () => {
       // When & Then
       expect(() =>
         Stock.create(id, productOptionId, totalQuantity, 0, 0, 0),
-      ).toThrow('Total quantity cannot be negative');
+      ).toThrow('총 재고 수량은 음수일 수 없습니다');
     });
 
     it('should throw error for negative available quantity', () => {
@@ -73,7 +73,7 @@ describe('Stock', () => {
       // When & Then
       expect(() =>
         Stock.create(id, productOptionId, 100, -1, 0, 0),
-      ).toThrow('Available quantity cannot be negative');
+      ).toThrow('가용 재고 수량은 음수일 수 없습니다');
     });
   });
 
@@ -163,7 +163,7 @@ describe('Stock', () => {
       const reserveQuantity = 60;
 
       // When & Then
-      expect(() => stock.reserve(reserveQuantity)).toThrow('Insufficient available quantity');
+      expect(() => stock.reserve(reserveQuantity)).toThrow('가용 재고가 부족합니다');
     });
 
     it('should throw error for zero quantity', () => {
@@ -171,7 +171,7 @@ describe('Stock', () => {
       const stock = Stock.create('stock-1', 'option-1', 100, 50, 0, 0);
 
       // When & Then
-      expect(() => stock.reserve(0)).toThrow('Reserve quantity must be positive');
+      expect(() => stock.reserve(0)).toThrow('예약 수량은 양수여야 합니다');
     });
 
     it('should throw error for negative quantity', () => {
@@ -179,7 +179,7 @@ describe('Stock', () => {
       const stock = Stock.create('stock-1', 'option-1', 100, 50, 0, 0);
 
       // When & Then
-      expect(() => stock.reserve(-1)).toThrow('Reserve quantity must be positive');
+      expect(() => stock.reserve(-1)).toThrow('예약 수량은 양수여야 합니다');
     });
   });
 
@@ -204,7 +204,7 @@ describe('Stock', () => {
 
       // When & Then
       expect(() => stock.restoreReserved(restoreQuantity)).toThrow(
-        'Restore quantity exceeds reserved quantity',
+        '복원 수량이 예약 수량을 초과합니다',
       );
     });
 
@@ -213,7 +213,7 @@ describe('Stock', () => {
       const stock = Stock.create('stock-1', 'option-1', 100, 80, 20, 0);
 
       // When & Then
-      expect(() => stock.restoreReserved(0)).toThrow('Restore quantity must be positive');
+      expect(() => stock.restoreReserved(0)).toThrow('복원 수량은 양수여야 합니다');
     });
   });
 
@@ -238,7 +238,7 @@ describe('Stock', () => {
       const sellQuantity = 30;
 
       // When & Then
-      expect(() => stock.sell(sellQuantity)).toThrow('Sell quantity exceeds reserved quantity');
+      expect(() => stock.sell(sellQuantity)).toThrow('판매 수량이 예약 수량을 초과합니다');
     });
 
     it('should throw error for zero quantity', () => {
@@ -246,7 +246,7 @@ describe('Stock', () => {
       const stock = Stock.create('stock-1', 'option-1', 100, 80, 20, 0);
 
       // When & Then
-      expect(() => stock.sell(0)).toThrow('Sell quantity must be positive');
+      expect(() => stock.sell(0)).toThrow('판매 수량은 양수여야 합니다');
     });
   });
 

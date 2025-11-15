@@ -90,7 +90,7 @@ describe('Product', () => {
           new Date(),
           new Date(),
         ),
-      ).toThrow('Product ID is required');
+      ).toThrow('상품 ID는 필수입니다');
     });
 
     it('should throw error when product name is empty', () => {
@@ -106,7 +106,7 @@ describe('Product', () => {
           new Date(),
           new Date(),
         ),
-      ).toThrow('Product name is required');
+      ).toThrow('상품명은 필수입니다');
     });
 
     it('should throw error when image URL is empty', () => {
@@ -122,7 +122,7 @@ describe('Product', () => {
           new Date(),
           new Date(),
         ),
-      ).toThrow('Product image URL is required');
+      ).toThrow('상품 이미지 URL은 필수입니다');
     });
   });
 
@@ -330,7 +330,7 @@ describe('Product', () => {
 
       // When & Then
       expect(() => product.calculateTotalPrice('non-existent', 1)).toThrow(
-        'Option not found: non-existent',
+        '옵션을 찾을 수 없습니다: non-existent',
       );
     });
 
@@ -341,7 +341,7 @@ describe('Product', () => {
 
       // When & Then
       expect(() => product.calculateTotalPrice('option-1', 0)).toThrow(
-        'Quantity must be positive',
+        '수량은 양수여야 합니다',
       );
     });
 
@@ -352,7 +352,7 @@ describe('Product', () => {
 
       // When & Then
       expect(() => product.calculateTotalPrice('option-1', -1)).toThrow(
-        'Quantity must be positive',
+        '수량은 양수여야 합니다',
       );
     });
   });

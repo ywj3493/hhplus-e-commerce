@@ -1,5 +1,5 @@
 /**
- * Get Product Detail Use Case Input DTO
+ * 상품 상세 조회 Use Case Input DTO
  */
 export class GetProductDetailInput {
   readonly productId: string;
@@ -11,7 +11,7 @@ export class GetProductDetailInput {
 
   private validate(): void {
     if (!this.productId || this.productId.trim() === '') {
-      throw new Error('Product ID is required');
+      throw new Error('상품 ID는 필수입니다');
     }
   }
 }

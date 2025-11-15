@@ -165,17 +165,17 @@ describe('GetProductsUseCase', () => {
   describe('input validation', () => {
     it('should validate page must be 1 or greater', () => {
       // When & Then
-      expect(() => new GetProductsInput(0, 10)).toThrow('Page must be 1 or greater');
+      expect(() => new GetProductsInput(0, 10)).toThrow('페이지는 1 이상이어야 합니다');
     });
 
     it('should validate page size minimum (BR-PROD-03)', () => {
       // When & Then
-      expect(() => new GetProductsInput(1, 0)).toThrow('Page size must be between 1-100');
+      expect(() => new GetProductsInput(1, 0)).toThrow('페이지 크기는 1-100 사이여야 합니다');
     });
 
     it('should validate page size maximum (BR-PROD-03)', () => {
       // When & Then
-      expect(() => new GetProductsInput(1, 101)).toThrow('Page size must be between 1-100');
+      expect(() => new GetProductsInput(1, 101)).toThrow('페이지 크기는 1-100 사이여야 합니다');
     });
 
     it('should accept page size at boundary values', () => {

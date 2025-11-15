@@ -1,7 +1,7 @@
 /**
- * Get Products Use Case Input DTO
- * BR-PROD-02: Default page size - 10 items
- * BR-PROD-03: Maximum page size - 100 items
+ * 상품 목록 조회 Use Case Input DTO
+ * BR-PROD-02: 기본 페이지 크기 - 10개 항목
+ * BR-PROD-03: 최대 페이지 크기 - 100개 항목
  */
 export class GetProductsInput {
   readonly page: number;
@@ -15,10 +15,10 @@ export class GetProductsInput {
 
   private validate(): void {
     if (this.page < 1) {
-      throw new Error('Page must be 1 or greater');
+      throw new Error('페이지는 1 이상이어야 합니다');
     }
     if (this.limit < 1 || this.limit > 100) {
-      throw new Error('Page size must be between 1-100');
+      throw new Error('페이지 크기는 1-100 사이여야 합니다');
     }
   }
 }

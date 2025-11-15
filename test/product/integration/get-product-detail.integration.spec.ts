@@ -136,7 +136,7 @@ describe('GetProductDetailUseCase Integration Test', () => {
       // When & Then
       await expect(useCase.execute(input)).rejects.toThrow(ProductNotFoundException);
       await expect(useCase.execute(input)).rejects.toThrow(
-        `Product not found: ${nonExistentId}`,
+        `상품을 찾을 수 없습니다: ${nonExistentId}`,
       );
     });
 
