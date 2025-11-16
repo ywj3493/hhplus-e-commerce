@@ -69,6 +69,43 @@ Backend service for an e-commerce platform built with NestJS and Prisma ORM.
   - Build: `pnpm run build`
 - **DO NOT use `npm` or `yarn`** - this project exclusively uses pnpm
 
+## Code Organization
+
+### DTO Structure
+Application Layer의 DTO는 Use Case별로 하나의 파일에 통합합니다:
+
+**파일 명명 규칙:**
+- `{use-case-name}.dto.ts` (예: `get-product-detail.dto.ts`, `get-products.dto.ts`)
+
+**파일 구성:**
+```typescript
+// {use-case-name}.dto.ts
+
+// 1. 관련 보조 클래스/VO (필요한 경우)
+export class SomeDetailClass { ... }
+
+// 2. Input DTO
+export class {UseCaseName}Input {
+  constructor() { ... }
+  private validate(): void { ... }
+}
+
+// 3. Output DTO
+export class {UseCaseName}Output {
+  constructor() { ... }
+}
+```
+
+**장점:**
+- Use Case 관련 모든 DTO를 한 파일에서 확인 가능
+- Input과 Output 간의 연관성 명확화
+- 파일 수 감소로 코드 탐색 용이성 향상
+
+**예시:**
+- ✅ `src/product/application/dtos/get-product-detail.dto.ts` (Input + Output 통합)
+- ❌ `src/product/application/dtos/get-product-detail.input.ts` (개별 파일)
+- ❌ `src/product/application/dtos/get-product-detail.output.ts` (개별 파일)
+
 ## Testing Conventions
 - **Test Language**: Korean for `describe` and `it` blocks
   - `describe` blocks: Use Korean to describe the test subject (e.g., "생성", "실행", "입력 검증")

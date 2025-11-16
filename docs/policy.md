@@ -103,6 +103,46 @@ Documents must be created and maintained in this order:
 - Architecture pattern: TBD (To Be Decided)
 - Will be documented as decisions are made
 
+## Code Organization
+
+### DTO Structure (Application Layer)
+Application Layer의 DTO는 Use Case별로 하나의 파일에 통합합니다.
+
+**파일 명명 규칙:**
+- `{use-case-name}.dto.ts` (예: `get-product-detail.dto.ts`, `get-products.dto.ts`)
+
+**파일 구성 순서:**
+```typescript
+// {use-case-name}.dto.ts
+
+// 1. Import statements
+import { ... } from '...';
+
+// 2. 관련 보조 클래스/VO (필요한 경우)
+export class SomeDetailClass { ... }
+
+// 3. Input DTO
+export class {UseCaseName}Input {
+  constructor() { ... }
+  private validate(): void { ... }
+}
+
+// 4. Output DTO
+export class {UseCaseName}Output {
+  constructor() { ... }
+}
+```
+
+**장점:**
+- Use Case 관련 모든 DTO를 한 파일에서 확인 가능
+- Input과 Output 간의 연관성 명확화
+- 파일 수 감소로 코드 탐색 용이성 향상
+
+**예시:**
+- ✅ `src/product/application/dtos/get-product-detail.dto.ts` (Input + Output 통합)
+- ❌ `src/product/application/dtos/get-product-detail.input.ts` (개별 파일)
+- ❌ `src/product/application/dtos/get-product-detail.output.ts` (개별 파일)
+
 ## Package Management
 
 ### pnpm Usage (REQUIRED)
