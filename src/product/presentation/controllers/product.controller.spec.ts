@@ -47,7 +47,7 @@ describe('ProductController', () => {
   });
 
   describe('getProducts', () => {
-    it('should return paginated product list', async () => {
+    it('페이징된 상품 목록을 반환해야 함', async () => {
       // Given
       const query = { page: 1, limit: 10 };
       const useCaseOutput = new GetProductsOutput(
@@ -85,7 +85,7 @@ describe('ProductController', () => {
       expect(response.totalPages).toBe(1);
     });
 
-    it('should use default pagination values', async () => {
+    it('기본 페이징 값을 사용해야 함', async () => {
       // Given
       const query = {};
       const useCaseOutput = new GetProductsOutput([], 0, 1, 10, 0);
@@ -101,7 +101,7 @@ describe('ProductController', () => {
       }));
     });
 
-    it('should throw BadRequestException for invalid page', async () => {
+    it('유효하지 않은 페이지에 대해 BadRequestException을 던져야 함', async () => {
       // Given
       const query = { page: 0, limit: 10 };
 
@@ -109,7 +109,7 @@ describe('ProductController', () => {
       await expect(controller.getProducts(query)).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw BadRequestException for invalid limit', async () => {
+    it('유효하지 않은 limit에 대해 BadRequestException을 던져야 함', async () => {
       // Given
       const query = { page: 1, limit: 101 };
 
@@ -117,7 +117,7 @@ describe('ProductController', () => {
       await expect(controller.getProducts(query)).rejects.toThrow(BadRequestException);
     });
 
-    it('should handle custom pagination values', async () => {
+    it('사용자 정의 페이징 값을 처리해야 함', async () => {
       // Given
       const query = { page: 2, limit: 20 };
       const useCaseOutput = new GetProductsOutput([], 0, 2, 20, 0);
@@ -133,7 +133,7 @@ describe('ProductController', () => {
       }));
     });
 
-    it('should return empty list when no products exist', async () => {
+    it('상품이 없을 때 빈 목록을 반환해야 함', async () => {
       // Given
       const query = { page: 1, limit: 10 };
       const useCaseOutput = new GetProductsOutput([], 0, 1, 10, 0);
@@ -149,7 +149,7 @@ describe('ProductController', () => {
   });
 
   describe('getProductDetail', () => {
-    it('should return product detail with grouped options', async () => {
+    it('그룹화된 옵션과 함께 상품 상세를 반환해야 함', async () => {
       // Given
       const param = { id: '550e8400-e29b-41d4-a716-446655440001' };
       const useCaseOutput = new GetProductDetailOutput(
@@ -187,7 +187,7 @@ describe('ProductController', () => {
       expect(response.optionGroups).toHaveLength(2);
     });
 
-    it('should map option groups correctly', async () => {
+    it('옵션 그룹을 올바르게 매핑해야 함', async () => {
       // Given
       const param = { id: '550e8400-e29b-41d4-a716-446655440001' };
       const useCaseOutput = new GetProductDetailOutput(
@@ -220,7 +220,7 @@ describe('ProductController', () => {
       });
     });
 
-    it('should throw NotFoundException when product not found', async () => {
+    it('상품을 찾을 수 없을 때 NotFoundException을 던져야 함', async () => {
       // Given
       const param = { id: '550e8400-e29b-41d4-a716-446655440001' };
       getProductDetailUseCase.execute.mockRejectedValue(
@@ -232,7 +232,7 @@ describe('ProductController', () => {
       await expect(controller.getProductDetail(param)).rejects.toThrow('Product not found');
     });
 
-    it('should handle product with no options', async () => {
+    it('옵션이 없는 상품을 처리해야 함', async () => {
       // Given
       const param = { id: '550e8400-e29b-41d4-a716-446655440001' };
       const useCaseOutput = new GetProductDetailOutput(
@@ -241,7 +241,7 @@ describe('ProductController', () => {
         Money.from(10000),
         'Description',
         'https://example.com/product.jpg',
-        [], // No options
+        [], // 옵션 없음
       );
       getProductDetailUseCase.execute.mockResolvedValue(useCaseOutput);
 
@@ -252,7 +252,7 @@ describe('ProductController', () => {
       expect(response.optionGroups).toHaveLength(0);
     });
 
-    it('should convert Money to number in response', async () => {
+    it('응답에서 Money를 number로 변환해야 함', async () => {
       // Given
       const param = { id: '550e8400-e29b-41d4-a716-446655440001' };
       const useCaseOutput = new GetProductDetailOutput(
@@ -277,7 +277,7 @@ describe('ProductController', () => {
       expect(response.optionGroups[0].options[0].additionalPrice).toBe(3000);
     });
 
-    it('should convert StockStatus to string in response', async () => {
+    it('응답에서 StockStatus를 문자열로 변환해야 함', async () => {
       // Given
       const param = { id: '550e8400-e29b-41d4-a716-446655440001' };
       const useCaseOutput = new GetProductDetailOutput(
@@ -303,7 +303,7 @@ describe('ProductController', () => {
       expect(response.optionGroups[0].options[1].stockStatus).toBe('품절');
     });
 
-    it('should include isSelectable field', async () => {
+    it('isSelectable 필드를 포함해야 함', async () => {
       // Given
       const param = { id: '550e8400-e29b-41d4-a716-446655440001' };
       const useCaseOutput = new GetProductDetailOutput(

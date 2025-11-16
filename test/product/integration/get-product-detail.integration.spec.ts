@@ -8,7 +8,7 @@ import { StockStatusType } from '../../../src/product/domain/entities/stock-stat
  * Integration Test: GetProductDetailUseCase + InMemoryProductRepository
  * Tests the interaction between application layer and infrastructure layer
  */
-describe('GetProductDetailUseCase Integration Test', () => {
+describe('GetProductDetailUseCase 통합 테스트', () => {
   let useCase: GetProductDetailUseCase;
   let repository: InMemoryProductRepository;
 
@@ -17,9 +17,9 @@ describe('GetProductDetailUseCase Integration Test', () => {
     useCase = new GetProductDetailUseCase(repository);
   });
 
-  describe('execute with real repository', () => {
-    it('should retrieve product detail from repository', async () => {
-      // Given: Use a product ID that exists in fixtures
+  describe('실제 레포지토리와 함께 실행', () => {
+    it('레포지토리에서 상품 상세를 조회해야 함', async () => {
+      // Given: 픽스처에 존재하는 상품 ID 사용
       const productId = '550e8400-e29b-41d4-a716-446655440001'; // Basic T-Shirt
       const input = new GetProductDetailInput(productId);
 
@@ -35,8 +35,8 @@ describe('GetProductDetailUseCase Integration Test', () => {
       expect(output.optionGroups).toBeDefined();
     });
 
-    it('should group options by type correctly (BR-PROD-05)', async () => {
-      // Given: Product with Color options (Basic T-Shirt)
+    it('옵션을 타입별로 올바르게 그룹화해야 함 (BR-PROD-05)', async () => {
+      // Given: Color 옵션이 있는 상품 (Basic T-Shirt)
       const productId = '550e8400-e29b-41d4-a716-446655440001';
       const input = new GetProductDetailInput(productId);
 
@@ -48,22 +48,22 @@ describe('GetProductDetailUseCase Integration Test', () => {
       expect(colorGroup).toBeDefined();
       expect(colorGroup?.options.length).toBeGreaterThan(0);
 
-      // All options in the group should have the same type
+      // 그룹의 모든 옵션은 같은 타입을 가져야 함
       colorGroup?.options.forEach((opt) => {
         expect(opt.id).toBeDefined();
         expect(opt.name).toBeDefined();
       });
     });
 
-    it('should include stock status for each option (BR-PROD-06)', async () => {
-      // Given: Product with multiple options
+    it('각 옵션에 재고 상태를 포함해야 함 (BR-PROD-06)', async () => {
+      // Given: 여러 옵션이 있는 상품
       const productId = '550e8400-e29b-41d4-a716-446655440001';
       const input = new GetProductDetailInput(productId);
 
       // When
       const output = await useCase.execute(input);
 
-      // Then: All options should have stock status
+      // Then: 모든 옵션은 재고 상태를 가져야 함
       output.optionGroups.forEach((group) => {
         group.options.forEach((opt) => {
           expect([StockStatusType.IN_STOCK, StockStatusType.OUT_OF_STOCK]).toContain(
@@ -73,8 +73,8 @@ describe('GetProductDetailUseCase Integration Test', () => {
       });
     });
 
-    it('should mark out-of-stock options as not selectable (BR-PROD-08)', async () => {
-      // Given: Product 1 has Navy color which is out of stock
+    it('품절 옵션을 선택 불가능으로 표시해야 함 (BR-PROD-08)', async () => {
+      // Given: 상품 1은 품절인 Navy 색상을 가짐
       const productId = '550e8400-e29b-41d4-a716-446655440001';
       const input = new GetProductDetailInput(productId);
 
@@ -90,7 +90,7 @@ describe('GetProductDetailUseCase Integration Test', () => {
         expect(navyOption.isSelectable).toBe(false);
       }
 
-      // White and Black should be in stock and selectable
+      // White와 Black은 재고가 있고 선택 가능해야 함
       const whiteOption = colorGroup?.options.find((o) => o.name === 'White');
       const blackOption = colorGroup?.options.find((o) => o.name === 'Black');
 
@@ -105,8 +105,8 @@ describe('GetProductDetailUseCase Integration Test', () => {
       }
     });
 
-    it('should include additional price for options', async () => {
-      // Given: Premium Hoodie has L and XL with additional price
+    it('옵션의 추가 가격을 포함해야 함', async () => {
+      // Given: Premium Hoodie는 L과 XL에 추가 가격이 있음
       const productId = '550e8400-e29b-41d4-a716-446655440002';
       const input = new GetProductDetailInput(productId);
 
@@ -128,7 +128,7 @@ describe('GetProductDetailUseCase Integration Test', () => {
       }
     });
 
-    it('should throw ProductNotFoundException for non-existent product', async () => {
+    it('존재하지 않는 상품에 대해 ProductNotFoundException을 던져야 함', async () => {
       // Given
       const nonExistentId = '00000000-0000-0000-0000-000000000000';
       const input = new GetProductDetailInput(nonExistentId);
@@ -140,9 +140,9 @@ describe('GetProductDetailUseCase Integration Test', () => {
       );
     });
 
-    it('should handle product with multiple option types', async () => {
-      // Given: Check a product that might have multiple option types
-      const productId = '550e8400-e29b-41d4-a716-446655440002'; // Premium Hoodie (Size options)
+    it('여러 옵션 타입이 있는 상품을 처리해야 함', async () => {
+      // Given: 여러 옵션 타입이 있을 수 있는 상품 확인
+      const productId = '550e8400-e29b-41d4-a716-446655440002'; // Premium Hoodie (Size 옵션)
       const input = new GetProductDetailInput(productId);
 
       // When
@@ -151,15 +151,15 @@ describe('GetProductDetailUseCase Integration Test', () => {
       // Then
       expect(output.optionGroups.length).toBeGreaterThan(0);
 
-      // Each group should have at least one option
+      // 각 그룹은 최소한 하나의 옵션을 가져야 함
       output.optionGroups.forEach((group) => {
         expect(group.type).toBeDefined();
         expect(group.options.length).toBeGreaterThan(0);
       });
     });
 
-    it('should handle products with single option', async () => {
-      // Given: Products 6-15 have single default option
+    it('단일 옵션이 있는 상품을 처리해야 함', async () => {
+      // Given: 상품 6-15는 단일 기본 옵션을 가짐
       const productId = '550e8400-e29b-41d4-a716-446655440006';
       const input = new GetProductDetailInput(productId);
 
@@ -173,8 +173,8 @@ describe('GetProductDetailUseCase Integration Test', () => {
     });
   });
 
-  describe('data integrity', () => {
-    it('should not modify repository state', async () => {
+  describe('데이터 무결성', () => {
+    it('레포지토리 상태를 변경하지 않아야 함', async () => {
       // Given
       const productId = '550e8400-e29b-41d4-a716-446655440001';
       const input = new GetProductDetailInput(productId);
@@ -184,11 +184,11 @@ describe('GetProductDetailUseCase Integration Test', () => {
       await useCase.execute(input);
       await useCase.execute(input);
 
-      // Then: Repository count should not change
+      // Then: 레포지토리 개수가 변경되지 않아야 함
       expect(repository.count()).toBe(initialCount);
     });
 
-    it('should return consistent data on multiple calls', async () => {
+    it('여러 호출에서 일관된 데이터를 반환해야 함', async () => {
       // Given
       const productId = '550e8400-e29b-41d4-a716-446655440001';
       const input = new GetProductDetailInput(productId);
@@ -197,7 +197,7 @@ describe('GetProductDetailUseCase Integration Test', () => {
       const output1 = await useCase.execute(input);
       const output2 = await useCase.execute(input);
 
-      // Then: Should return same data
+      // Then: 같은 데이터를 반환해야 함
       expect(output1.id).toBe(output2.id);
       expect(output1.name).toBe(output2.name);
       expect(output1.price.amount).toBe(output2.price.amount);
@@ -205,9 +205,9 @@ describe('GetProductDetailUseCase Integration Test', () => {
     });
   });
 
-  describe('all fixture products', () => {
-    it('should be able to retrieve all products by their IDs', async () => {
-      // Given: IDs of all fixture products
+  describe('모든 픽스처 상품', () => {
+    it('모든 상품을 ID로 조회할 수 있어야 함', async () => {
+      // Given: 모든 픽스처 상품의 ID
       const productIds = [
         '550e8400-e29b-41d4-a716-446655440001', // Basic T-Shirt
         '550e8400-e29b-41d4-a716-446655440002', // Premium Hoodie
@@ -229,8 +229,8 @@ describe('GetProductDetailUseCase Integration Test', () => {
     });
   });
 
-  describe('option details validation', () => {
-    it('should have valid option structure', async () => {
+  describe('옵션 상세 검증', () => {
+    it('유효한 옵션 구조를 가져야 함', async () => {
       // Given
       const productId = '550e8400-e29b-41d4-a716-446655440001';
       const input = new GetProductDetailInput(productId);
@@ -238,7 +238,7 @@ describe('GetProductDetailUseCase Integration Test', () => {
       // When
       const output = await useCase.execute(input);
 
-      // Then: Validate option structure
+      // Then: 옵션 구조 검증
       output.optionGroups.forEach((group) => {
         group.options.forEach((opt) => {
           expect(opt.id).toBeDefined();

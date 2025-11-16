@@ -37,8 +37,8 @@ describe('InMemoryProductRepository', () => {
     );
   };
 
-  describe('initialization', () => {
-    it('should initialize with sample data', () => {
+  describe('초기화', () => {
+    it('샘플 데이터로 초기화해야 함', () => {
       // When
       const count = repository.count();
 
@@ -48,8 +48,8 @@ describe('InMemoryProductRepository', () => {
   });
 
   describe('findById', () => {
-    it('should find existing product by ID', async () => {
-      // Given: Sample data is initialized
+    it('ID로 존재하는 상품을 조회해야 함', async () => {
+      // Given: 샘플 데이터가 초기화됨
       const existingId = '550e8400-e29b-41d4-a716-446655440001';
 
       // When
@@ -60,7 +60,7 @@ describe('InMemoryProductRepository', () => {
       expect(product?.id).toBe(existingId);
     });
 
-    it('should return undefined for non-existent ID', async () => {
+    it('존재하지 않는 ID에 대해 undefined를 반환해야 함', async () => {
       // Given
       const nonExistentId = 'non-existent-id';
 
@@ -74,7 +74,7 @@ describe('InMemoryProductRepository', () => {
 
   describe('findAll', () => {
     beforeEach(() => {
-      // Clear and add test data
+      // 테스트 데이터 초기화
       repository.clear();
       repository.save(createTestProduct('prod-1', 'Product 1', new Date('2024-01-01')));
       repository.save(createTestProduct('prod-2', 'Product 2', new Date('2024-01-02')));
@@ -83,7 +83,7 @@ describe('InMemoryProductRepository', () => {
       repository.save(createTestProduct('prod-5', 'Product 5', new Date('2024-01-05')));
     });
 
-    it('should return paginated products sorted by newest first (BR-PROD-01)', async () => {
+    it('최신순으로 정렬된 페이징된 상품 목록을 반환해야 함 (BR-PROD-01)', async () => {
       // Given
       const page = 1;
       const limit = 3;
@@ -93,7 +93,7 @@ describe('InMemoryProductRepository', () => {
 
       // Then
       expect(result.items).toHaveLength(3);
-      expect(result.items[0].name).toBe('Product 5'); // Newest
+      expect(result.items[0].name).toBe('Product 5'); // 최신
       expect(result.items[1].name).toBe('Product 4');
       expect(result.items[2].name).toBe('Product 3');
       expect(result.total).toBe(5);
@@ -102,7 +102,7 @@ describe('InMemoryProductRepository', () => {
       expect(result.totalPages).toBe(2);
     });
 
-    it('should return second page correctly', async () => {
+    it('두 번째 페이지를 올바르게 반환해야 함', async () => {
       // Given
       const page = 2;
       const limit = 3;
@@ -113,11 +113,11 @@ describe('InMemoryProductRepository', () => {
       // Then
       expect(result.items).toHaveLength(2);
       expect(result.items[0].name).toBe('Product 2');
-      expect(result.items[1].name).toBe('Product 1'); // Oldest
+      expect(result.items[1].name).toBe('Product 1'); // 가장 오래됨
       expect(result.page).toBe(2);
     });
 
-    it('should return empty array for page beyond total pages', async () => {
+    it('전체 페이지를 초과하는 페이지에 대해 빈 배열을 반환해야 함', async () => {
       // Given
       const page = 10;
       const limit = 10;
@@ -131,7 +131,7 @@ describe('InMemoryProductRepository', () => {
       expect(result.totalPages).toBe(1);
     });
 
-    it('should handle limit larger than total products', async () => {
+    it('전체 상품보다 큰 limit을 처리해야 함', async () => {
       // Given
       const page = 1;
       const limit = 100;
@@ -144,7 +144,7 @@ describe('InMemoryProductRepository', () => {
       expect(result.totalPages).toBe(1);
     });
 
-    it('should handle limit of 1', async () => {
+    it('limit이 1인 경우를 처리해야 함', async () => {
       // Given
       const page = 1;
       const limit = 1;
@@ -162,15 +162,15 @@ describe('InMemoryProductRepository', () => {
   describe('findPopular', () => {
     beforeEach(() => {
       repository.clear();
-      // Create products with different sold quantities
-      repository.save(createTestProduct('prod-1', 'Product 1', new Date('2024-01-01'), 100)); // Most sold
+      // 판매량이 다른 상품 생성
+      repository.save(createTestProduct('prod-1', 'Product 1', new Date('2024-01-01'), 100)); // 가장 많이 팔림
       repository.save(createTestProduct('prod-2', 'Product 2', new Date('2024-01-02'), 80));
       repository.save(createTestProduct('prod-3', 'Product 3', new Date('2024-01-03'), 50));
       repository.save(createTestProduct('prod-4', 'Product 4', new Date('2024-01-04'), 30));
-      repository.save(createTestProduct('prod-5', 'Product 5', new Date('2024-01-05'), 10)); // Least sold
+      repository.save(createTestProduct('prod-5', 'Product 5', new Date('2024-01-05'), 10)); // 가장 적게 팔림
     });
 
-    it('should return top 5 popular products sorted by sales', async () => {
+    it('판매량 순으로 정렬된 상위 5개 인기 상품을 반환해야 함', async () => {
       // Given
       const limit = 5;
 
@@ -179,14 +179,14 @@ describe('InMemoryProductRepository', () => {
 
       // Then
       expect(products).toHaveLength(5);
-      expect(products[0].name).toBe('Product 1'); // Most sold
+      expect(products[0].name).toBe('Product 1'); // 가장 많이 팔림
       expect(products[1].name).toBe('Product 2');
       expect(products[2].name).toBe('Product 3');
       expect(products[3].name).toBe('Product 4');
-      expect(products[4].name).toBe('Product 5'); // Least sold
+      expect(products[4].name).toBe('Product 5'); // 가장 적게 팔림
     });
 
-    it('should return top 3 popular products', async () => {
+    it('상위 3개 인기 상품을 반환해야 함', async () => {
       // Given
       const limit = 3;
 
@@ -200,7 +200,7 @@ describe('InMemoryProductRepository', () => {
       expect(products[2].name).toBe('Product 3');
     });
 
-    it('should handle limit larger than available products', async () => {
+    it('사용 가능한 상품보다 큰 limit을 처리해야 함', async () => {
       // Given
       const limit = 10;
 
@@ -211,8 +211,8 @@ describe('InMemoryProductRepository', () => {
       expect(products).toHaveLength(5);
     });
 
-    it('should calculate total sold across all options', async () => {
-      // Given: Product with multiple options
+    it('모든 옵션의 총 판매량을 계산해야 함', async () => {
+      // Given: 여러 옵션이 있는 상품
       repository.clear();
       const option1 = ProductOption.create(
         'opt-1',
@@ -245,14 +245,14 @@ describe('InMemoryProductRepository', () => {
       // When
       const products = await repository.findPopular(1);
 
-      // Then: Total sold = 50 + 80 = 130
+      // Then: 총 판매량 = 50 + 80 = 130
       expect(products).toHaveLength(1);
       expect(products[0].id).toBe('prod-multi');
     });
   });
 
   describe('save', () => {
-    it('should save new product', async () => {
+    it('새 상품을 저장해야 함', async () => {
       // Given
       repository.clear();
       const product = createTestProduct('new-prod', 'New Product', new Date());
@@ -267,25 +267,25 @@ describe('InMemoryProductRepository', () => {
       expect(repository.count()).toBe(1);
     });
 
-    it('should update existing product', async () => {
+    it('기존 상품을 업데이트해야 함', async () => {
       // Given
       repository.clear();
       const product1 = createTestProduct('prod-1', 'Original Name', new Date());
       await repository.save(product1);
 
-      // When: Save product with same ID but different data
+      // When: 같은 ID로 다른 데이터의 상품 저장
       const product2 = createTestProduct('prod-1', 'Updated Name', new Date());
       await repository.save(product2);
 
       // Then
       const found = await repository.findById('prod-1');
       expect(found?.name).toBe('Updated Name');
-      expect(repository.count()).toBe(1); // Count should not increase
+      expect(repository.count()).toBe(1); // 개수가 증가하지 않아야 함
     });
   });
 
   describe('exists', () => {
-    it('should return true for existing product', async () => {
+    it('존재하는 상품에 대해 true를 반환해야 함', async () => {
       // Given
       repository.clear();
       const product = createTestProduct('prod-1', 'Product 1', new Date());
@@ -298,7 +298,7 @@ describe('InMemoryProductRepository', () => {
       expect(exists).toBe(true);
     });
 
-    it('should return false for non-existent product', async () => {
+    it('존재하지 않는 상품에 대해 false를 반환해야 함', async () => {
       // Given
       repository.clear();
 
@@ -311,7 +311,7 @@ describe('InMemoryProductRepository', () => {
   });
 
   describe('clear', () => {
-    it('should remove all products', () => {
+    it('모든 상품을 제거해야 함', () => {
       // Given
       const initialCount = repository.count();
       expect(initialCount).toBeGreaterThan(0);
@@ -325,7 +325,7 @@ describe('InMemoryProductRepository', () => {
   });
 
   describe('count', () => {
-    it('should return correct count', () => {
+    it('올바른 개수를 반환해야 함', () => {
       // Given
       repository.clear();
       repository.save(createTestProduct('prod-1', 'Product 1', new Date()));

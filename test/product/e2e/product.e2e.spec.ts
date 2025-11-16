@@ -33,7 +33,7 @@ describe('Product API (e2e)', () => {
   });
 
   describe('GET /products', () => {
-    it('should return product list with default pagination', () => {
+    it('기본 페이징으로 상품 목록을 반환해야 함', () => {
       return request(app.getHttpServer())
         .get('/products')
         .expect(200)
@@ -50,7 +50,7 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should return product list with custom pagination', () => {
+    it('사용자 정의 페이징으로 상품 목록을 반환해야 함', () => {
       return request(app.getHttpServer())
         .get('/products')
         .query({ page: 2, limit: 5 })
@@ -62,7 +62,7 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should return products with correct structure', () => {
+    it('올바른 구조의 상품을 반환해야 함', () => {
       return request(app.getHttpServer())
         .get('/products')
         .expect(200)
@@ -83,28 +83,28 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should return 400 for invalid page parameter', () => {
+    it('유효하지 않은 페이지 파라미터에 대해 400을 반환해야 함', () => {
       return request(app.getHttpServer())
         .get('/products')
         .query({ page: 0 })
         .expect(400);
     });
 
-    it('should return 400 for page size below minimum', () => {
+    it('최소값 미만의 페이지 크기에 대해 400을 반환해야 함', () => {
       return request(app.getHttpServer())
         .get('/products')
         .query({ page: 1, limit: 0 })
         .expect(400);
     });
 
-    it('should return 400 for page size above maximum (BR-PROD-03)', () => {
+    it('최대값 초과의 페이지 크기에 대해 400을 반환해야 함 (BR-PROD-03)', () => {
       return request(app.getHttpServer())
         .get('/products')
         .query({ page: 1, limit: 101 })
         .expect(400);
     });
 
-    it('should accept maximum page size of 100', () => {
+    it('최대 페이지 크기 100을 허용해야 함', () => {
       return request(app.getHttpServer())
         .get('/products')
         .query({ page: 1, limit: 100 })
@@ -114,7 +114,7 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should handle page beyond available data', () => {
+    it('사용 가능한 데이터를 초과하는 페이지를 처리해야 함', () => {
       return request(app.getHttpServer())
         .get('/products')
         .query({ page: 1000, limit: 10 })
@@ -125,25 +125,25 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should sort products by newest first (BR-PROD-01)', () => {
+    it('상품을 최신순으로 정렬해야 함 (BR-PROD-01)', () => {
       return request(app.getHttpServer())
         .get('/products')
         .query({ page: 1, limit: 5 })
         .expect(200)
         .expect((res) => {
           expect(res.body.items.length).toBeGreaterThan(0);
-          // Products should be sorted by creation date (newest first)
-          // We can verify this by checking IDs in descending order
+          // 상품은 생성일자 순으로 정렬되어야 함 (최신 먼저)
+          // ID가 내림차순인지 확인하여 이를 검증할 수 있음
         });
     });
   });
 
   describe('GET /products/:id', () => {
     const validProductId = '550e8400-e29b-41d4-a716-446655440001'; // Basic T-Shirt
-    const invalidProductId = '550e8400-e29b-41d4-a716-446655449999'; // Valid UUID format but non-existent
+    const invalidProductId = '550e8400-e29b-41d4-a716-446655449999'; // 유효한 UUID 형식이지만 존재하지 않음
     const malformedId = 'not-a-uuid';
 
-    it('should return product detail for valid ID', () => {
+    it('유효한 ID에 대해 상품 상세를 반환해야 함', () => {
       return request(app.getHttpServer())
         .get(`/products/${validProductId}`)
         .expect(200)
@@ -159,7 +159,7 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should return product with correct structure', () => {
+    it('올바른 구조의 상품을 반환해야 함', () => {
       return request(app.getHttpServer())
         .get(`/products/${validProductId}`)
         .expect(200)
@@ -173,7 +173,7 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should return grouped options (BR-PROD-05)', () => {
+    it('그룹화된 옵션을 반환해야 함 (BR-PROD-05)', () => {
       return request(app.getHttpServer())
         .get(`/products/${validProductId}`)
         .expect(200)
@@ -190,7 +190,7 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should include stock status per option (BR-PROD-06)', () => {
+    it('옵션별 재고 상태를 포함해야 함 (BR-PROD-06)', () => {
       return request(app.getHttpServer())
         .get(`/products/${validProductId}`)
         .expect(200)
@@ -208,12 +208,12 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should mark out-of-stock options as not selectable (BR-PROD-08)', () => {
+    it('품절 옵션을 선택 불가능으로 표시해야 함 (BR-PROD-08)', () => {
       return request(app.getHttpServer())
         .get(`/products/${validProductId}`)
         .expect(200)
         .expect((res) => {
-          // Find the Color group with Navy option (which is out of stock)
+          // Navy 옵션(품절)이 있는 Color 그룹 찾기
           const colorGroup = res.body.optionGroups.find((g: any) => g.type === 'Color');
           if (colorGroup) {
             const navyOption = colorGroup.options.find((o: any) => o.name === 'Navy');
@@ -225,8 +225,8 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should include additional price for options', () => {
-      // Test with Premium Hoodie which has L and XL with +2000 KRW
+    it('옵션의 추가 가격을 포함해야 함', () => {
+      // L과 XL에 +2000원이 있는 Premium Hoodie로 테스트
       const hoodieId = '550e8400-e29b-41d4-a716-446655440002';
 
       return request(app.getHttpServer())
@@ -243,7 +243,7 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should return 404 for non-existent product ID', () => {
+    it('존재하지 않는 상품 ID에 대해 404를 반환해야 함', () => {
       return request(app.getHttpServer())
         .get(`/products/${invalidProductId}`)
         .expect(404)
@@ -253,7 +253,7 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('should return 400 for malformed product ID', () => {
+    it('잘못된 형식의 상품 ID에 대해 400을 반환해야 함', () => {
       return request(app.getHttpServer())
         .get(`/products/${malformedId}`)
         .expect(400)
@@ -263,16 +263,16 @@ describe('Product API (e2e)', () => {
     });
   });
 
-  describe('API consistency', () => {
-    it('should return same product count in list and detail', async () => {
-      // Get product list
+  describe('API 일관성', () => {
+    it('목록과 상세에서 동일한 상품 개수를 반환해야 함', async () => {
+      // 상품 목록 조회
       const listResponse = await request(app.getHttpServer())
         .get('/products')
         .query({ page: 1, limit: 5 });
 
       expect(listResponse.status).toBe(200);
 
-      // For each product in list, get detail
+      // 목록의 각 상품에 대해 상세 조회
       for (const product of listResponse.body.items) {
         const detailResponse = await request(app.getHttpServer())
           .get(`/products/${product.id}`);
@@ -284,8 +284,8 @@ describe('Product API (e2e)', () => {
       }
     });
 
-    it('should have consistent stock status between list and detail', async () => {
-      // Get product list
+    it('목록과 상세 간 일관된 재고 상태를 가져야 함', async () => {
+      // 상품 목록 조회
       const listResponse = await request(app.getHttpServer())
         .get('/products')
         .query({ page: 1, limit: 1 });
@@ -293,15 +293,15 @@ describe('Product API (e2e)', () => {
       if (listResponse.body.items.length > 0) {
         const listProduct = listResponse.body.items[0];
 
-        // Get product detail
+        // 상품 상세 조회
         const detailResponse = await request(app.getHttpServer())
           .get(`/products/${listProduct.id}`);
 
         expect(detailResponse.status).toBe(200);
 
-        // Stock status in list is overall product status
-        // Detail has per-option status
-        // At least one option should match the overall status if in stock
+        // 목록의 재고 상태는 전체 상품 상태
+        // 상세는 옵션별 상태를 가짐
+        // 재고가 있는 경우 최소한 하나의 옵션이 전체 상태와 일치해야 함
         if (listProduct.stockStatus === '재고 있음') {
           const hasInStockOption = detailResponse.body.optionGroups.some((group: any) =>
             group.options.some((opt: any) => opt.stockStatus === '재고 있음'),
