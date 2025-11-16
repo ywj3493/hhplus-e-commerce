@@ -2,8 +2,9 @@
 
 ## Metadata
 - **Issue Number**: #007
-- **Status**: In Progress
+- **Status**: Completed
 - **Created**: 2025-11-04
+- **Completed**: 2025-11-16
 - **Related Branch**: `feature/007`
 - **Related Docs**:
   - [Architecture](../dev/dashboard/architecture.md)
@@ -99,14 +100,14 @@ test/
 - [ ] Update folder structure diagrams
 
 ### 2. Document Test Organization
-- [ ] Define test types (unit, integration, e2e)
-- [ ] Specify test location conventions
-- [ ] Provide naming conventions
-- [ ] Add test examples for each layer
+- [x] Define test types (unit, integration, e2e)
+- [x] Specify test location conventions
+- [x] Provide naming conventions
+- [x] Add test examples for each layer
 
 ### 3. Update References
-- [ ] Update cross-references in related documents
-- [ ] Ensure consistency with other docs
+- [x] Update cross-references in related documents (CLAUDE.md, policy.md)
+- [x] Ensure consistency with other docs
 
 ## Documentation Changes
 
@@ -145,11 +146,45 @@ test/
 
 ## Success Criteria
 
-- [ ] Architecture documentation clearly presents domain-first as the primary approach
-- [ ] All code examples use domain-first folder structure
-- [ ] Test organization section is comprehensive and clear
-- [ ] Import paths in examples are updated
-- [ ] Documentation is consistent throughout
+- [x] Architecture documentation clearly presents domain-first as the primary approach
+- [x] All code examples use domain-first folder structure
+- [x] Test organization section is comprehensive and clear
+- [x] Import paths in examples are updated
+- [x] Documentation is consistent throughout
+
+## Completed Work
+
+### Test Organization and Localization
+
+- Localized 12 test files (~170 test cases) from English to Korean
+- Established Korean test writing conventions in CLAUDE.md and policy.md:
+  - `describe` blocks in Korean (생성, 실행, 입력 검증)
+  - `it` blocks in Korean ending with "해야 함"
+  - Given-When-Then comments in English
+  - Inline comments in Korean
+
+### DTO Structure Standardization
+
+- Consolidated Application Layer DTOs to Use Case-based structure:
+  - `get-product-detail.dto.ts` (Input + Output combined)
+  - `get-products.dto.ts` (Input + Output combined)
+- Documented DTO organization rules in CLAUDE.md and policy.md
+
+### Documentation Updates
+
+- Added comprehensive coding conventions to CLAUDE.md and policy.md:
+  - Package Manager: pnpm (exclusive usage)
+  - Test Language Conventions
+  - Commit Message Format (Korean with English type prefix)
+  - DTO Structure Guidelines
+
+### Commits Made
+
+- `195da4d`: test: convert test descriptions to Korean for better readability
+- `5d45aa6`: test: update test expectations to match Korean error messages
+- `ec4509e`: refactor: apply coding conventions to Product domain for Issue #007
+- `405491b`: docs: add Issue #007 and assignment 3 reference documents
+- `1651080`: test: add E2E tests for Product API for Issue #007
 
 ## Notes
 
