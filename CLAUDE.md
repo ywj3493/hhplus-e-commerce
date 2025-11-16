@@ -80,6 +80,56 @@ Backend service for an e-commerce platform built with NestJS and Prisma ORM.
 - **Code and Variables**: Keep in English (variable names, function names, etc.)
 - **Error Messages**: Already in Korean, keep as-is
 
+## Commit Message Conventions
+All commit messages must follow Korean conventions (except for the type prefix):
+
+**Format:**
+```
+<type>: <subject in Korean>
+
+<body in Korean>
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+**Types** (keep in English):
+- `feat`: 새로운 기능 추가
+- `fix`: 버그 수정
+- `refactor`: 코드 리팩토링
+- `test`: 테스트 추가 또는 수정
+- `docs`: 문서 수정
+- `style`: 코드 포맷팅
+- `chore`: 빌드 설정 등 기타 변경사항
+
+**Examples:**
+```
+test: 테스트 한글화 완료
+
+Domain, Application, Infrastructure 레이어의 모든 테스트 파일을 한글로 변환했습니다.
+- describe/it 블록을 한글로 작성
+- Given-When-Then 주석은 영문 유지
+- 인라인 주석은 한글로 작성
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+```
+feat: 상품 상세 조회 API 구현
+
+상품 상세 정보와 옵션 그룹을 조회하는 API를 구현했습니다.
+- BR-PROD-05: 옵션 타입별 그룹화
+- BR-PROD-06: 재고 상태 포함
+- BR-PROD-08: 품절 옵션 선택 불가 표시
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
 ## Notes
 - All commits should reference the related issue number
 - Documentation should be updated before implementation
