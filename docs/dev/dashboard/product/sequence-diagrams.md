@@ -125,18 +125,18 @@ export class ProductController {
 
   @Get()
   async getProducts(
-    @Query() query: GetProductsDto,
-  ): Promise<ProductListResponseDto> {
+    @Query() query: GetProducts,
+  ): Promise<ProductListResponse> {
     const output = await this.getProductsUseCase.execute({
       page: query.page || 1,
       limit: query.limit || 10,
     });
 
-    return ProductListResponseDto.from(output);
+    return ProductListResponse.from(output);
   }
 }
 
-export class GetProductsDto {
+export class GetProducts {
   @IsOptional()
   @IsInt()
   @Min(1)

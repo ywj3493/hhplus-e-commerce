@@ -199,25 +199,25 @@ Create JSON files in `src/mock-data/`:
 Create TypeScript DTOs matching the API specification with Swagger decorators:
 
 1. **product.dto.ts**: Product-related DTOs
-   - `ProductListItemDto`
-   - `ProductDetailDto`
-   - `ProductOptionDto`
+   - `ProductListItem`
+   - `ProductDetail`
+   - `ProductOption`
 
 2. **cart.dto.ts**: Cart-related DTOs
-   - `CartDto`
-   - `CartItemDto`
-   - `AddToCartDto`
-   - `UpdateCartItemDto`
+   - `Cart`
+   - `CartItem`
+   - `AddToCart`
+   - `UpdateCartItem`
 
 3. **order.dto.ts**: Order-related DTOs
-   - `OrderDto`
-   - `OrderItemDto`
-   - `CreateOrderDto`
-   - `PaymentDto`
+   - `Order`
+   - `OrderItem`
+   - `CreateOrder`
+   - `Payment`
 
 4. **coupon.dto.ts**: Coupon-related DTOs
-   - `CouponDto`
-   - `IssueCouponDto`
+   - `Coupon`
+   - `IssueCoupon`
 
 ### Phase 6: Controller Implementation
 

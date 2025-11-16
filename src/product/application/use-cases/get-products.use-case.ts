@@ -3,8 +3,8 @@ import {
   IProductRepository,
   PRODUCT_REPOSITORY,
 } from '../../domain/repositories/product.repository';
-import { GetProductsInput } from '../dtos/get-products.input';
-import { GetProductsOutput, ProductListItem } from '../dtos/get-products.output';
+import { GetProductsInput } from '../dtos/get-products.dto';
+import { GetProductsOutput, ProductListItem } from '../dtos/get-products.dto';
 
 /**
  * Get Products Use Case

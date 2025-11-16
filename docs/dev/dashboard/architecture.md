@@ -292,7 +292,7 @@ export class ProductController {
   constructor(private readonly getProductsUseCase: GetProductsUseCase) {}
 
   @Get()
-  async getProducts(@Query() query: GetProductsDto): Promise<ProductListResponseDto> {
+  async getProducts(@Query() query: GetProducts): Promise<ProductListResponse> {
     // 1. 입력 검증 (Pipe/Validator)
     // 2. UseCase 호출
     const result = await this.getProductsUseCase.execute({
@@ -301,7 +301,7 @@ export class ProductController {
     });
 
     // 3. 응답 DTO 변환
-    return ProductListResponseDto.from(result);
+    return ProductListResponse.from(result);
   }
 }
 ```
@@ -309,7 +309,7 @@ export class ProductController {
 **DTO (Data Transfer Object)**
 ```typescript
 // src/product/presentation/dtos/get-products.dto.ts
-export class GetProductsDto {
+export class GetProducts {
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -931,8 +931,8 @@ src/
 │   │   ├── event-handlers/
 │   │   │   └── order-created.handler.ts
 │   │   └── dtos/
-│   │       ├── get-products.input.ts
-│   │       └── get-products.output.ts
+│   │       ├── get-products.dto.ts
+│   │       └── get-products.dto.ts
 │   ├── domain/
 │   │   ├── entities/
 │   │   │   ├── product.entity.ts
@@ -1712,9 +1712,9 @@ export class OrderController {
   @Post()
   @HttpCode(201)
   async createOrder(
-    @Body() dto: CreateOrderRequestDto,
+    @Body() dto: CreateOrderRequest,
     @CurrentUser() user: User,
-  ): Promise<OrderResponseDto> {
+  ): Promise<OrderResponse> {
     // 1. DTO 검증은 자동 (ValidationPipe)
     // 2. UseCase 호출
     const result = await this.createOrderUseCase.execute({
@@ -1723,7 +1723,7 @@ export class OrderController {
     });
 
     // 3. Response DTO 변환
-    return OrderResponseDto.from(result);
+    return OrderResponse.from(result);
   }
 }
 ```
@@ -1732,7 +1732,7 @@ export class OrderController {
 ```typescript
 // 비즈니스 로직을 Controller에 포함하지 않기
 @Post()
-async createOrder(@Body() dto: CreateOrderRequestDto) {
+async createOrder(@Body() dto: CreateOrderRequest) {
   // ❌ 비즈니스 로직
   const stock = await this.stockRepository.findByProductId(dto.productId);
   if (stock.availableQuantity < dto.quantity) {

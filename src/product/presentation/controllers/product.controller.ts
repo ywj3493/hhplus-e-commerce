@@ -11,12 +11,12 @@ import {
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GetProductsUseCase } from '../../application/use-cases/get-products.use-case';
 import { GetProductDetailUseCase } from '../../application/use-cases/get-product-detail.use-case';
-import { GetProductsInput } from '../../application/dtos/get-products.input';
-import { GetProductDetailInput } from '../../application/dtos/get-product-detail.input';
-import { GetProductsQueryDto } from '../dtos/get-products-query.dto';
-import { ProductListResponseDto } from '../dtos/product-list-response.dto';
-import { GetProductDetailParamDto } from '../dtos/get-product-detail-param.dto';
-import { ProductDetailResponseDto } from '../dtos/product-detail-response.dto';
+import { GetProductsInput } from '../../application/dtos/get-products.dto';
+import { GetProductDetailInput } from '../../application/dtos/get-product-detail.dto';
+import { GetProductsQuery } from '../dtos/get-products-query.dto';
+import { ProductListResponse } from '../dtos/product-list-response.dto';
+import { GetProductDetailParam } from '../dtos/get-product-detail-param.dto';
+import { ProductDetailResponse } from '../dtos/product-detail-response.dto';
 import { ProductNotFoundException } from '../../domain/product.exceptions';
 
 /**
@@ -44,13 +44,13 @@ export class ProductController {
   @ApiResponse({
     status: 200,
     description: 'Product list retrieved successfully',
-    type: ProductListResponseDto,
+    type: ProductListResponse,
   })
   @ApiResponse({
     status: 400,
     description: 'Invalid pagination parameters',
   })
-  async getProducts(@Query() query: GetProductsQueryDto): Promise<ProductListResponseDto> {
+  async getProducts(@Query() query: GetProductsQuery): Promise<ProductListResponse> {
     try {
       // HTTP DTO를 Use Case input으로 매핑
       const input = new GetProductsInput(query.page, query.limit);
@@ -93,7 +93,7 @@ export class ProductController {
   @ApiResponse({
     status: 200,
     description: 'Product detail retrieved successfully',
-    type: ProductDetailResponseDto,
+    type: ProductDetailResponse,
   })
   @ApiResponse({
     status: 400,
@@ -104,8 +104,8 @@ export class ProductController {
     description: 'Product not found',
   })
   async getProductDetail(
-    @Param() param: GetProductDetailParamDto,
-  ): Promise<ProductDetailResponseDto> {
+    @Param() param: GetProductDetailParam,
+  ): Promise<ProductDetailResponse> {
     try {
       // HTTP DTO를 Use Case input으로 매핑
       const input = new GetProductDetailInput(param.id);

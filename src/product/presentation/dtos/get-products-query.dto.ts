@@ -7,7 +7,7 @@ import { IsInt, IsOptional, Max, Min } from 'class-validator';
  * BR-PROD-02: Default page size - 10 items
  * BR-PROD-03: Maximum page size - 100 items
  */
-export class GetProductsQueryDto {
+export class GetProductsQuery {
   @ApiProperty({
     description: 'Page number (1-indexed)',
     minimum: 1,

@@ -1,5 +1,5 @@
 import { GetProductDetailUseCase } from './get-product-detail.use-case';
-import { GetProductDetailInput } from '../dtos/get-product-detail.input';
+import { GetProductDetailInput } from '../dtos/get-product-detail.dto';
 import { IProductRepository } from '../../domain/repositories/product.repository';
 import { Product } from '../../domain/entities/product.entity';
 import { ProductOption } from '../../domain/entities/product-option.entity';

@@ -3,12 +3,12 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ProductController } from './product.controller';
 import { GetProductsUseCase } from '../../application/use-cases/get-products.use-case';
 import { GetProductDetailUseCase } from '../../application/use-cases/get-product-detail.use-case';
-import { GetProductsOutput, ProductListItem } from '../../application/dtos/get-products.output';
+import { GetProductsOutput, ProductListItem } from '../../application/dtos/get-products.dto';
 import {
   GetProductDetailOutput,
   ProductOptionGroup,
   ProductOptionDetail,
-} from '../../application/dtos/get-product-detail.output';
+} from '../../application/dtos/get-product-detail.dto';
 import { Money } from '../../domain/entities/money.vo';
 import { StockStatus } from '../../domain/entities/stock-status.vo';
 import { ProductNotFoundException } from '../../domain/product.exceptions';
@@ -47,7 +47,7 @@ describe('ProductController', () => {
   });
 
   describe('getProducts', () => {
-    it('페이징된 상품 목록을 반환해야 함', async () => {
+    it('페이지네이션된 상품 목록을 반환해야 함', async () => {
       // Given
       const query = { page: 1, limit: 10 };
       const useCaseOutput = new GetProductsOutput(
@@ -85,7 +85,7 @@ describe('ProductController', () => {
       expect(response.totalPages).toBe(1);
     });
 
-    it('기본 페이징 값을 사용해야 함', async () => {
+    it('기본 페이지네이션 값을 사용해야 함', async () => {
       // Given
       const query = {};
       const useCaseOutput = new GetProductsOutput([], 0, 1, 10, 0);
@@ -117,7 +117,7 @@ describe('ProductController', () => {
       await expect(controller.getProducts(query)).rejects.toThrow(BadRequestException);
     });
 
-    it('사용자 정의 페이징 값을 처리해야 함', async () => {
+    it('사용자 정의 페이지네이션 값을 처리해야 함', async () => {
       // Given
       const query = { page: 2, limit: 20 };
       const useCaseOutput = new GetProductsOutput([], 0, 2, 20, 0);

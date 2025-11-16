@@ -166,9 +166,9 @@ export class CartController {
   @HttpCode(201)
   @UseGuards(JwtAuthGuard)
   async addItem(
-    @Body() dto: AddCartItemDto,
+    @Body() dto: AddCartItem,
     @CurrentUser() user: User,
-  ): Promise<CartItemResponseDto> {
+  ): Promise<CartItemResponse> {
     const output = await this.addCartItemUseCase.execute({
       userId: user.id,
       productId: dto.productId,
@@ -176,7 +176,7 @@ export class CartController {
       quantity: dto.quantity,
     });
 
-    return CartItemResponseDto.from(output);
+    return CartItemResponse.from(output);
   }
 }
 ```

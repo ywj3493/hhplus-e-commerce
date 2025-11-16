@@ -17,7 +17,7 @@ describe('Product API (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
 
-    // Enable validation pipe (same as main.ts)
+    // 글로벌 유효성 검사 파이프 설정
     app.useGlobalPipes(
       new ValidationPipe({
         transform: true,
@@ -33,7 +33,7 @@ describe('Product API (e2e)', () => {
   });
 
   describe('GET /products', () => {
-    it('기본 페이징으로 상품 목록을 반환해야 함', () => {
+    it('기본 페이지네이션으로 상품 목록을 반환해야 함', () => {
       return request(app.getHttpServer())
         .get('/products')
         .expect(200)
@@ -50,7 +50,7 @@ describe('Product API (e2e)', () => {
         });
     });
 
-    it('사용자 정의 페이징으로 상품 목록을 반환해야 함', () => {
+    it('사용자 정의 페이지네이션으로 상품 목록을 반환해야 함', () => {
       return request(app.getHttpServer())
         .get('/products')
         .query({ page: 2, limit: 5 })

@@ -219,16 +219,16 @@ export class PaymentController {
   @HttpCode(201)
   @UseGuards(JwtAuthGuard)
   async processPayment(
-    @Body() dto: ProcessPaymentDto,
+    @Body() dto: ProcessPayment,
     @CurrentUser() user: User,
-  ): Promise<PaymentResponseDto> {
+  ): Promise<PaymentResponse> {
     const output = await this.processPaymentUseCase.execute({
       userId: user.id,
       orderId: dto.orderId,
       paymentMethod: dto.paymentMethod,
     });
 
-    return PaymentResponseDto.from(output);
+    return PaymentResponse.from(output);
   }
 }
 ```

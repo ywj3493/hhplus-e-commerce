@@ -196,15 +196,15 @@ export class OrderController {
   @HttpCode(201)
   @UseGuards(JwtAuthGuard)
   async createOrder(
-    @Body() dto: CreateOrderDto,
+    @Body() dto: CreateOrder,
     @CurrentUser() user: User,
-  ): Promise<OrderResponseDto> {
+  ): Promise<OrderResponse> {
     const output = await this.createOrderUseCase.execute({
       userId: user.id,
       couponId: dto.couponId,
     });
 
-    return OrderResponseDto.from(output);
+    return OrderResponse.from(output);
   }
 }
 ```

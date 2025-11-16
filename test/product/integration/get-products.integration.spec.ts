@@ -1,5 +1,5 @@
 import { GetProductsUseCase } from '../../../src/product/application/use-cases/get-products.use-case';
-import { GetProductsInput } from '../../../src/product/application/dtos/get-products.input';
+import { GetProductsInput } from '../../../src/product/application/dtos/get-products.dto';
 import { InMemoryProductRepository } from '../../../src/product/infrastructure/repositories/in-memory-product.repository';
 import { StockStatusType } from '../../../src/product/domain/entities/stock-status.vo';
 
@@ -17,7 +17,7 @@ describe('GetProductsUseCase 통합 테스트', () => {
   });
 
   describe('실제 레포지토리와 함께 실행', () => {
-    it('올바른 페이징으로 레포지토리에서 상품을 조회해야 함', async () => {
+    it('올바른 페이지네이션으로 레포지토리에서 상품을 조회해야 함', async () => {
       // Given: 샘플 데이터로 레포지토리가 초기화됨
       const input = new GetProductsInput(1, 10);
 
@@ -64,7 +64,7 @@ describe('GetProductsUseCase 통합 테스트', () => {
       });
     });
 
-    it('두 번째 페이지 페이징을 처리해야 함', async () => {
+    it('두 번째 페이지 페이지네이션을 처리해야 함', async () => {
       // Given
       const input = new GetProductsInput(2, 5);
 
@@ -91,7 +91,7 @@ describe('GetProductsUseCase 통합 테스트', () => {
       expect(output.items.length).toBeLessThanOrEqual(100);
     });
 
-    it('기본 페이징 값을 사용해야 함 (BR-PROD-02)', async () => {
+    it('기본 페이지네이션 값을 사용해야 함 (BR-PROD-02)', async () => {
       // Given: 기본값 (page=1, limit=10)
       const input = new GetProductsInput();
 
@@ -161,7 +161,7 @@ describe('GetProductsUseCase 통합 테스트', () => {
     });
   });
 
-  describe('페이징 경계 케이스', () => {
+  describe('페이지네이션 경계 케이스', () => {
     it('page=1, limit=1을 처리해야 함', async () => {
       // Given
       const input = new GetProductsInput(1, 1);

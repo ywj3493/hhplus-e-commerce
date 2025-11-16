@@ -1,12 +1,11 @@
 import { GetProductDetailUseCase } from '../../../src/product/application/use-cases/get-product-detail.use-case';
-import { GetProductDetailInput } from '../../../src/product/application/dtos/get-product-detail.input';
+import { GetProductDetailInput } from '../../../src/product/application/dtos/get-product-detail.dto';
 import { InMemoryProductRepository } from '../../../src/product/infrastructure/repositories/in-memory-product.repository';
 import { ProductNotFoundException } from '../../../src/product/domain/product.exceptions';
 import { StockStatusType } from '../../../src/product/domain/entities/stock-status.vo';
 
 /**
  * Integration Test: GetProductDetailUseCase + InMemoryProductRepository
- * Tests the interaction between application layer and infrastructure layer
  */
 describe('GetProductDetailUseCase 통합 테스트', () => {
   let useCase: GetProductDetailUseCase;

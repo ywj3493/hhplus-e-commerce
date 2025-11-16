@@ -1,5 +1,5 @@
 import { GetProductsUseCase } from './get-products.use-case';
-import { GetProductsInput } from '../dtos/get-products.input';
+import { GetProductsInput } from '../dtos/get-products.dto';
 import { IProductRepository, PaginationResult } from '../../domain/repositories/product.repository';
 import { Product } from '../../domain/entities/product.entity';
 import { ProductOption } from '../../domain/entities/product-option.entity';

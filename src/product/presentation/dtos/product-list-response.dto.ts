@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 /**
  * Product item in list response
  */
-export class ProductItemDto {
+export class ProductItem {
   @ApiProperty({ description: 'Product ID (UUID)', example: '550e8400-e29b-41d4-a716-446655440001' })
   id: string;
 
@@ -23,9 +23,9 @@ export class ProductItemDto {
 /**
  * Product list response with pagination
  */
-export class ProductListResponseDto {
-  @ApiProperty({ description: 'List of products', type: [ProductItemDto] })
-  items: ProductItemDto[];
+export class ProductListResponse {
+  @ApiProperty({ description: 'List of products', type: [ProductItem] })
+  items: ProductItem[];
 
   @ApiProperty({ description: 'Total number of products', example: 50 })
   total: number;

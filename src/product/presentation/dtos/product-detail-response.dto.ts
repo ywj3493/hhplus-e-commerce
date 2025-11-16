@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 /**
  * Product option in detail response
  */
-export class ProductOptionDto {
+export class ProductOption {
   @ApiProperty({ description: 'Option ID', example: 'opt-color-red' })
   id: string;
 
@@ -23,18 +23,18 @@ export class ProductOptionDto {
 /**
  * Grouped options by type
  */
-export class ProductOptionGroupDto {
+export class ProductOptionGroup {
   @ApiProperty({ description: 'Option type', example: 'Color' })
   type: string;
 
-  @ApiProperty({ description: 'Options in this group', type: [ProductOptionDto] })
-  options: ProductOptionDto[];
+  @ApiProperty({ description: 'Options in this group', type: [ProductOption] })
+  options: ProductOption[];
 }
 
 /**
  * Product detail response
  */
-export class ProductDetailResponseDto {
+export class ProductDetailResponse {
   @ApiProperty({ description: 'Product ID (UUID)', example: '550e8400-e29b-41d4-a716-446655440001' })
   id: string;
 
@@ -50,6 +50,6 @@ export class ProductDetailResponseDto {
   @ApiProperty({ description: 'Product image URL', example: 'https://example.com/images/tshirt.jpg' })
   imageUrl: string;
 
-  @ApiProperty({ description: 'Grouped options by type', type: [ProductOptionGroupDto] })
-  optionGroups: ProductOptionGroupDto[];
+  @ApiProperty({ description: 'Grouped options by type', type: [ProductOptionGroup] })
+  optionGroups: ProductOptionGroup[];
 }

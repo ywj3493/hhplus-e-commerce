@@ -185,13 +185,13 @@ export class CouponController {
   async issueCoupon(
     @Param('id') couponId: string,
     @CurrentUser() user: User,
-  ): Promise<UserCouponResponseDto> {
+  ): Promise<UserCouponResponse> {
     const output = await this.issueCouponUseCase.execute({
       userId: user.id,
       couponId,
     });
 
-    return UserCouponResponseDto.from(output);
+    return UserCouponResponse.from(output);
   }
 }
 ```

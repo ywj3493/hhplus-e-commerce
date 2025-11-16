@@ -83,7 +83,7 @@ describe('InMemoryProductRepository', () => {
       repository.save(createTestProduct('prod-5', 'Product 5', new Date('2024-01-05')));
     });
 
-    it('최신순으로 정렬된 페이징된 상품 목록을 반환해야 함 (BR-PROD-01)', async () => {
+    it('최신순으로 정렬된 페이지네이션된 상품 목록을 반환해야 함 (BR-PROD-01)', async () => {
       // Given
       const page = 1;
       const limit = 3;
