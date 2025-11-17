@@ -8,6 +8,7 @@ import { FakeAuthController } from './__fake__/auth/fake-auth.controller';
 import { FakeJwtAuthGuard } from './__fake__/auth/fake-jwt-auth.guard';
 import { ProductModule } from './product/product.module';
 import { CartModule } from './cart/cart.module';
+import { CouponModule } from './coupon/coupon.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CartModule } from './cart/cart.module';
     }),
     ProductModule,
     CartModule,
+    CouponModule,
   ],
   controllers: [
     FakeAuthController,
