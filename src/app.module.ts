@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ProductsController } from './controllers/products.controller';
-import { CartController } from './controllers/cart.controller';
+import { CartController as OldCartController } from './controllers/cart.controller';
 import { OrdersController } from './controllers/orders.controller';
 import { CouponsController } from './controllers/coupons.controller';
 import { FakeAuthController } from './__fake__/auth/fake-auth.controller';
 import { FakeJwtAuthGuard } from './__fake__/auth/fake-jwt-auth.guard';
 import { ProductModule } from './product/product.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -15,11 +16,12 @@ import { ProductModule } from './product/product.module';
       signOptions: { expiresIn: '1d' },
     }),
     ProductModule,
+    CartModule,
   ],
   controllers: [
     FakeAuthController,
     ProductsController,
-    CartController,
+    OldCartController, // 기존 mock controller는 임시로 유지
     OrdersController,
     CouponsController,
   ],
