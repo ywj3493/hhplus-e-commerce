@@ -375,18 +375,22 @@ export class OrderItem {
   private productId: string;
   private productName: string;        // Snapshot
   private productOptionId: string;
-  private productOptionValue: string; // Snapshot
-  private price: number;              // Snapshot
+  private productOptionName: string;  // Snapshot
+  private price: number;              // Snapshot (상품 가격 + 옵션 추가 가격)
   private quantity: number;
-  private reservedStockId: string;    // 예약된 재고 추적
 
-  static fromCartItem(orderId: string, cartItem: CartItem): OrderItem {
+  static fromCartItem(
+    orderId: string,
+    cartItem: CartItem,
+    optionName: string | null,
+  ): OrderItem {
     const item = new OrderItem();
     item.id = uuidv4();
     item.orderId = orderId;
     item.productId = cartItem.getProductId();
     item.productName = cartItem.getProductName();
     item.productOptionId = cartItem.getProductOptionId();
+    item.productOptionName = optionName;
     item.price = cartItem.getPrice();
     item.quantity = cartItem.getQuantity();
     return item;
@@ -394,6 +398,18 @@ export class OrderItem {
 
   getSubtotal(): number {
     return this.price * this.quantity;
+  }
+
+  getProductId(): string {
+    return this.productId;
+  }
+
+  getProductOptionId(): string | null {
+    return this.productOptionId;
+  }
+
+  getQuantity(): number {
+    return this.quantity;
   }
 }
 
@@ -719,11 +735,11 @@ sequenceDiagram
         Note over BatchJob: Domain logic:<br/>status = CANCELED
 
         loop For each order item
-            BatchJob->>StockRepo: findByIdForUpdate(stockId, em)
+            BatchJob->>StockRepo: findByProductAndOption(productId, optionId, em)
             activate StockRepo
-            StockRepo->>Infrastructure: findByIdForUpdate(stockId, em)
+            StockRepo->>Infrastructure: findByProductAndOption(productId, optionId, em)
             activate Infrastructure
-            Infrastructure->>DB: SELECT * FROM Stock<br/>WHERE id = ?<br/>FOR UPDATE
+            Infrastructure->>DB: SELECT * FROM Stock<br/>WHERE productId = ? AND optionId = ?<br/>FOR UPDATE
             activate DB
             DB-->>Infrastructure: Stock
             deactivate DB
@@ -743,7 +759,7 @@ sequenceDiagram
             activate StockRepo
             StockRepo->>Infrastructure: save(stock, em)
             activate Infrastructure
-            Infrastructure->>DB: UPDATE Stock
+            Infrastructure->>DB: UPDATE Stock<br/>SET reservedQuantity = reservedQuantity - ?<br/>availableQuantity = availableQuantity + ?
             activate DB
             DB-->>Infrastructure: Success
             deactivate DB
@@ -883,13 +899,15 @@ export class StockService {
     em: EntityManager,
   ): Promise<void> {
     for (const item of orderItems) {
-      const stock = await this.stockRepository.findByIdForUpdate(
-        item.getReservedStockId(),
+      // ProductId와 OptionId로 Stock 조회
+      const stock = await this.stockRepository.findByProductAndOption(
+        item.getProductId(),
+        item.getProductOptionId(),
         em,
       );
 
       if (!stock) {
-        this.logger.warn(`재고를 찾을 수 없음: ${item.getReservedStockId()}`);
+        this.logger.warn(`재고를 찾을 수 없음: product=${item.getProductId()}, option=${item.getProductOptionId()}`);
         continue;
       }
 
@@ -997,11 +1015,10 @@ classDiagram
         -String productId
         -String productName
         -String productOptionId
-        -String productOptionValue
+        -String productOptionName
         -Number price
         -Number quantity
-        -String reservedStockId
-        +fromCartItem(orderId, cartItem) OrderItem
+        +fromCartItem(orderId, cartItem, optionName) OrderItem
         +getSubtotal() Number
     }
 
