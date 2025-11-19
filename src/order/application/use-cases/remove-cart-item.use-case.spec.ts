@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RemoveCartItemUseCase } from './remove-cart-item.use-case';
 import { CartRepository } from '../../domain/repositories/cart.repository';
 import { RemoveCartItemInput } from '../dtos/remove-cart-item.dto';
-import { CartNotFoundException } from '../../domain/cart.exceptions';
+import { CartNotFoundException } from '../../domain/order.exceptions';
 import { createTestCart } from '../../infrastructure/fixtures/cart.fixtures';
 import { Money } from '../../../product/domain/entities/money.vo';
 

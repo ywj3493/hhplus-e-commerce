@@ -3,7 +3,7 @@ import { UpdateCartItemUseCase } from './update-cart-item.use-case';
 import { CartRepository } from '../../domain/repositories/cart.repository';
 import { CartStockValidationService } from '../../domain/services/cart-stock-validation.service';
 import { UpdateCartItemInput } from '../dtos/update-cart-item.dto';
-import { CartNotFoundException, CartItemNotFoundException } from '../../domain/cart.exceptions';
+import { CartNotFoundException, CartItemNotFoundException } from '../../domain/order.exceptions';
 import { createTestCart } from '../../infrastructure/fixtures/cart.fixtures';
 import { Money } from '../../../product/domain/entities/money.vo';
 

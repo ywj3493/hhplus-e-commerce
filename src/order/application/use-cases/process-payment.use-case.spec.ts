@@ -12,18 +12,18 @@ import {
   IPaymentApiClient,
   PAYMENT_API_CLIENT,
 } from '../../infrastructure/clients/payment-api.interface';
-import { OrderRepository } from '../../../order/domain/repositories/order.repository';
-import { ORDER_REPOSITORY } from '../../../order/application/use-cases/create-order.use-case';
-import { Order } from '../../../order/domain/entities/order.entity';
-import { OrderStatus } from '../../../order/domain/entities/order-status.enum';
-import { OrderItem } from '../../../order/domain/entities/order-item.entity';
+import { OrderRepository } from '../../domain/repositories/order.repository';
+import { ORDER_REPOSITORY } from './create-order.use-case';
+import { Order } from '../../domain/entities/order.entity';
+import { OrderStatus } from '../../domain/entities/order-status.enum';
+import { OrderItem } from '../../domain/entities/order-item.entity';
 import { Payment } from '../../domain/entities/payment.entity';
 import {
   AlreadyPaidException,
   OrderExpiredException,
   InvalidOrderStatusException,
   PaymentFailedException,
-} from '../../domain/payment.exceptions';
+} from '../../domain/order.exceptions';
 import { PaymentCompletedEvent } from '../../domain/events/payment-completed.event';
 import { Money } from '../../../product/domain/entities/money.vo';
 

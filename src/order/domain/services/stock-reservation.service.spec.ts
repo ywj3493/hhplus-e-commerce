@@ -8,7 +8,7 @@ import { Product } from '../../../product/domain/entities/product.entity';
 import { ProductOption } from '../../../product/domain/entities/product-option.entity';
 import { Stock } from '../../../product/domain/entities/stock.entity';
 import { Money } from '../../../product/domain/entities/money.vo';
-import { CartItem } from '../../../cart/domain/entities/cart-item.entity';
+import { CartItem } from '../entities/cart-item.entity';
 import { OrderItem } from '../entities/order-item.entity';
 import { OrderRepository } from '../repositories/order.repository';
 import { ORDER_REPOSITORY } from '../../application/use-cases/create-order.use-case';

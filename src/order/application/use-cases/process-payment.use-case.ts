@@ -6,7 +6,7 @@ import {
   InvalidOrderStatusException,
   OrderExpiredException,
   PaymentFailedException,
-} from '../../domain/payment.exceptions';
+} from '../../domain/order.exceptions';
 import {
   PaymentRepository,
   PAYMENT_REPOSITORY,
@@ -20,10 +20,10 @@ import {
   ProcessPaymentInput,
   ProcessPaymentOutput,
 } from '../dtos/process-payment.dto';
-import { Order } from '../../../order/domain/entities/order.entity';
-import { OrderStatus } from '../../../order/domain/entities/order-status.enum';
-import { OrderRepository } from '../../../order/domain/repositories/order.repository';
-import { ORDER_REPOSITORY } from '../../../order/application/use-cases/create-order.use-case';
+import { Order } from '../../domain/entities/order.entity';
+import { OrderStatus } from '../../domain/entities/order-status.enum';
+import { OrderRepository } from '../../domain/repositories/order.repository';
+import { ORDER_REPOSITORY } from './create-order.use-case';
 
 /**
  * ProcessPaymentUseCase

@@ -3,7 +3,7 @@ import {
   IProductRepository,
   PRODUCT_REPOSITORY,
 } from '../../../product/domain/repositories/product.repository';
-import { InsufficientStockException } from '../cart.exceptions';
+import { InsufficientStockException } from '../order.exceptions';
 import { ProductNotFoundException } from '../../../product/domain/product.exceptions';
 
 /**

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { CartRepository } from '../../domain/repositories/cart.repository';
-import { CartNotFoundException } from '../../domain/cart.exceptions';
+import { CartNotFoundException } from '../../domain/order.exceptions';
 import {
   RemoveCartItemInput,
   RemoveCartItemOutput,

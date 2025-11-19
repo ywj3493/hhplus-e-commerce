@@ -4,7 +4,7 @@ import { Money } from '../../../product/domain/entities/money.vo';
 import {
   CartItemNotFoundException,
   InsufficientStockException,
-} from '../cart.exceptions';
+} from '../order.exceptions';
 
 describe('Cart', () => {
   describe('생성', () => {

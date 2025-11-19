@@ -1,9 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { OrderRepository } from '../../domain/repositories/order.repository';
+import { CartRepository } from '../../domain/repositories/cart.repository';
 import { Order } from '../../domain/entities/order.entity';
 import { OrderItem } from '../../domain/entities/order-item.entity';
 import { StockReservationService } from '../../domain/services/stock-reservation.service';
-import { CartCheckoutService } from '../../../cart/application/services/cart-checkout.service';
 import { CouponApplicationService } from '../../../coupon/application/services/coupon-application.service';
 import {
   IProductRepository,
@@ -13,40 +13,40 @@ import { CreateOrderInput, CreateOrderOutput } from '../dtos/create-order.dto';
 import { EmptyCartException } from '../../domain/order.exceptions';
 
 export const ORDER_REPOSITORY = Symbol('ORDER_REPOSITORY');
+export const CART_REPOSITORY = Symbol('CART_REPOSITORY');
 
 /**
  * CreateOrderUseCase
  * 주문 생성 Use Case
  *
  * 플로우:
- * 1. 장바구니 조회 및 검증 (CartCheckoutService)
+ * 1. 장바구니 조회 및 검증 (CartRepository)
  * 2. 재고 예약 (StockReservationService)
  * 3. 쿠폰 적용 (CouponApplicationService)
  * 4. Order.create() 호출
- * 5. 장바구니 비우기 (CartCheckoutService)
+ * 5. 장바구니 비우기 (CartRepository)
  */
 @Injectable()
 export class CreateOrderUseCase {
   constructor(
+    @Inject(CART_REPOSITORY)
+    private readonly cartRepository: CartRepository,
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: OrderRepository,
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: IProductRepository,
     private readonly stockReservationService: StockReservationService,
-    private readonly cartCheckoutService: CartCheckoutService,
     private readonly couponApplicationService: CouponApplicationService,
   ) {}
 
   async execute(input: CreateOrderInput): Promise<CreateOrderOutput> {
-    // 1. 장바구니 조회 및 검증 (Application Service)
-    let cartItems;
-    try {
-      cartItems = await this.cartCheckoutService.getCartItemsForCheckout(
-        input.userId,
-      );
-    } catch (error) {
-      throw new EmptyCartException();
+    // 1. 장바구니 조회 및 검증
+    const cart = await this.cartRepository.findByUserId(input.userId);
+    if (!cart || cart.getItems().length === 0) {
+      throw new EmptyCartException('장바구니가 비어있습니다.');
     }
+
+    const cartItems = cart.getItems();
 
     // 2. 재고 예약
     await this.stockReservationService.reserveStockForCart(cartItems);
@@ -115,8 +115,8 @@ export class CreateOrderUseCase {
       // 6. Order 저장
       const savedOrder = await this.orderRepository.save(finalOrder);
 
-      // 7. 장바구니 비우기 (Application Service)
-      await this.cartCheckoutService.clearCartAfterCheckout(input.userId);
+      // 7. 장바구니 비우기
+      await this.cartRepository.clearByUserId(input.userId);
 
       // 8. Output DTO 반환
       return CreateOrderOutput.from(

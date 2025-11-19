@@ -1,5 +1,5 @@
 import { Cart } from '../../domain/entities/cart.entity';
-import { CartItemNotFoundException, InvalidQuantityException } from '../../domain/cart.exceptions';
+import { CartItemNotFoundException, InvalidQuantityException } from '../../domain/order.exceptions';
 
 export interface AddCartItemInputData {
   userId: string;

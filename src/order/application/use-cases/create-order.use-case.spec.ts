@@ -1,10 +1,11 @@
 import { CreateOrderUseCase } from './create-order.use-case';
 import { OrderRepository } from '../../domain/repositories/order.repository';
+import { CartRepository } from '../../domain/repositories/cart.repository';
 import { IProductRepository } from '../../../product/domain/repositories/product.repository';
 import { StockReservationService } from '../../domain/services/stock-reservation.service';
-import { CartCheckoutService } from '../../../cart/application/services/cart-checkout.service';
 import { CouponApplicationService } from '../../../coupon/application/services/coupon-application.service';
-import { CartItem } from '../../../cart/domain/entities/cart-item.entity';
+import { Cart } from '../../domain/entities/cart.entity';
+import { CartItem } from '../../domain/entities/cart-item.entity';
 import { Product } from '../../../product/domain/entities/product.entity';
 import { ProductOption } from '../../../product/domain/entities/product-option.entity';
 import { Stock } from '../../../product/domain/entities/stock.entity';
@@ -14,14 +15,20 @@ import { EmptyCartException } from '../../domain/order.exceptions';
 
 describe('CreateOrderUseCase', () => {
   let useCase: CreateOrderUseCase;
+  let cartRepository: jest.Mocked<CartRepository>;
   let orderRepository: jest.Mocked<OrderRepository>;
   let productRepository: jest.Mocked<IProductRepository>;
   let stockReservationService: jest.Mocked<StockReservationService>;
-  let cartCheckoutService: jest.Mocked<CartCheckoutService>;
   let couponApplicationService: jest.Mocked<CouponApplicationService>;
 
   beforeEach(() => {
     // Mock repositories
+    cartRepository = {
+      findByUserId: jest.fn(),
+      save: jest.fn(),
+      clearByUserId: jest.fn(),
+    } as jest.Mocked<CartRepository>;
+
     orderRepository = {
       findById: jest.fn(),
       findByUserId: jest.fn(),
@@ -45,21 +52,16 @@ describe('CreateOrderUseCase', () => {
       convertReservedToSold: jest.fn(),
     } as any;
 
-    cartCheckoutService = {
-      getCartItemsForCheckout: jest.fn(),
-      clearCartAfterCheckout: jest.fn(),
-    } as any;
-
     couponApplicationService = {
       applyCoupon: jest.fn(),
     } as any;
 
     // Create use case
     useCase = new CreateOrderUseCase(
+      cartRepository,
       orderRepository,
       productRepository,
       stockReservationService,
-      cartCheckoutService,
       couponApplicationService,
     );
   });
@@ -105,10 +107,20 @@ describe('CreateOrderUseCase', () => {
       // Given
       const userId = 'user-1';
       const cartItems = createTestCartItems();
+      const cart = Cart.create(userId);
+      cartItems.forEach((item) => {
+        cart.addItem({
+          productId: item.productId,
+          productName: item.productName,
+          productOptionId: item.productOptionId,
+          price: item.getPrice(),
+          quantity: item.quantity,
+        });
+      });
       const product = createTestProduct();
       const input = new CreateOrderInput(userId);
 
-      cartCheckoutService.getCartItemsForCheckout.mockResolvedValue(cartItems);
+      cartRepository.findByUserId.mockResolvedValue(cart);
       productRepository.findById.mockResolvedValue(product);
       orderRepository.save.mockImplementation((order) =>
         Promise.resolve(order),
@@ -119,12 +131,10 @@ describe('CreateOrderUseCase', () => {
 
       // Then
       expect(stockReservationService.reserveStockForCart).toHaveBeenCalledWith(
-        cartItems,
+        cart.getItems(),
       );
       expect(orderRepository.save).toHaveBeenCalled();
-      expect(cartCheckoutService.clearCartAfterCheckout).toHaveBeenCalledWith(
-        userId,
-      );
+      expect(cartRepository.clearByUserId).toHaveBeenCalledWith(userId);
       expect(result.orderId).toBeDefined();
       expect(result.status).toBe('PENDING');
     });
@@ -133,14 +143,13 @@ describe('CreateOrderUseCase', () => {
       // Given
       const userId = 'user-1';
       const input = new CreateOrderInput(userId);
+      const emptyCart = Cart.create(userId);
 
-      cartCheckoutService.getCartItemsForCheckout.mockRejectedValue(
-        new Error('장바구니가 비어있습니다.'),
-      );
+      cartRepository.findByUserId.mockResolvedValue(emptyCart);
 
       // When & Then
       await expect(useCase.execute(input)).rejects.toThrow(
-        '장바구니가 비어있습니다.',
+        EmptyCartException,
       );
     });
 
@@ -148,10 +157,20 @@ describe('CreateOrderUseCase', () => {
       // Given
       const userId = 'user-1';
       const cartItems = createTestCartItems();
+      const cart = Cart.create(userId);
+      cartItems.forEach((item) => {
+        cart.addItem({
+          productId: item.productId,
+          productName: item.productName,
+          productOptionId: item.productOptionId,
+          price: item.getPrice(),
+          quantity: item.quantity,
+        });
+      });
       const product = createTestProduct();
       const input = new CreateOrderInput(userId);
 
-      cartCheckoutService.getCartItemsForCheckout.mockResolvedValue(cartItems);
+      cartRepository.findByUserId.mockResolvedValue(cart);
       productRepository.findById.mockResolvedValue(product);
       orderRepository.save.mockImplementation((order) =>
         Promise.resolve(order),
@@ -171,10 +190,20 @@ describe('CreateOrderUseCase', () => {
       // Given
       const userId = 'user-1';
       const cartItems = createTestCartItems();
+      const cart = Cart.create(userId);
+      cartItems.forEach((item) => {
+        cart.addItem({
+          productId: item.productId,
+          productName: item.productName,
+          productOptionId: item.productOptionId,
+          price: item.getPrice(),
+          quantity: item.quantity,
+        });
+      });
       const product = createTestProduct();
       const input = new CreateOrderInput(userId);
 
-      cartCheckoutService.getCartItemsForCheckout.mockResolvedValue(cartItems);
+      cartRepository.findByUserId.mockResolvedValue(cart);
       productRepository.findById.mockResolvedValue(product);
       stockReservationService.reserveStockForCart.mockRejectedValue(
         new Error('재고 부족'),

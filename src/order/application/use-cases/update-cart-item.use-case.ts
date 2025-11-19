@@ -4,7 +4,7 @@ import { CartStockValidationService } from '../../domain/services/cart-stock-val
 import {
   CartNotFoundException,
   CartItemNotFoundException,
-} from '../../domain/cart.exceptions';
+} from '../../domain/order.exceptions';
 import {
   UpdateCartItemInput,
   UpdateCartItemOutput,

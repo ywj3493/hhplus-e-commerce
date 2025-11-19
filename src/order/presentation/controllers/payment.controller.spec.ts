@@ -10,7 +10,7 @@ import {
   OrderExpiredException,
   InvalidOrderStatusException,
   PaymentFailedException,
-} from '../../domain/payment.exceptions';
+} from '../../domain/order.exceptions';
 
 describe('PaymentController', () => {
   let controller: PaymentController;

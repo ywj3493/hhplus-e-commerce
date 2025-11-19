@@ -7,10 +7,17 @@ import { CouponsController } from './controllers/coupons.controller';
 import { FakeAuthController } from './__fake__/auth/fake-auth.controller';
 import { FakeJwtAuthGuard } from './__fake__/auth/fake-jwt-auth.guard';
 import { ProductModule } from './product/product.module';
-import { CartModule } from './cart/cart.module';
 import { CouponModule } from './coupon/coupon.module';
 import { OrderModule } from './order/order.module';
 
+/**
+ * App Module
+ *
+ * 도메인 통합 후 구조:
+ * - ProductModule: 상품 및 재고 관리
+ * - CouponModule: 쿠폰 관리
+ * - OrderModule: 장바구니, 주문, 결제 통합 (구 CartModule, PaymentModule 포함)
+ */
 @Module({
   imports: [
     JwtModule.register({
@@ -18,9 +25,8 @@ import { OrderModule } from './order/order.module';
       signOptions: { expiresIn: '1d' },
     }),
     ProductModule,
-    CartModule,
     CouponModule,
-    OrderModule,
+    OrderModule, // Cart + Order + Payment 통합
   ],
   controllers: [
     FakeAuthController,

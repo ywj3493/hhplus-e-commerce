@@ -5,7 +5,7 @@ import { Product } from '../../../product/domain/entities/product.entity';
 import { ProductOption } from '../../../product/domain/entities/product-option.entity';
 import { Stock } from '../../../product/domain/entities/stock.entity';
 import { Money } from '../../../product/domain/entities/money.vo';
-import { InsufficientStockException } from '../cart.exceptions';
+import { InsufficientStockException } from '../order.exceptions';
 import { ProductNotFoundException } from '../../../product/domain/product.exceptions';
 
 describe('CartStockValidationService', () => {
