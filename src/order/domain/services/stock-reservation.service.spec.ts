@@ -10,10 +10,13 @@ import { Stock } from '../../../product/domain/entities/stock.entity';
 import { Money } from '../../../product/domain/entities/money.vo';
 import { CartItem } from '../../../cart/domain/entities/cart-item.entity';
 import { OrderItem } from '../entities/order-item.entity';
+import { OrderRepository } from '../repositories/order.repository';
+import { ORDER_REPOSITORY } from '../../application/use-cases/create-order.use-case';
 
 describe('StockReservationService', () => {
   let service: StockReservationService;
   let productRepository: jest.Mocked<IProductRepository>;
+  let orderRepository: jest.Mocked<OrderRepository>;
 
   beforeEach(async () => {
     const mockProductRepository: jest.Mocked<IProductRepository> = {
@@ -24,6 +27,14 @@ describe('StockReservationService', () => {
       exists: jest.fn(),
     };
 
+    const mockOrderRepository: jest.Mocked<OrderRepository> = {
+      findById: jest.fn(),
+      findByUserId: jest.fn(),
+      countByUserId: jest.fn(),
+      findExpiredPendingOrders: jest.fn(),
+      save: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StockReservationService,
@@ -31,11 +42,16 @@ describe('StockReservationService', () => {
           provide: PRODUCT_REPOSITORY,
           useValue: mockProductRepository,
         },
+        {
+          provide: ORDER_REPOSITORY,
+          useValue: mockOrderRepository,
+        },
       ],
     }).compile();
 
     service = module.get<StockReservationService>(StockReservationService);
     productRepository = module.get(PRODUCT_REPOSITORY);
+    orderRepository = module.get(ORDER_REPOSITORY);
   });
 
   const createTestProduct = (

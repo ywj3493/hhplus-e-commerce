@@ -1,11 +1,9 @@
 import { CreateOrderUseCase } from './create-order.use-case';
 import { OrderRepository } from '../../domain/repositories/order.repository';
-import { CartRepository } from '../../../cart/domain/repositories/cart.repository';
-import { UserCouponRepository } from '../../../coupon/domain/repositories/user-coupon.repository';
 import { IProductRepository } from '../../../product/domain/repositories/product.repository';
 import { StockReservationService } from '../../domain/services/stock-reservation.service';
-import { CouponService } from '../../../coupon/domain/services/coupon.service';
-import { Cart } from '../../../cart/domain/entities/cart.entity';
+import { CartCheckoutService } from '../../../cart/application/services/cart-checkout.service';
+import { CouponApplicationService } from '../../../coupon/application/services/coupon-application.service';
 import { CartItem } from '../../../cart/domain/entities/cart-item.entity';
 import { Product } from '../../../product/domain/entities/product.entity';
 import { ProductOption } from '../../../product/domain/entities/product-option.entity';
@@ -17,12 +15,10 @@ import { EmptyCartException } from '../../domain/order.exceptions';
 describe('CreateOrderUseCase', () => {
   let useCase: CreateOrderUseCase;
   let orderRepository: jest.Mocked<OrderRepository>;
-  let cartRepository: jest.Mocked<CartRepository>;
-  let userCouponRepository: jest.Mocked<UserCouponRepository>;
-  let couponRepository: jest.Mocked<any>;
   let productRepository: jest.Mocked<IProductRepository>;
   let stockReservationService: jest.Mocked<StockReservationService>;
-  let couponService: jest.Mocked<CouponService>;
+  let cartCheckoutService: jest.Mocked<CartCheckoutService>;
+  let couponApplicationService: jest.Mocked<CouponApplicationService>;
 
   beforeEach(() => {
     // Mock repositories
@@ -33,25 +29,6 @@ describe('CreateOrderUseCase', () => {
       findExpiredPendingOrders: jest.fn(),
       save: jest.fn(),
     } as jest.Mocked<OrderRepository>;
-
-    cartRepository = {
-      findByUserId: jest.fn(),
-      save: jest.fn(),
-      clearByUserId: jest.fn(),
-    } as jest.Mocked<CartRepository>;
-
-    userCouponRepository = {
-      findById: jest.fn(),
-      findByUserId: jest.fn(),
-      existsByUserIdAndCouponId: jest.fn(),
-      save: jest.fn(),
-    } as jest.Mocked<UserCouponRepository>;
-
-    couponRepository = {
-      findById: jest.fn(),
-      findByIdForUpdate: jest.fn(),
-      save: jest.fn(),
-    } as jest.Mocked<any>;
 
     productRepository = {
       findById: jest.fn(),
@@ -68,21 +45,22 @@ describe('CreateOrderUseCase', () => {
       convertReservedToSold: jest.fn(),
     } as any;
 
-    couponService = {
-      issueCoupon: jest.fn(),
-      validateAndUseCoupon: jest.fn(),
-      calculateDiscount: jest.fn(),
-    } as jest.Mocked<CouponService>;
+    cartCheckoutService = {
+      getCartItemsForCheckout: jest.fn(),
+      clearCartAfterCheckout: jest.fn(),
+    } as any;
+
+    couponApplicationService = {
+      applyCoupon: jest.fn(),
+    } as any;
 
     // Create use case
     useCase = new CreateOrderUseCase(
       orderRepository,
-      cartRepository,
-      userCouponRepository,
-      couponRepository,
       productRepository,
       stockReservationService,
-      couponService,
+      cartCheckoutService,
+      couponApplicationService,
     );
   });
 
@@ -109,10 +87,9 @@ describe('CreateOrderUseCase', () => {
     );
   };
 
-  const createTestCart = (userId: string): Cart => {
-    const cart = Cart.create(userId);
+  const createTestCartItems = (): CartItem[] => {
     const cartItem = CartItem.create({
-      cartId: cart.id,
+      cartId: 'cart-1',
       productId: 'product-1',
       productName: '테스트 상품',
       productOptionId: 'option-1',
@@ -120,25 +97,18 @@ describe('CreateOrderUseCase', () => {
       quantity: 2,
     });
 
-    // Add item using Cart's method
-    return Cart.reconstitute({
-      id: cart.id,
-      userId: cart.userId,
-      items: [cartItem],
-      createdAt: cart.createdAt,
-      updatedAt: cart.updatedAt,
-    });
+    return [cartItem];
   };
 
   describe('실행', () => {
     it('장바구니의 상품으로 주문을 생성해야 함', async () => {
       // Given
       const userId = 'user-1';
-      const cart = createTestCart(userId);
+      const cartItems = createTestCartItems();
       const product = createTestProduct();
       const input = new CreateOrderInput(userId);
 
-      cartRepository.findByUserId.mockResolvedValue(cart);
+      cartCheckoutService.getCartItemsForCheckout.mockResolvedValue(cartItems);
       productRepository.findById.mockResolvedValue(product);
       orderRepository.save.mockImplementation((order) =>
         Promise.resolve(order),
@@ -149,10 +119,12 @@ describe('CreateOrderUseCase', () => {
 
       // Then
       expect(stockReservationService.reserveStockForCart).toHaveBeenCalledWith(
-        cart.getItems(),
+        cartItems,
       );
       expect(orderRepository.save).toHaveBeenCalled();
-      expect(cartRepository.clearByUserId).toHaveBeenCalledWith(userId);
+      expect(cartCheckoutService.clearCartAfterCheckout).toHaveBeenCalledWith(
+        userId,
+      );
       expect(result.orderId).toBeDefined();
       expect(result.status).toBe('PENDING');
     });
@@ -160,32 +132,26 @@ describe('CreateOrderUseCase', () => {
     it('빈 장바구니는 EmptyCartException을 던져야 함', async () => {
       // Given
       const userId = 'user-1';
-      const emptyCart = Cart.create(userId);
       const input = new CreateOrderInput(userId);
 
-      cartRepository.findByUserId.mockResolvedValue(emptyCart);
+      cartCheckoutService.getCartItemsForCheckout.mockRejectedValue(
+        new Error('장바구니가 비어있습니다.'),
+      );
 
       // When & Then
-      await expect(useCase.execute(input)).rejects.toThrow(EmptyCartException);
-    });
-
-    it('장바구니를 찾을 수 없으면 EmptyCartException을 던져야 함', async () => {
-      // Given
-      const input = new CreateOrderInput('user-1');
-      cartRepository.findByUserId.mockResolvedValue(null);
-
-      // When & Then
-      await expect(useCase.execute(input)).rejects.toThrow(EmptyCartException);
+      await expect(useCase.execute(input)).rejects.toThrow(
+        '장바구니가 비어있습니다.',
+      );
     });
 
     it('BR-ORDER-02: 주문 시점의 상품 정보를 스냅샷으로 저장해야 함', async () => {
       // Given
       const userId = 'user-1';
-      const cart = createTestCart(userId);
+      const cartItems = createTestCartItems();
       const product = createTestProduct();
       const input = new CreateOrderInput(userId);
 
-      cartRepository.findByUserId.mockResolvedValue(cart);
+      cartCheckoutService.getCartItemsForCheckout.mockResolvedValue(cartItems);
       productRepository.findById.mockResolvedValue(product);
       orderRepository.save.mockImplementation((order) =>
         Promise.resolve(order),
@@ -201,14 +167,14 @@ describe('CreateOrderUseCase', () => {
       expect(savedOrder.items[0].price.amount).toBe(10000);
     });
 
-    it('재고 예약 실패 시 재고를 해제해야 함', async () => {
+    it('재고 예약 실패 시 에러를 던져야 함', async () => {
       // Given
       const userId = 'user-1';
-      const cart = createTestCart(userId);
+      const cartItems = createTestCartItems();
       const product = createTestProduct();
       const input = new CreateOrderInput(userId);
 
-      cartRepository.findByUserId.mockResolvedValue(cart);
+      cartCheckoutService.getCartItemsForCheckout.mockResolvedValue(cartItems);
       productRepository.findById.mockResolvedValue(product);
       stockReservationService.reserveStockForCart.mockRejectedValue(
         new Error('재고 부족'),

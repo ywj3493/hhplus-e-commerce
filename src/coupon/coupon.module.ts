@@ -3,6 +3,7 @@ import { CouponController } from './presentation/controllers/coupon.controller';
 import { IssueCouponUseCase } from './application/use-cases/issue-coupon.use-case';
 import { GetUserCouponsUseCase } from './application/use-cases/get-user-coupons.use-case';
 import { CouponService } from './domain/services/coupon.service';
+import { CouponApplicationService } from './application/services/coupon-application.service';
 import { UserCouponQueryService } from './domain/services/user-coupon-query.service';
 import { InMemoryCouponRepository } from './infrastructure/repositories/in-memory-coupon.repository';
 import { InMemoryUserCouponRepository } from './infrastructure/repositories/in-memory-user-coupon.repository';
@@ -27,6 +28,9 @@ import { InMemoryUserCouponRepository } from './infrastructure/repositories/in-m
     CouponService,
     UserCouponQueryService,
 
+    // Application Services
+    CouponApplicationService,
+
     // Use Cases
     IssueCouponUseCase,
     GetUserCouponsUseCase,
@@ -44,7 +48,8 @@ import { InMemoryUserCouponRepository } from './infrastructure/repositories/in-m
   exports: [
     'CouponRepository',
     'UserCouponRepository',
-    CouponService, // Export for Order domain to use
+    CouponService,
+    CouponApplicationService, // Export for Order module
   ],
 })
 export class CouponModule {}

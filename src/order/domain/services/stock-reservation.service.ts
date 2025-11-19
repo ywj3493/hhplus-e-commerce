@@ -5,6 +5,8 @@ import {
   PRODUCT_REPOSITORY,
 } from '../../../product/domain/repositories/product.repository';
 import { OrderItem } from '../entities/order-item.entity';
+import { OrderRepository } from '../repositories/order.repository';
+import { ORDER_REPOSITORY } from '../../application/use-cases/create-order.use-case';
 
 /**
  * StockReservationService
@@ -17,6 +19,8 @@ export class StockReservationService {
   constructor(
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: IProductRepository,
+    @Inject(ORDER_REPOSITORY)
+    private readonly orderRepository: OrderRepository,
   ) {}
 
   /**
@@ -127,10 +131,32 @@ export class StockReservationService {
   }
 
   /**
-   * 예약된 재고를 판매로 전환 (결제 완료 시)
+   * 예약된 재고를 판매로 전환 (결제 완료 시) - orderId 버전
+   * @param orderId - 주문 ID
+   */
+  async convertReservedToSold(orderId: string): Promise<void>;
+  /**
+   * 예약된 재고를 판매로 전환 (결제 완료 시) - OrderItem[] 버전
    * @param orderItems - 주문 아이템 목록
    */
-  async convertReservedToSold(orderItems: OrderItem[]): Promise<void> {
+  async convertReservedToSold(orderItems: OrderItem[]): Promise<void>;
+  /**
+   * 구현부
+   */
+  async convertReservedToSold(
+    orderIdOrItems: string | OrderItem[],
+  ): Promise<void> {
+    // orderId인 경우 Order 조회 후 OrderItem 추출
+    let orderItems: OrderItem[];
+    if (typeof orderIdOrItems === 'string') {
+      const order = await this.orderRepository.findById(orderIdOrItems);
+      if (!order) {
+        throw new Error(`주문을 찾을 수 없습니다: ${orderIdOrItems}`);
+      }
+      orderItems = order.items;
+    } else {
+      orderItems = orderIdOrItems;
+    }
     for (const orderItem of orderItems) {
       const product = await this.productRepository.findById(
         orderItem.productId,

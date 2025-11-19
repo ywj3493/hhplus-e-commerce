@@ -7,6 +7,7 @@ import { UpdateCartItemUseCase } from './application/use-cases/update-cart-item.
 import { RemoveCartItemUseCase } from './application/use-cases/remove-cart-item.use-case';
 import { ClearCartUseCase } from './application/use-cases/clear-cart.use-case';
 import { CartStockValidationService } from './domain/services/cart-stock-validation.service';
+import { CartCheckoutService } from './application/services/cart-checkout.service';
 import { InMemoryCartRepository } from './infrastructure/repositories/in-memory-cart.repository';
 
 export const CART_REPOSITORY = 'CartRepository';
@@ -25,6 +26,9 @@ export const CART_REPOSITORY = 'CartRepository';
     // Domain Services
     CartStockValidationService,
 
+    // Application Services
+    CartCheckoutService,
+
     // Use Cases
     AddCartItemUseCase,
     GetCartUseCase,
@@ -39,8 +43,9 @@ export const CART_REPOSITORY = 'CartRepository';
     },
   ],
   exports: [
-    // Export repository if needed by other modules (e.g., Order module)
+    // Export for other modules
     CART_REPOSITORY,
+    CartCheckoutService, // Export for Order module
   ],
 })
 export class CartModule {}
