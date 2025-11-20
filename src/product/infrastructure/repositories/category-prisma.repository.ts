@@ -75,11 +75,6 @@ export class CategoryPrismaRepository implements CategoryRepository {
     createdAt: Date;
     updatedAt: Date;
   }): Category {
-    return Category.reconstitute({
-      id: model.id,
-      name: model.name,
-      createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
-    });
+    return Category.reconstitute(model.id, model.name, model.createdAt, model.updatedAt);
   }
 }
