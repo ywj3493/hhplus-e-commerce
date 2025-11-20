@@ -6,6 +6,7 @@ import { Stock } from '@/product/domain/entities/stock.entity';
 import { Price } from '@/product/domain/entities/price.vo';
 import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { OptimisticLockException } from '@/product/domain/exceptions/optimistic-lock.exception';
 
 /**
  * ProductPrismaRepository
@@ -141,160 +142,162 @@ export class ProductPrismaRepository implements ProductRepository {
   }
 
   /**
-   * 재고 예약 (비관적 락 사용)
-   * SELECT FOR UPDATE를 사용하여 동시성 제어
+   * 재고 예약 (낙관적 락 사용)
+   * version 필드를 사용하여 동시성 제어
    *
    * @param stockId - 재고 ID
    * @param quantity - 예약할 수량
    * @throws Error - 재고 부족 또는 유효하지 않은 수량
+   * @throws OptimisticLockException - 다른 트랜잭션이 동시에 재고를 수정한 경우
    */
   async reserveStock(stockId: string, quantity: number): Promise<void> {
     if (quantity <= 0) {
       throw new Error('예약 수량은 양수여야 합니다');
     }
 
-    await this.prisma.$transaction(async (tx) => {
-      // 비관적 락: SELECT FOR UPDATE
-      // 다른 트랜잭션이 이 행을 수정하지 못하도록 잠금
-      const stockModel = await tx.$queryRaw<
-        Array<{
-          id: string;
-          productId: string;
-          productOptionId: string | null;
-          totalQuantity: number;
-          availableQuantity: number;
-          reservedQuantity: number;
-          soldQuantity: number;
-        }>
-      >`SELECT * FROM stocks WHERE id = ${stockId} FOR UPDATE`;
-
-      if (!stockModel || stockModel.length === 0) {
-        throw new Error(`재고를 찾을 수 없습니다: ${stockId}`);
-      }
-
-      const stock = stockModel[0];
-
-      // 재고 부족 검증
-      if (stock.availableQuantity < quantity) {
-        throw new Error(
-          `재고가 부족합니다. 요청: ${quantity}, 가용: ${stock.availableQuantity}`,
-        );
-      }
-
-      // 재고 예약 처리
-      await tx.stock.update({
-        where: { id: stockId },
-        data: {
-          availableQuantity: stock.availableQuantity - quantity,
-          reservedQuantity: stock.reservedQuantity + quantity,
-          updatedAt: new Date(),
-        },
-      });
+    // 1. 현재 재고 조회 (잠금 없이)
+    const stockModel = await this.prisma.stock.findUnique({
+      where: { id: stockId },
     });
+
+    if (!stockModel) {
+      throw new Error(`재고를 찾을 수 없습니다: ${stockId}`);
+    }
+
+    // 2. 재고 부족 검증
+    if (stockModel.availableQuantity < quantity) {
+      throw new Error(
+        `재고가 부족합니다. 요청: ${quantity}, 가용: ${stockModel.availableQuantity}`,
+      );
+    }
+
+    // 3. 낙관적 락: version 필드를 조건에 포함하여 업데이트
+    const result = await this.prisma.stock.updateMany({
+      where: {
+        id: stockId,
+        version: stockModel.version, // 낙관적 락 조건
+        availableQuantity: { gte: quantity }, // 재고 충분 조건 (이중 체크)
+      },
+      data: {
+        availableQuantity: { decrement: quantity },
+        reservedQuantity: { increment: quantity },
+        version: { increment: 1 },
+        updatedAt: new Date(),
+      },
+    });
+
+    // 4. 업데이트 실패 시 (다른 트랜잭션이 먼저 수정함)
+    if (result.count === 0) {
+      throw new OptimisticLockException(
+        '재고가 다른 트랜잭션에 의해 수정되었습니다. 다시 시도해주세요.',
+      );
+    }
   }
 
   /**
    * 예약된 재고 복원 (예: 주문 취소 시)
-   * SELECT FOR UPDATE를 사용하여 동시성 제어
+   * version 필드를 사용하여 동시성 제어
    *
    * @param stockId - 재고 ID
    * @param quantity - 복원할 수량
    * @throws Error - 예약 수량 초과 또는 유효하지 않은 수량
+   * @throws OptimisticLockException - 다른 트랜잭션이 동시에 재고를 수정한 경우
    */
   async releaseStock(stockId: string, quantity: number): Promise<void> {
     if (quantity <= 0) {
       throw new Error('복원 수량은 양수여야 합니다');
     }
 
-    await this.prisma.$transaction(async (tx) => {
-      // 비관적 락: SELECT FOR UPDATE
-      const stockModel = await tx.$queryRaw<
-        Array<{
-          id: string;
-          productId: string;
-          productOptionId: string | null;
-          totalQuantity: number;
-          availableQuantity: number;
-          reservedQuantity: number;
-          soldQuantity: number;
-        }>
-      >`SELECT * FROM stocks WHERE id = ${stockId} FOR UPDATE`;
-
-      if (!stockModel || stockModel.length === 0) {
-        throw new Error(`재고를 찾을 수 없습니다: ${stockId}`);
-      }
-
-      const stock = stockModel[0];
-
-      // 예약 수량 검증
-      if (stock.reservedQuantity < quantity) {
-        throw new Error(
-          `복원 수량이 예약 수량을 초과합니다. 요청: ${quantity}, 예약: ${stock.reservedQuantity}`,
-        );
-      }
-
-      // 재고 복원 처리
-      await tx.stock.update({
-        where: { id: stockId },
-        data: {
-          availableQuantity: stock.availableQuantity + quantity,
-          reservedQuantity: stock.reservedQuantity - quantity,
-          updatedAt: new Date(),
-        },
-      });
+    // 1. 현재 재고 조회
+    const stockModel = await this.prisma.stock.findUnique({
+      where: { id: stockId },
     });
+
+    if (!stockModel) {
+      throw new Error(`재고를 찾을 수 없습니다: ${stockId}`);
+    }
+
+    // 2. 예약 수량 검증
+    if (stockModel.reservedQuantity < quantity) {
+      throw new Error(
+        `복원 수량이 예약 수량을 초과합니다. 요청: ${quantity}, 예약: ${stockModel.reservedQuantity}`,
+      );
+    }
+
+    // 3. 낙관적 락: version 필드를 조건에 포함하여 업데이트
+    const result = await this.prisma.stock.updateMany({
+      where: {
+        id: stockId,
+        version: stockModel.version, // 낙관적 락 조건
+        reservedQuantity: { gte: quantity }, // 예약 수량 충분 조건 (이중 체크)
+      },
+      data: {
+        availableQuantity: { increment: quantity },
+        reservedQuantity: { decrement: quantity },
+        version: { increment: 1 },
+        updatedAt: new Date(),
+      },
+    });
+
+    // 4. 업데이트 실패 시
+    if (result.count === 0) {
+      throw new OptimisticLockException(
+        '재고가 다른 트랜잭션에 의해 수정되었습니다. 다시 시도해주세요.',
+      );
+    }
   }
 
   /**
    * 예약된 재고를 판매로 확정 (예: 결제 완료 시)
-   * SELECT FOR UPDATE를 사용하여 동시성 제어
+   * version 필드를 사용하여 동시성 제어
    *
    * @param stockId - 재고 ID
    * @param quantity - 판매 확정할 수량
    * @throws Error - 예약 수량 초과 또는 유효하지 않은 수량
+   * @throws OptimisticLockException - 다른 트랜잭션이 동시에 재고를 수정한 경우
    */
   async confirmStock(stockId: string, quantity: number): Promise<void> {
     if (quantity <= 0) {
       throw new Error('판매 확정 수량은 양수여야 합니다');
     }
 
-    await this.prisma.$transaction(async (tx) => {
-      // 비관적 락: SELECT FOR UPDATE
-      const stockModel = await tx.$queryRaw<
-        Array<{
-          id: string;
-          productId: string;
-          productOptionId: string | null;
-          totalQuantity: number;
-          availableQuantity: number;
-          reservedQuantity: number;
-          soldQuantity: number;
-        }>
-      >`SELECT * FROM stocks WHERE id = ${stockId} FOR UPDATE`;
-
-      if (!stockModel || stockModel.length === 0) {
-        throw new Error(`재고를 찾을 수 없습니다: ${stockId}`);
-      }
-
-      const stock = stockModel[0];
-
-      // 예약 수량 검증
-      if (stock.reservedQuantity < quantity) {
-        throw new Error(
-          `판매 확정 수량이 예약 수량을 초과합니다. 요청: ${quantity}, 예약: ${stock.reservedQuantity}`,
-        );
-      }
-
-      // 재고 판매 확정 처리
-      await tx.stock.update({
-        where: { id: stockId },
-        data: {
-          reservedQuantity: stock.reservedQuantity - quantity,
-          soldQuantity: stock.soldQuantity + quantity,
-          updatedAt: new Date(),
-        },
-      });
+    // 1. 현재 재고 조회
+    const stockModel = await this.prisma.stock.findUnique({
+      where: { id: stockId },
     });
+
+    if (!stockModel) {
+      throw new Error(`재고를 찾을 수 없습니다: ${stockId}`);
+    }
+
+    // 2. 예약 수량 검증
+    if (stockModel.reservedQuantity < quantity) {
+      throw new Error(
+        `판매 확정 수량이 예약 수량을 초과합니다. 요청: ${quantity}, 예약: ${stockModel.reservedQuantity}`,
+      );
+    }
+
+    // 3. 낙관적 락: version 필드를 조건에 포함하여 업데이트
+    const result = await this.prisma.stock.updateMany({
+      where: {
+        id: stockId,
+        version: stockModel.version, // 낙관적 락 조건
+        reservedQuantity: { gte: quantity }, // 예약 수량 충분 조건 (이중 체크)
+      },
+      data: {
+        reservedQuantity: { decrement: quantity },
+        soldQuantity: { increment: quantity },
+        version: { increment: 1 },
+        updatedAt: new Date(),
+      },
+    });
+
+    // 4. 업데이트 실패 시
+    if (result.count === 0) {
+      throw new OptimisticLockException(
+        '재고가 다른 트랜잭션에 의해 수정되었습니다. 다시 시도해주세요.',
+      );
+    }
   }
 
   /**
@@ -329,6 +332,7 @@ export class ProductPrismaRepository implements ProductRepository {
         stockModel.availableQuantity,
         stockModel.reservedQuantity,
         stockModel.soldQuantity,
+        stockModel.version,
       );
 
       return ProductOption.create(

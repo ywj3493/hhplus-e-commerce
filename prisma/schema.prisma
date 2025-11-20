@@ -100,7 +100,7 @@ model ProductOption {
 /// 재고 엔티티 (동시성 제어 대상)
 /// - 상품별 또는 옵션별 재고 관리
 /// - productOptionId가 null이면 옵션이 없는 상품의 재고
-/// - 비관적 락(SELECT FOR UPDATE)을 통한 동시성 제어
+/// - 낙관적 락(Optimistic Locking)을 통한 동시성 제어
 model Stock {
   id                String   @id @default(uuid()) // 재고 고유 ID (UUID)
   productId         String // 상품 ID (FK)
@@ -109,6 +109,7 @@ model Stock {
   availableQuantity Int // 구매 가능 수량
   reservedQuantity  Int      @default(0) // 예약된 수량 (주문 중)
   soldQuantity      Int      @default(0) // 판매 완료 수량
+  version           Int      @default(0) // 낙관적 락 버전
   updatedAt         DateTime @updatedAt // 수정 일시
 
   product       Product        @relation(fields: [productId], references: [id]) // 상품
