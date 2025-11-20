@@ -27,6 +27,7 @@ model User {
   orders      Order[] // 사용자의 주문들
   payments    Payment[] // 사용자의 결제 내역들
   userCoupons UserCoupon[] // 사용자가 발급받은 쿠폰들
+  cart        Cart? // 사용자의 장바구니 (1:1)
 
   @@index([createdAt]) // 생성일 인덱스
   @@map("users") // 테이블명: users
@@ -68,6 +69,7 @@ model Product {
   options    ProductOption[] // 상품 옵션들
   stocks     Stock[] // 재고 정보
   orderItems OrderItem[] // 주문 항목들 (스냅샷 참조)
+  cartItems  CartItem[] // 장바구니 항목들
 
   @@index([categoryId]) // 카테고리별 조회 최적화
   @@index([createdAt]) // 최신순 정렬 최적화
@@ -89,6 +91,7 @@ model ProductOption {
   product    Product     @relation(fields: [productId], references: [id]) // 상품
   stocks     Stock[] // 이 옵션의 재고 정보
   orderItems OrderItem[] // 주문 항목들 (스냅샷 참조)
+  cartItems  CartItem[] // 장바구니 항목들
 
   @@index([productId]) // 상품별 옵션 조회 최적화
   @@map("product_options") // 테이블명: product_options
@@ -115,6 +118,49 @@ model Stock {
   @@index([productId]) // 상품별 재고 조회 최적화
   @@index([productOptionId]) // 옵션별 재고 조회 최적화
   @@map("stocks") // 테이블명: stocks
+}
+
+// ============================================================================
+// Cart 도메인
+// ============================================================================
+
+/// 장바구니 엔티티
+/// - 사용자당 장바구니 1개 (userId unique)
+/// - CartItem을 포함하여 조회
+model Cart {
+  id        String   @id @default(uuid()) // 장바구니 고유 ID (UUID)
+  userId    String   @unique // 사용자 ID (FK, unique - 사용자당 장바구니 1개)
+  createdAt DateTime @default(now()) // 생성 일시
+  updatedAt DateTime @updatedAt // 수정 일시
+
+  user  User       @relation(fields: [userId], references: [id]) // 사용자
+  items CartItem[] // 장바구니 항목들
+
+  @@index([userId]) // 사용자별 조회 최적화
+  @@map("carts") // 테이블명: carts
+}
+
+/// 장바구니 아이템 엔티티 (스냅샷 패턴)
+/// - 상품 정보 스냅샷 저장 (주문 시점 가격 보존)
+/// - 수량 조정 가능
+model CartItem {
+  id              String   @id @default(uuid()) // 장바구니 아이템 고유 ID (UUID)
+  cartId          String // 장바구니 ID (FK)
+  productId       String // 상품 ID (FK)
+  productName     String // 상품명 (스냅샷)
+  productOptionId String // 옵션 ID (FK)
+  price           Decimal  @db.Decimal(10, 2) // 가격 (스냅샷)
+  quantity        Int // 수량
+  createdAt       DateTime @default(now()) // 생성 일시
+
+  cart          Cart          @relation(fields: [cartId], references: [id], onDelete: Cascade) // 장바구니 (Cascade delete)
+  product       Product       @relation(fields: [productId], references: [id]) // 상품
+  productOption ProductOption @relation(fields: [productOptionId], references: [id]) // 옵션
+
+  @@index([cartId]) // 장바구니별 조회 최적화
+  @@index([productId]) // 상품별 조회 최적화
+  @@index([productOptionId]) // 옵션별 조회 최적화
+  @@map("cart_items") // 테이블명: cart_items
 }
 
 // ============================================================================
