@@ -1,11 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import type { OrderRepository } from '@/order/domain/repositories/order.repository';
 import { GetOrderInput, GetOrderOutput } from '@/order/application/dtos/get-order.dto';
 import {
   OrderNotFoundException,
   OrderOwnershipException,
 } from '@/order/domain/order.exceptions';
-import { ORDER_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
+import { ORDER_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 /**
  * GetOrderUseCase

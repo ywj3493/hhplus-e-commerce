@@ -1,10 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import type { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { CartNotFoundException } from '@/order/domain/order.exceptions';
 import {
   RemoveCartItemInput,
   RemoveCartItemOutput,
 } from '@/order/application/dtos/remove-cart-item.dto';
+import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 /**
  * 장바구니 아이템 삭제 Use Case
@@ -18,7 +19,7 @@ import {
 @Injectable()
 export class RemoveCartItemUseCase {
   constructor(
-    @Inject('CartRepository')
+    @Inject(CART_REPOSITORY)
     private readonly cartRepository: CartRepository,
   ) {}
 

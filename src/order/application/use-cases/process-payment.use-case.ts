@@ -7,10 +7,7 @@ import {
   OrderExpiredException,
   PaymentFailedException,
 } from '@/order/domain/order.exceptions';
-import {
-  PaymentRepository,
-  PAYMENT_REPOSITORY,
-} from '@/order/domain/repositories/payment.repository';
+import type { PaymentRepository } from '@/order/domain/repositories/payment.repository';
 import { PaymentCompletedEvent } from '@/order/domain/events/payment-completed.event';
 import {
   IPaymentApiClient,
@@ -22,8 +19,8 @@ import {
 } from '@/order/application/dtos/process-payment.dto';
 import { Order } from '@/order/domain/entities/order.entity';
 import { OrderStatus } from '@/order/domain/entities/order-status.enum';
-import { OrderRepository } from '@/order/domain/repositories/order.repository';
-import { ORDER_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
+import type { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { ORDER_REPOSITORY, PAYMENT_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 /**
  * ProcessPaymentUseCase

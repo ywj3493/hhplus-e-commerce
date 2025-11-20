@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import type { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { CartStockValidationService } from '@/order/domain/services/cart-stock-validation.service';
 import {
   CartNotFoundException,
@@ -9,6 +9,7 @@ import {
   UpdateCartItemInput,
   UpdateCartItemOutput,
 } from '@/order/application/dtos/update-cart-item.dto';
+import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 /**
  * 장바구니 아이템 수량 변경 Use Case
@@ -25,7 +26,7 @@ import {
 @Injectable()
 export class UpdateCartItemUseCase {
   constructor(
-    @Inject('CartRepository')
+    @Inject(CART_REPOSITORY)
     private readonly cartRepository: CartRepository,
     private readonly cartStockValidationService: CartStockValidationService,
   ) {}

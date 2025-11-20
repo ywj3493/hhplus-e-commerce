@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
 import { ProcessPaymentUseCase } from '@/order/application/use-cases/process-payment.use-case';
 import { ProcessPaymentInput } from '@/order/application/dtos/process-payment.dto';
 import { ProcessPaymentRequestDto } from '@/order/presentation/dtos/process-payment-request.dto';
@@ -16,6 +17,7 @@ import { PaymentResponseDto } from '@/order/presentation/dtos/payment-response.d
  *
  * POST /payments - 결제 처리
  */
+@ApiTags('payments')
 @Controller('payments')
 export class PaymentController {
   constructor(
@@ -32,6 +34,11 @@ export class PaymentController {
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: '결제 처리', description: '주문에 대한 결제를 처리합니다.' })
+  @ApiHeader({ name: 'X-Test-Fail', required: false, description: '테스트용 강제 실패 플래그 (true/false)', schema: { type: 'string', example: 'false' } })
+  @ApiResponse({ status: 201, description: '결제 처리 성공', type: PaymentResponseDto })
+  @ApiResponse({ status: 400, description: '잘못된 요청 (주문 없음, 이미 결제됨 등)' })
+  @ApiResponse({ status: 402, description: '결제 실패' })
   async processPayment(
     @Body() body: ProcessPaymentRequestDto,
     @Headers('x-test-fail') testFail?: string,

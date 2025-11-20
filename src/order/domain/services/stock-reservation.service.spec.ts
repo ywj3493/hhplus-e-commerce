@@ -10,8 +10,8 @@ import { Stock } from '@/product/domain/entities/stock.entity';
 import { Money } from '@/product/domain/entities/money.vo';
 import { CartItem } from '@/order/domain/entities/cart-item.entity';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
-import { OrderRepository } from '@/order/domain/repositories/order.repository';
-import { ORDER_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
+import type { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { ORDER_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 describe('StockReservationService', () => {
   let service: StockReservationService;

@@ -7,6 +7,7 @@ import {
   Query,
   HttpCode,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { CreateOrderUseCase } from '@/order/application/use-cases/create-order.use-case';
 import { GetOrderUseCase } from '@/order/application/use-cases/get-order.use-case';
 import { GetOrdersUseCase } from '@/order/application/use-cases/get-orders.use-case';
@@ -29,6 +30,7 @@ import { OrderListResponseDto } from '@/order/presentation/dtos/order-list-respo
  * - GET /orders/:id - 주문 조회
  * - GET /orders - 주문 목록 조회
  */
+@ApiTags('orders')
 @Controller('orders')
 export class OrderController {
   constructor(
@@ -48,6 +50,10 @@ export class OrderController {
    */
   @Post()
   @HttpCode(201)
+  @ApiOperation({ summary: '주문 생성', description: '장바구니 상품으로 주문을 생성합니다.' })
+  @ApiResponse({ status: 201, description: '주문 생성 성공', type: CreateOrderResponseDto })
+  @ApiResponse({ status: 400, description: '잘못된 요청 (장바구니 비어있음, 쿠폰 사용 불가 등)' })
+  @ApiResponse({ status: 409, description: '재고 부족' })
   async createOrder(
     @Body() body: CreateOrderRequestDto,
     // TODO: @CurrentUser() user: User 구현 후 적용
@@ -71,6 +77,10 @@ export class OrderController {
    * @returns 주문 상세 정보
    */
   @Get(':id')
+  @ApiOperation({ summary: '주문 조회', description: '주문 상세 정보를 조회합니다.' })
+  @ApiParam({ name: 'id', description: '주문 ID', example: 'order-1' })
+  @ApiResponse({ status: 200, description: '주문 조회 성공', type: OrderResponseDto })
+  @ApiResponse({ status: 404, description: '주문을 찾을 수 없음' })
   async getOrder(
     @Param('id') id: string,
     // TODO: @CurrentUser() user: User 구현 후 적용
@@ -95,6 +105,10 @@ export class OrderController {
    * @returns 주문 목록 (페이지네이션)
    */
   @Get()
+  @ApiOperation({ summary: '주문 목록 조회', description: '사용자의 주문 목록을 페이지네이션으로 조회합니다.' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: '페이지 번호 (기본값: 1)', example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: '페이지당 항목 수 (기본값: 10)', example: 10 })
+  @ApiResponse({ status: 200, description: '주문 목록 조회 성공', type: OrderListResponseDto })
   async getOrders(
     @Query() query: PaginationQueryDto,
     // TODO: @CurrentUser() user: User 구현 후 적용

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { GetUserProfileOutput } from '@/user/application/dtos/get-user-profile.dto';
 
 /**
@@ -5,9 +6,16 @@ import { GetUserProfileOutput } from '@/user/application/dtos/get-user-profile.d
  * 사용자 정보 조회 API 응답 DTO
  */
 export class UserResponseDto {
+  @ApiProperty({ description: '사용자 ID', example: 'user-1' })
   id: string;
+
+  @ApiProperty({ description: '사용자 이름', example: '홍길동' })
   name: string;
+
+  @ApiProperty({ description: '이메일 주소', example: 'hong@example.com', nullable: true })
   email: string | null;
+
+  @ApiProperty({ description: '가입 일시', example: '2025-01-01T00:00:00.000Z' })
   createdAt: string;
 
   constructor(

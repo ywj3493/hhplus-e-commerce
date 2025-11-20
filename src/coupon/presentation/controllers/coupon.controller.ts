@@ -6,6 +6,7 @@ import {
   Query,
   HttpCode,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { IssueCouponUseCase } from '@/coupon/application/use-cases/issue-coupon.use-case';
 import { GetUserCouponsUseCase } from '@/coupon/application/use-cases/get-user-coupons.use-case';
 import { IssueCouponInput } from '@/coupon/application/dtos/issue-coupon.dto';
@@ -21,6 +22,7 @@ import { CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
  * - POST /coupons/:id/issue - 쿠폰 발급
  * - GET /coupons/my - 사용자 쿠폰 목록 조회
  */
+@ApiTags('coupons')
 @Controller('coupons')
 export class CouponController {
   constructor(
@@ -39,6 +41,11 @@ export class CouponController {
    */
   @Post(':id/issue')
   @HttpCode(201)
+  @ApiOperation({ summary: '쿠폰 발급', description: '사용자에게 쿠폰을 발급합니다.' })
+  @ApiParam({ name: 'id', description: '쿠폰 ID', example: 'coupon-1' })
+  @ApiResponse({ status: 201, description: '쿠폰 발급 성공', type: UserCouponResponseDto })
+  @ApiResponse({ status: 400, description: '잘못된 요청 (쿠폰 없음, 중복 발급 등)' })
+  @ApiResponse({ status: 409, description: '수량 부족으로 발급 실패' })
   async issueCoupon(
     @Param('id') couponId: string,
     // TODO: @CurrentUser() user: User 구현 후 적용
@@ -67,6 +74,9 @@ export class CouponController {
    * @returns 사용자 쿠폰 목록
    */
   @Get('my')
+  @ApiOperation({ summary: '내 쿠폰 목록 조회', description: '사용자의 쿠폰 목록을 조회합니다.' })
+  @ApiQuery({ name: 'status', required: false, enum: CouponStatus, description: '쿠폰 상태 필터 (AVAILABLE, USED, EXPIRED)' })
+  @ApiResponse({ status: 200, description: '쿠폰 목록 조회 성공', type: UserCouponsResponseDto })
   async getUserCoupons(
     @Query('status') status?: CouponStatus,
     // TODO: @CurrentUser() user: User 구현 후 적용

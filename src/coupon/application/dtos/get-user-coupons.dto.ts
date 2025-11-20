@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
 import {
   CouponStatus,
@@ -29,14 +30,31 @@ export class GetUserCouponsInput {
  * 사용자 쿠폰 데이터
  */
 export class UserCouponData {
+  @ApiProperty({ description: '사용자 쿠폰 ID', example: 'user-coupon-1' })
   id: string;
+
+  @ApiProperty({ description: '쿠폰 ID', example: 'coupon-1' })
   couponId: string;
+
+  @ApiProperty({ description: '쿠폰 이름', example: '신규 가입 환영 쿠폰' })
   couponName: string;
+
+  @ApiProperty({ description: '할인 타입', enum: CouponType, example: CouponType.PERCENTAGE })
   discountType: CouponType;
+
+  @ApiProperty({ description: '할인 값', example: 10 })
   discountValue: number;
+
+  @ApiProperty({ description: '쿠폰 상태', enum: CouponStatus, example: CouponStatus.AVAILABLE })
   status: CouponStatus;
+
+  @ApiProperty({ description: '발급 일시', example: '2025-01-15T10:00:00.000Z' })
   issuedAt: Date;
+
+  @ApiProperty({ description: '만료 일시', example: '2025-12-31T23:59:59.999Z' })
   expiresAt: Date;
+
+  @ApiProperty({ description: '사용 일시', example: null, nullable: true })
   usedAt: Date | null;
 
   constructor(

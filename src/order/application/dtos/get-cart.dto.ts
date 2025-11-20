@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Cart } from '@/order/domain/entities/cart.entity';
 
 export class GetCartInput {
@@ -8,13 +9,26 @@ export class GetCartInput {
   }
 }
 
-export interface CartItemData {
+export class CartItemData {
+  @ApiProperty({ description: '장바구니 아이템 ID', example: 'cart-item-1' })
   id: string;
+
+  @ApiProperty({ description: '상품 ID', example: 'product-1' })
   productId: string;
+
+  @ApiProperty({ description: '상품 이름', example: '맥북 프로 14인치' })
   productName: string;
+
+  @ApiProperty({ description: '상품 옵션 ID', example: 'option-1', nullable: true })
   productOptionId: string | null;
+
+  @ApiProperty({ description: '단가', example: 2490000 })
   price: number;
+
+  @ApiProperty({ description: '수량', example: 2 })
   quantity: number;
+
+  @ApiProperty({ description: '소계 (단가 × 수량)', example: 4980000 })
   subtotal: number;
 }
 

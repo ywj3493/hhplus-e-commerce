@@ -6,14 +6,13 @@ import {
   ProcessPaymentOutput,
 } from '@/order/application/dtos/process-payment.dto';
 import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
-import { PaymentRepository } from '@/order/domain/repositories/payment.repository';
-import { PAYMENT_REPOSITORY } from '@/order/domain/repositories/payment.repository';
+import type { PaymentRepository } from '@/order/domain/repositories/payment.repository';
 import {
   IPaymentApiClient,
   PAYMENT_API_CLIENT,
 } from '@/order/infrastructure/clients/payment-api.interface';
-import { OrderRepository } from '@/order/domain/repositories/order.repository';
-import { ORDER_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
+import type { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { ORDER_REPOSITORY, PAYMENT_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { Order } from '@/order/domain/entities/order.entity';
 import { OrderStatus } from '@/order/domain/entities/order-status.enum';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';

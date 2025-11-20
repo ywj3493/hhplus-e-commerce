@@ -38,10 +38,12 @@ async function bootstrap() {
       'access-token',
     )
     .addTag('Fake Auth', '테스트용 인증 엔드포인트 (Fake Implementation)')
-    .addTag('Products', 'EPIC-1: Product browsing endpoints')
-    .addTag('Cart', 'EPIC-2: Cart management endpoints (인증 필요)')
-    .addTag('Orders', 'EPIC-3: Orders and payment endpoints (인증 필요)')
-    .addTag('Coupons', 'EPIC-4: Coupon usage endpoints (인증 필요)')
+    .addTag('products', 'EPIC-1: Product browsing endpoints')
+    .addTag('carts', 'EPIC-2: Cart management endpoints (인증 필요)')
+    .addTag('orders', 'EPIC-3: Order management endpoints (인증 필요)')
+    .addTag('payments', 'EPIC-3: Payment processing endpoints (인증 필요)')
+    .addTag('coupons', 'EPIC-4: Coupon usage endpoints (인증 필요)')
+    .addTag('users', 'User profile endpoints (인증 필요)')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

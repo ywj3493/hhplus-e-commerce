@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import type { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { GetCartInput, GetCartOutput } from '@/order/application/dtos/get-cart.dto';
+import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 /**
  * 장바구니 조회 Use Case
@@ -13,7 +14,7 @@ import { GetCartInput, GetCartOutput } from '@/order/application/dtos/get-cart.d
 @Injectable()
 export class GetCartUseCase {
   constructor(
-    @Inject('CartRepository')
+    @Inject(CART_REPOSITORY)
     private readonly cartRepository: CartRepository,
   ) {}
 

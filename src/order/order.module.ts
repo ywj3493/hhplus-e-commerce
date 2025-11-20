@@ -41,8 +41,7 @@ import { MockPaymentApiClient } from '@/order/infrastructure/clients/mock-paymen
 import { PAYMENT_API_CLIENT } from '@/order/infrastructure/clients/payment-api.interface';
 
 // Symbols
-import { ORDER_REPOSITORY, CART_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
-import { PAYMENT_REPOSITORY } from '@/order/domain/repositories/payment.repository';
+import { ORDER_REPOSITORY, CART_REPOSITORY, PAYMENT_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 // Import other modules
 import { CouponModule } from '@/coupon/coupon.module';

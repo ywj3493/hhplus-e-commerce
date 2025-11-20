@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { OrderRepository } from '@/order/domain/repositories/order.repository';
-import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import type { OrderRepository } from '@/order/domain/repositories/order.repository';
+import type { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { ORDER_REPOSITORY, CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { Order } from '@/order/domain/entities/order.entity';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
 import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
@@ -11,9 +12,6 @@ import {
 } from '@/product/domain/repositories/product.repository';
 import { CreateOrderInput, CreateOrderOutput } from '@/order/application/dtos/create-order.dto';
 import { EmptyCartException } from '@/order/domain/order.exceptions';
-
-export const ORDER_REPOSITORY = Symbol('ORDER_REPOSITORY');
-export const CART_REPOSITORY = Symbol('CART_REPOSITORY');
 
 /**
  * CreateOrderUseCase

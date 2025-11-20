@@ -1,10 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import type { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { IProductRepository, PRODUCT_REPOSITORY } from '@/product/domain/repositories/product.repository';
 import { CartStockValidationService } from '@/order/domain/services/cart-stock-validation.service';
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 import { AddCartItemInput, AddCartItemOutput } from '@/order/application/dtos/add-cart-item.dto';
+import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 /**
  * 장바구니 아이템 추가 Use Case
@@ -20,7 +21,7 @@ import { AddCartItemInput, AddCartItemOutput } from '@/order/application/dtos/ad
 @Injectable()
 export class AddCartItemUseCase {
   constructor(
-    @Inject('CartRepository')
+    @Inject(CART_REPOSITORY)
     private readonly cartRepository: CartRepository,
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: IProductRepository,
