@@ -34,7 +34,7 @@ describe('GetProductsUseCase', () => {
       'Default',
       'Standard',
       Price.from(0),
-      Stock.initialize(`stock-${id}`, `opt-${id}`, availableQuantity),
+      Stock.initialize(`stock-${id}`, id, `opt-${id}`, availableQuantity),
     );
     return Product.create(
       id,

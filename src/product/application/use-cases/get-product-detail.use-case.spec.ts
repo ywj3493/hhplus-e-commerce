@@ -31,7 +31,7 @@ describe('GetProductDetailUseCase', () => {
         'Color',
         'Red',
         Price.from(0),
-        Stock.initialize('stock-red', 'opt-color-red', 50),
+        Stock.initialize('stock-red', 'product-1', 'opt-color-red', 50),
       ),
       ProductOption.create(
         'opt-color-blue',
@@ -39,7 +39,7 @@ describe('GetProductDetailUseCase', () => {
         'Color',
         'Blue',
         Price.from(0),
-        Stock.create('stock-blue', 'opt-color-blue', 50, 0, 30, 20), // 품절
+        Stock.create('stock-blue', 'product-1', 'opt-color-blue', 50, 0, 30, 20), // 품절
       ),
     ];
 
@@ -50,7 +50,7 @@ describe('GetProductDetailUseCase', () => {
         'Size',
         'S',
         Price.from(0),
-        Stock.create('stock-s', 'opt-size-s', 30, 0, 10, 20), // 품절
+        Stock.create('stock-s', 'product-1', 'opt-size-s', 30, 0, 10, 20), // 품절
       ),
       ProductOption.create(
         'opt-size-m',
@@ -58,7 +58,7 @@ describe('GetProductDetailUseCase', () => {
         'Size',
         'M',
         Price.from(0),
-        Stock.initialize('stock-m', 'opt-size-m', 40),
+        Stock.initialize('stock-m', 'product-1', 'opt-size-m', 40),
       ),
       ProductOption.create(
         'opt-size-l',
@@ -66,7 +66,7 @@ describe('GetProductDetailUseCase', () => {
         'Size',
         'L',
         Price.from(2000),
-        Stock.initialize('stock-l', 'opt-size-l', 30),
+        Stock.initialize('stock-l', 'product-1', 'opt-size-l', 30),
       ),
     ];
 
@@ -223,7 +223,7 @@ describe('GetProductDetailUseCase', () => {
         'Color',
         'Red',
         Price.from(0),
-        Stock.initialize('stock-1', 'opt-1', 50),
+        Stock.initialize('stock-1', 'product-1', 'opt-1', 50),
       );
       const product = Product.create(
         'product-1',

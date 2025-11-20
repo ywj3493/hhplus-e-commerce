@@ -28,7 +28,8 @@ describe('Product', () => {
   ): ProductOption => {
     const stock = Stock.create(
       `stock-${id}`,
-      id,
+      'product-1', // productId
+      id, // productOptionId
       100,
       availableQuantity,
       0,

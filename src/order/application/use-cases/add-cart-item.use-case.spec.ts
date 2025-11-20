@@ -63,7 +63,7 @@ describe('AddCartItemUseCase', () => {
   });
 
   const createTestProduct = (): Product => {
-    const stock = Stock.create('stock-1', 'option-1', 100, 50, 0, 50);
+    const stock = Stock.create('stock-1', 'product-1', 'option-1', 100, 50, 0, 50);
     const option = ProductOption.create(
       'option-1',
       'product-1',
