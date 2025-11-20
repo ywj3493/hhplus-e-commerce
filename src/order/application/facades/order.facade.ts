@@ -10,9 +10,9 @@ import type { OrderRepository } from '@/order/domain/repositories/order.reposito
 import { ORDER_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 /**
- * PaymentFacadeService
+ * OrderFacade
  *
- * 결제 프로세스 전체를 조율하는 Facade 서비스
+ * 주문 관련 복합 프로세스를 조율하는 Facade 서비스
  *
  * 책임:
  * 1. 결제 처리 (ProcessPaymentUseCase)
@@ -30,8 +30,8 @@ import { ORDER_REPOSITORY } from '@/order/domain/repositories/tokens';
  * - 분산 트랜잭션 관리
  */
 @Injectable()
-export class PaymentFacadeService {
-  private readonly logger = new Logger(PaymentFacadeService.name);
+export class OrderFacade {
+  private readonly logger = new Logger(OrderFacade.name);
 
   constructor(
     @Inject(ORDER_REPOSITORY)
@@ -42,7 +42,7 @@ export class PaymentFacadeService {
   ) {}
 
   /**
-   * 결제 프로세스 전체 실행
+   * 주문 결제 및 완료 처리
    *
    * 순서:
    * 1. 결제 처리
@@ -53,11 +53,11 @@ export class PaymentFacadeService {
    * @param testFail 테스트용 강제 실패 플래그
    * @returns 결제 결과
    */
-  async processPaymentAndComplete(
+  async completeOrder(
     input: ProcessPaymentInput,
     testFail = false,
   ): Promise<ProcessPaymentOutput> {
-    this.logger.log(`결제 프로세스 시작: orderId=${input.orderId}`);
+    this.logger.log(`주문 완료 프로세스 시작: orderId=${input.orderId}`);
 
     // Step 1: 결제 처리
     const payment = await this.processPaymentUseCase.execute(input, testFail);

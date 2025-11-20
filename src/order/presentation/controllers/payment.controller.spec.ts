@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { PaymentController } from '@/order/presentation/controllers/payment.controller';
-import { PaymentFacadeService } from '@/order/application/facades/payment-facade.service';
+import { OrderFacade } from '@/order/application/facades/order.facade';
 import { ProcessPaymentRequestDto } from '@/order/presentation/dtos/process-payment-request.dto';
 import { PaymentResponseDto } from '@/order/presentation/dtos/payment-response.dto';
 import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
@@ -15,7 +15,7 @@ import {
 
 describe('PaymentController', () => {
   let controller: PaymentController;
-  let paymentFacadeService: jest.Mocked<PaymentFacadeService>;
+  let orderFacade: jest.Mocked<OrderFacade>;
 
   const TEST_USER_ID = 'user-001';
   const TEST_ORDER_ID = 'order-1';
@@ -32,16 +32,16 @@ describe('PaymentController', () => {
   };
 
   beforeEach(async () => {
-    const mockPaymentFacadeService = {
-      processPaymentAndComplete: jest.fn(),
+    const mockOrderFacade = {
+      completeOrder: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PaymentController],
       providers: [
         {
-          provide: PaymentFacadeService,
-          useValue: mockPaymentFacadeService,
+          provide: OrderFacade,
+          useValue: mockOrderFacade,
         },
         {
           provide: JwtService,
@@ -54,7 +54,7 @@ describe('PaymentController', () => {
     }).compile();
 
     controller = module.get<PaymentController>(PaymentController);
-    paymentFacadeService = module.get(PaymentFacadeService);
+    orderFacade = module.get(OrderFacade);
   });
 
   describe('processPayment', () => {
@@ -72,7 +72,7 @@ describe('PaymentController', () => {
         TEST_TRANSACTION_ID,
         new Date(),
       );
-      paymentFacadeService.processPaymentAndComplete.mockResolvedValue(output);
+      orderFacade.completeOrder.mockResolvedValue(output);
 
       // When
       const response = await controller.processPayment(requestDto, undefined, mockRequest);
@@ -84,7 +84,7 @@ describe('PaymentController', () => {
       expect(response.amount).toBe(TEST_AMOUNT);
       expect(response.transactionId).toBe(TEST_TRANSACTION_ID);
 
-      expect(paymentFacadeService.processPaymentAndComplete).toHaveBeenCalledWith(
+      expect(orderFacade.completeOrder).toHaveBeenCalledWith(
         expect.objectContaining({
           userId: TEST_USER_ID,
           orderId: TEST_ORDER_ID,
@@ -108,13 +108,13 @@ describe('PaymentController', () => {
         TEST_TRANSACTION_ID,
         new Date(),
       );
-      paymentFacadeService.processPaymentAndComplete.mockResolvedValue(output);
+      orderFacade.completeOrder.mockResolvedValue(output);
 
       // When
       await controller.processPayment(requestDto, 'true', mockRequest);
 
       // Then
-      expect(paymentFacadeService.processPaymentAndComplete).toHaveBeenCalledWith(
+      expect(orderFacade.completeOrder).toHaveBeenCalledWith(
         expect.anything(),
         true, // testFail = true
       );
@@ -134,13 +134,13 @@ describe('PaymentController', () => {
         TEST_TRANSACTION_ID,
         new Date(),
       );
-      paymentFacadeService.processPaymentAndComplete.mockResolvedValue(output);
+      orderFacade.completeOrder.mockResolvedValue(output);
 
       // When
       await controller.processPayment(requestDto, 'false', mockRequest);
 
       // Then
-      expect(paymentFacadeService.processPaymentAndComplete).toHaveBeenCalledWith(
+      expect(orderFacade.completeOrder).toHaveBeenCalledWith(
         expect.anything(),
         false, // testFail = false
       );
@@ -160,13 +160,13 @@ describe('PaymentController', () => {
         TEST_TRANSACTION_ID,
         new Date(),
       );
-      paymentFacadeService.processPaymentAndComplete.mockResolvedValue(output);
+      orderFacade.completeOrder.mockResolvedValue(output);
 
       // When
       await controller.processPayment(requestDto, undefined, mockRequest);
 
       // Then
-      expect(paymentFacadeService.processPaymentAndComplete).toHaveBeenCalledWith(
+      expect(orderFacade.completeOrder).toHaveBeenCalledWith(
         expect.anything(),
         false, // testFail = false
       );
@@ -180,7 +180,7 @@ describe('PaymentController', () => {
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
 
-      paymentFacadeService.processPaymentAndComplete.mockRejectedValue(
+      orderFacade.completeOrder.mockRejectedValue(
         new AlreadyPaidException(),
       );
 
@@ -196,7 +196,7 @@ describe('PaymentController', () => {
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
 
-      paymentFacadeService.processPaymentAndComplete.mockRejectedValue(
+      orderFacade.completeOrder.mockRejectedValue(
         new OrderExpiredException(),
       );
 
@@ -212,7 +212,7 @@ describe('PaymentController', () => {
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
 
-      paymentFacadeService.processPaymentAndComplete.mockRejectedValue(
+      orderFacade.completeOrder.mockRejectedValue(
         new InvalidOrderStatusException(),
       );
 
@@ -228,7 +228,7 @@ describe('PaymentController', () => {
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
 
-      paymentFacadeService.processPaymentAndComplete.mockRejectedValue(
+      orderFacade.completeOrder.mockRejectedValue(
         new PaymentFailedException('결제 실패'),
       );
 
@@ -245,7 +245,7 @@ describe('PaymentController', () => {
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
 
       const genericError = new Error('예상치 못한 오류');
-      paymentFacadeService.processPaymentAndComplete.mockRejectedValue(genericError);
+      orderFacade.completeOrder.mockRejectedValue(genericError);
 
       // When & Then
       await expect(controller.processPayment(requestDto, undefined, mockRequest)).rejects.toThrow(
@@ -270,7 +270,7 @@ describe('PaymentController', () => {
         TEST_TRANSACTION_ID,
         createdAt,
       );
-      paymentFacadeService.processPaymentAndComplete.mockResolvedValue(output);
+      orderFacade.completeOrder.mockResolvedValue(output);
 
       // When
       const response = await controller.processPayment(requestDto, undefined, mockRequest);

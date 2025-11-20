@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiHeader, ApiBearerAuth } from '@nestjs/swagger';
 import { FakeJwtAuthGuard } from '@/__fake__/auth/fake-jwt-auth.guard';
-import { PaymentFacadeService } from '@/order/application/facades/payment-facade.service';
+import { OrderFacade } from '@/order/application/facades/order.facade';
 import { ProcessPaymentInput } from '@/order/application/dtos/process-payment.dto';
 import { ProcessPaymentRequestDto } from '@/order/presentation/dtos/process-payment-request.dto';
 import { PaymentResponseDto } from '@/order/presentation/dtos/payment-response.dto';
@@ -28,7 +28,7 @@ import { PaymentResponseDto } from '@/order/presentation/dtos/payment-response.d
 @ApiBearerAuth('access-token')
 export class PaymentController {
   constructor(
-    private readonly paymentFacadeService: PaymentFacadeService,
+    private readonly orderFacade: OrderFacade,
   ) {}
 
   /**
@@ -60,9 +60,9 @@ export class PaymentController {
       body.paymentMethod,
     );
 
-    // Facade를 통한 결제 프로세스 실행 (결제 → 재고 확정 → 주문 완료)
+    // Facade를 통한 주문 완료 처리 (결제 → 재고 확정 → 주문 완료)
     const shouldFail = testFail === 'true';
-    const output = await this.paymentFacadeService.processPaymentAndComplete(input, shouldFail);
+    const output = await this.orderFacade.completeOrder(input, shouldFail);
 
     // Response DTO 반환
     return PaymentResponseDto.from(output);

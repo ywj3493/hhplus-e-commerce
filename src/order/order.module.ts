@@ -24,7 +24,7 @@ import { ConfirmStockUseCase } from '@/order/application/use-cases/confirm-stock
 import { CompleteOrderUseCase } from '@/order/application/use-cases/complete-order.use-case';
 
 // Facades
-import { PaymentFacadeService } from '@/order/application/facades/payment-facade.service';
+import { OrderFacade } from '@/order/application/facades/order.facade';
 
 // Batch Jobs
 import { ReleaseExpiredReservationJob } from '@/order/application/jobs/release-expired-reservation.job';
@@ -93,7 +93,7 @@ import { ProductModule } from '@/product/product.module';
     CompleteOrderUseCase,
 
     // Facades
-    PaymentFacadeService,
+    OrderFacade,
 
     // Batch Jobs
     ReleaseExpiredReservationJob,
