@@ -8,6 +8,7 @@ describe('UserCoupon', () => {
       '테스트 쿠폰',
       CouponType.PERCENTAGE,
       10,
+        null, // minAmount
       100,
       0,
       new Date('2025-01-01'),
@@ -21,6 +22,7 @@ describe('UserCoupon', () => {
       '만료된 테스트 쿠폰',
       CouponType.PERCENTAGE,
       10,
+        null, // minAmount
       100,
       0,
       new Date('2020-01-01'),

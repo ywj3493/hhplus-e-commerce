@@ -58,6 +58,7 @@ describe('IssueCouponUseCase', () => {
       '테스트 쿠폰',
       CouponType.PERCENTAGE,
       10,
+        null, // minAmount
       overrides?.totalQuantity || 100,
       overrides?.issuedQuantity || 0,
       overrides?.validFrom || new Date('2025-01-01'),

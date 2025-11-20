@@ -48,3 +48,12 @@ export class CouponAlreadyUsedException extends BadRequestException {
     super(message);
   }
 }
+
+/**
+ * 최소 주문 금액을 만족하지 못할 때 발생하는 예외
+ */
+export class CouponMinAmountNotMetException extends BadRequestException {
+  constructor(message: string = '쿠폰 사용을 위한 최소 주문 금액을 만족하지 못했습니다.') {
+    super(message);
+  }
+}

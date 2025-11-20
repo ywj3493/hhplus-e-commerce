@@ -29,6 +29,7 @@ describe('CouponService', () => {
       '테스트 쿠폰',
       overrides?.discountType || CouponType.PERCENTAGE,
       overrides?.discountValue || 10,
+      null, // minAmount
       overrides?.totalQuantity || 100,
       overrides?.issuedQuantity || 0,
       overrides?.validFrom || new Date('2025-01-01'),

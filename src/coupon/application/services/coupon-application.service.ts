@@ -6,6 +6,7 @@ import {
   USER_COUPON_REPOSITORY,
 } from '@/coupon/domain/repositories/tokens';
 import { CouponService } from '@/coupon/domain/services/coupon.service';
+import { CouponMinAmountNotMetException } from '@/coupon/domain/coupon.exceptions';
 
 /**
  * 쿠폰 적용 결과
@@ -71,13 +72,21 @@ export class CouponApplicationService {
       throw new Error('쿠폰 정보를 찾을 수 없습니다.');
     }
 
-    // 5. 할인 금액 계산
+    // 5. 최소 주문 금액 검증 (BR-COUPON-04)
+    if (!coupon.canBeAppliedTo(totalAmount)) {
+      const minAmount = coupon.minAmount ?? 0;
+      throw new CouponMinAmountNotMetException(
+        `쿠폰 사용을 위한 최소 주문 금액(${minAmount}원)을 만족하지 못했습니다.`,
+      );
+    }
+
+    // 6. 할인 금액 계산
     const discountAmount = this.couponService.calculateDiscount(
       coupon,
       totalAmount,
     );
 
-    // 6. UserCoupon 저장 (사용됨 상태로)
+    // 7. UserCoupon 저장 (사용됨 상태로)
     await this.userCouponRepository.save(userCoupon);
 
     return {
