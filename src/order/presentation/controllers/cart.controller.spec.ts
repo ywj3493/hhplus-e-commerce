@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { CartController } from '@/order/presentation/controllers/cart.controller';
 import { AddCartItemUseCase } from '@/order/application/use-cases/add-cart-item.use-case';
 import { GetCartUseCase } from '@/order/application/use-cases/get-cart.use-case';
@@ -70,6 +71,13 @@ describe('CartController', () => {
         {
           provide: ClearCartUseCase,
           useValue: mockClearCartUseCase,
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            verify: jest.fn().mockReturnValue({ userId: 'user-001', name: 'Test User' }),
+            sign: jest.fn().mockReturnValue('fake-token'),
+          },
         },
       ],
     }).compile();

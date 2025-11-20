@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { PaymentController } from '@/order/presentation/controllers/payment.controller';
 import { ProcessPaymentUseCase } from '@/order/application/use-cases/process-payment.use-case';
 import { ProcessPaymentRequestDto } from '@/order/presentation/dtos/process-payment-request.dto';
@@ -41,6 +42,13 @@ describe('PaymentController', () => {
         {
           provide: ProcessPaymentUseCase,
           useValue: mockProcessPaymentUseCase,
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            verify: jest.fn().mockReturnValue({ userId: 'user-001', name: 'Test User' }),
+            sign: jest.fn().mockReturnValue('fake-token'),
+          },
         },
       ],
     }).compile();

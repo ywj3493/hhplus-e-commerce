@@ -54,33 +54,43 @@ describe('PaymentCompletedHandler', () => {
     loggerErrorSpy.mockRestore();
   });
 
+  // 테스트 헬퍼 함수: Order 엔티티 생성
+  const createTestOrder = (
+    orderId: string,
+    productId: string,
+    optionId: string,
+    quantity: number = 1,
+  ): Order => {
+    const orderItem = OrderItem.create({
+      orderId,
+      productId,
+      productName: 'Test Product',
+      productOptionId: optionId,
+      productOptionName: 'Test Option',
+      price: Price.from(10000),
+      quantity,
+    });
+
+    return Order.reconstitute({
+      id: orderId,
+      userId: 'user-1',
+      status: OrderStatus.COMPLETED,
+      items: [orderItem],
+      totalAmount: 10000 * quantity,
+      discountAmount: 0,
+      finalAmount: 10000 * quantity,
+      userCouponId: null,
+      reservationExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
+      createdAt: new Date(),
+      paidAt: new Date(),
+      updatedAt: new Date(),
+    });
+  };
+
   describe('handle', () => {
     it('결제 완료 이벤트 수신 시 재고를 확정해야 함', async () => {
       // Given
-      const orderItem = OrderItem.create({
-        orderId: 'order-1',
-        productId: 'product-1',
-        productName: 'Test Product',
-        productOptionId: 'option-1',
-        productOptionName: 'Red',
-        price: Price.from(10000),
-        quantity: 2,
-      });
-      const order = Order.reconstitute({
-        id: 'order-1',
-        userId: 'user-1',
-        status: OrderStatus.COMPLETED,
-        items: [orderItem],
-        totalAmount: 20000,
-        discountAmount: 0,
-        finalAmount: 20000,
-        userCouponId: null,
-        reservationExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
-        createdAt: new Date(),
-        paidAt: new Date(),
-        updatedAt: new Date(),
-      });
-
+      const order = createTestOrder('order-1', 'product-1', 'option-1', 2);
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
       orderRepository.findById.mockResolvedValue(order);
       stockManagementService.confirmSale.mockResolvedValue(undefined);
@@ -100,31 +110,7 @@ describe('PaymentCompletedHandler', () => {
 
     it('이벤트 수신 시 로그를 기록해야 함', async () => {
       // Given
-      const orderItem = OrderItem.create({
-        orderId: 'order-1',
-        productId: 'product-1',
-        productName: 'Test Product',
-        productOptionId: 'option-1',
-        productOptionName: 'Red',
-        price: Price.from(10000),
-        quantity: 2,
-      }
-      );
-      const order = Order.reconstitute({
-        id: 'order-1',
-        userId: 'user-1',
-        status: OrderStatus.COMPLETED,
-        items: [orderItem],
-        totalAmount: 20000,
-        discountAmount: 0,
-        finalAmount: 20000,
-        userCouponId: null,
-        reservationExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
-        createdAt: new Date(),
-        paidAt: new Date(),
-        updatedAt: new Date(),
-      });
-
+      const order = createTestOrder('order-1', 'product-1', 'option-1', 2);
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
       orderRepository.findById.mockResolvedValue(order);
       stockManagementService.confirmSale.mockResolvedValue(undefined);
@@ -146,7 +132,9 @@ describe('PaymentCompletedHandler', () => {
 
     it('재고 확정 완료 시 성공 로그를 기록해야 함', async () => {
       // Given
+      const order = createTestOrder('order-1', 'product-1', 'option-1', 2);
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
+      orderRepository.findById.mockResolvedValue(order);
       stockManagementService.confirmSale.mockResolvedValue(undefined);
 
       // When
@@ -163,8 +151,10 @@ describe('PaymentCompletedHandler', () => {
 
     it('재고 확정 실패 시 에러 로그를 기록하고 예외를 재발생해야 함', async () => {
       // Given
+      const order = createTestOrder('order-1', 'product-1', 'option-1', 2);
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
       const error = new Error('재고 확정 실패');
+      orderRepository.findById.mockResolvedValue(order);
       stockManagementService.confirmSale.mockRejectedValue(error);
 
       // When & Then
@@ -178,8 +168,10 @@ describe('PaymentCompletedHandler', () => {
 
     it('재고가 부족한 경우 예외를 전파해야 함', async () => {
       // Given
+      const order = createTestOrder('order-1', 'product-1', 'option-1', 2);
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
       const insufficientStockError = new Error('재고가 부족합니다');
+      orderRepository.findById.mockResolvedValue(order);
       stockManagementService.confirmSale.mockRejectedValue(
         insufficientStockError,
       );
@@ -190,24 +182,26 @@ describe('PaymentCompletedHandler', () => {
       );
 
       expect(stockManagementService.confirmSale).toHaveBeenCalledWith(
-        'order-1',
+        'product-1',
+        'option-1',
+        2,
       );
     });
 
     it('주문을 찾을 수 없는 경우 예외를 전파해야 함', async () => {
       // Given
       const event = new PaymentCompletedEvent('payment-1', 'non-existent-order');
-      const notFoundError = new Error('주문을 찾을 수 없습니다');
-      stockManagementService.confirmSale.mockRejectedValue(
-        notFoundError,
-      );
+      orderRepository.findById.mockResolvedValue(null);
 
       // When & Then
-      await expect(handler.handle(event)).rejects.toThrow(notFoundError);
+      await expect(handler.handle(event)).rejects.toThrow(
+        '주문을 찾을 수 없습니다: non-existent-order',
+      );
 
+      expect(stockManagementService.confirmSale).not.toHaveBeenCalled();
       expect(loggerErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('재고 확정 실패'),
-        notFoundError,
+        expect.any(Error),
       );
     });
   });
@@ -215,9 +209,20 @@ describe('PaymentCompletedHandler', () => {
   describe('이벤트 처리 흐름', () => {
     it('여러 이벤트를 순차적으로 처리할 수 있어야 함', async () => {
       // Given
+      const order1 = createTestOrder('order-1', 'product-1', 'option-1', 1);
+      const order2 = createTestOrder('order-2', 'product-2', 'option-2', 2);
+      const order3 = createTestOrder('order-3', 'product-3', 'option-3', 3);
+
       const event1 = new PaymentCompletedEvent('payment-1', 'order-1');
       const event2 = new PaymentCompletedEvent('payment-2', 'order-2');
       const event3 = new PaymentCompletedEvent('payment-3', 'order-3');
+
+      orderRepository.findById.mockImplementation((orderId: string) => {
+        if (orderId === 'order-1') return Promise.resolve(order1);
+        if (orderId === 'order-2') return Promise.resolve(order2);
+        if (orderId === 'order-3') return Promise.resolve(order3);
+        return Promise.resolve(null);
+      });
 
       stockManagementService.confirmSale.mockResolvedValue(undefined);
 
@@ -227,28 +232,43 @@ describe('PaymentCompletedHandler', () => {
       await handler.handle(event3);
 
       // Then
-      expect(stockManagementService.confirmSale).toHaveBeenCalledTimes(
-        3,
-      );
+      expect(stockManagementService.confirmSale).toHaveBeenCalledTimes(3);
       expect(stockManagementService.confirmSale).toHaveBeenNthCalledWith(
         1,
-        'order-1',
+        'product-1',
+        'option-1',
+        1,
       );
       expect(stockManagementService.confirmSale).toHaveBeenNthCalledWith(
         2,
-        'order-2',
+        'product-2',
+        'option-2',
+        2,
       );
       expect(stockManagementService.confirmSale).toHaveBeenNthCalledWith(
         3,
-        'order-3',
+        'product-3',
+        'option-3',
+        3,
       );
     });
 
     it('한 이벤트가 실패해도 다음 이벤트를 처리할 수 있어야 함', async () => {
       // Given
+      const order1 = createTestOrder('order-1', 'product-1', 'option-1', 1);
+      const order2 = createTestOrder('order-2', 'product-2', 'option-2', 2);
+      const order3 = createTestOrder('order-3', 'product-3', 'option-3', 3);
+
       const event1 = new PaymentCompletedEvent('payment-1', 'order-1');
       const event2 = new PaymentCompletedEvent('payment-2', 'order-2'); // 실패할 이벤트
       const event3 = new PaymentCompletedEvent('payment-3', 'order-3');
+
+      orderRepository.findById.mockImplementation((orderId: string) => {
+        if (orderId === 'order-1') return Promise.resolve(order1);
+        if (orderId === 'order-2') return Promise.resolve(order2);
+        if (orderId === 'order-3') return Promise.resolve(order3);
+        return Promise.resolve(null);
+      });
 
       stockManagementService.confirmSale
         .mockResolvedValueOnce(undefined) // event1 성공
@@ -261,9 +281,7 @@ describe('PaymentCompletedHandler', () => {
       await handler.handle(event3); // 성공
 
       // Then
-      expect(stockManagementService.confirmSale).toHaveBeenCalledTimes(
-        3,
-      );
+      expect(stockManagementService.confirmSale).toHaveBeenCalledTimes(3);
       expect(loggerSpy).toHaveBeenCalledWith(
         expect.stringContaining('재고 확정 완료'),
       );
@@ -279,16 +297,21 @@ describe('PaymentCompletedHandler', () => {
       // Given
       const paymentId = 'payment-12345';
       const orderId = 'order-67890';
+      const order = createTestOrder(orderId, 'product-1', 'option-1', 5);
       const event = new PaymentCompletedEvent(paymentId, orderId);
 
+      orderRepository.findById.mockResolvedValue(order);
       stockManagementService.confirmSale.mockResolvedValue(undefined);
 
       // When
       await handler.handle(event);
 
       // Then
+      expect(orderRepository.findById).toHaveBeenCalledWith(orderId);
       expect(stockManagementService.confirmSale).toHaveBeenCalledWith(
-        orderId,
+        'product-1',
+        'option-1',
+        5,
       );
     });
 

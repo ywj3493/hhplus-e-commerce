@@ -10,14 +10,14 @@ describe('InMemoryUserRepository', () => {
   describe('findById', () => {
     it('존재하는 사용자를 조회해야 함', async () => {
       // Given
-      const userId = 'user-uuid-1';
+      const userId = 'user-001';
 
       // When
       const user = await repository.findById(userId);
 
       // Then
       expect(user).not.toBeNull();
-      expect(user!.id).toBe('user-uuid-1');
+      expect(user!.id).toBe('user-001');
       expect(user!.name).toBe('홍길동');
       expect(user!.email).toBe('hong@example.com');
     });
@@ -35,28 +35,28 @@ describe('InMemoryUserRepository', () => {
 
     it('두 번째 사용자를 조회해야 함', async () => {
       // Given
-      const userId = 'user-uuid-2';
+      const userId = 'user-002';
 
       // When
       const user = await repository.findById(userId);
 
       // Then
       expect(user).not.toBeNull();
-      expect(user!.id).toBe('user-uuid-2');
+      expect(user!.id).toBe('user-002');
       expect(user!.name).toBe('김철수');
       expect(user!.email).toBe('kim@example.com');
     });
 
     it('세 번째 사용자를 조회해야 함', async () => {
       // Given
-      const userId = 'user-uuid-3';
+      const userId = 'user-003';
 
       // When
       const user = await repository.findById(userId);
 
       // Then
       expect(user).not.toBeNull();
-      expect(user!.id).toBe('user-uuid-3');
+      expect(user!.id).toBe('user-003');
       expect(user!.name).toBe('이영희');
       expect(user!.email).toBe('lee@example.com');
     });
@@ -65,7 +65,7 @@ describe('InMemoryUserRepository', () => {
   describe('reset', () => {
     it('저장소를 초기화해야 함', async () => {
       // Given
-      const userId = 'user-uuid-1';
+      const userId = 'user-001';
 
       // When
       repository.reset();
@@ -73,7 +73,7 @@ describe('InMemoryUserRepository', () => {
 
       // Then
       expect(user).not.toBeNull();
-      expect(user!.id).toBe('user-uuid-1');
+      expect(user!.id).toBe('user-001');
     });
   });
 
