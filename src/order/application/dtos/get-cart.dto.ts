@@ -1,4 +1,4 @@
-import { Cart } from '../../domain/entities/cart.entity';
+import { Cart } from '@/order/domain/entities/cart.entity';
 
 export class GetCartInput {
   userId: string;

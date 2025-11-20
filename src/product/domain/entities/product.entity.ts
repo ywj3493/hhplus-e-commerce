@@ -1,6 +1,6 @@
-import { Money } from './money.vo';
-import { StockStatus } from './stock-status.vo';
-import { ProductOption } from './product-option.entity';
+import { Money } from '@/product/domain/entities/money.vo';
+import { StockStatus } from '@/product/domain/entities/stock-status.vo';
+import { ProductOption } from '@/product/domain/entities/product-option.entity';
 
 /**
  * 타입별로 그룹화된 옵션

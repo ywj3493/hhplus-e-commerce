@@ -1,4 +1,4 @@
-import { Cart } from '../entities/cart.entity';
+import { Cart } from '@/order/domain/entities/cart.entity';
 
 export interface CartRepository {
   /**

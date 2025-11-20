@@ -2,14 +2,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   IProductRepository,
   PRODUCT_REPOSITORY,
-} from '../../domain/repositories/product.repository';
-import { ProductNotFoundException } from '../../domain/product.exceptions';
-import { GetProductDetailInput } from '../dtos/get-product-detail.dto';
+} from '@/product/domain/repositories/product.repository';
+import { ProductNotFoundException } from '@/product/domain/product.exceptions';
+import { GetProductDetailInput } from '@/product/application/dtos/get-product-detail.dto';
 import {
   GetProductDetailOutput,
   ProductOptionDetail,
   ProductOptionGroup,
-} from '../dtos/get-product-detail.dto';
+} from '@/product/application/dtos/get-product-detail.dto';
 
 /**
  * 상품 상세 조회 Use Case

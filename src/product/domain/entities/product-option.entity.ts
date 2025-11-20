@@ -1,6 +1,6 @@
-import { Money } from './money.vo';
-import { StockStatus } from './stock-status.vo';
-import { Stock } from './stock.entity';
+import { Money } from '@/product/domain/entities/money.vo';
+import { StockStatus } from '@/product/domain/entities/stock-status.vo';
+import { Stock } from '@/product/domain/entities/stock.entity';
 
 /**
  * ProductOption Entity

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Payment, PaymentData } from '../../domain/entities/payment.entity';
-import { PaymentRepository } from '../../domain/repositories/payment.repository';
+import { Payment, PaymentData } from '@/order/domain/entities/payment.entity';
+import { PaymentRepository } from '@/order/domain/repositories/payment.repository';
 
 /**
  * In-Memory Payment Repository

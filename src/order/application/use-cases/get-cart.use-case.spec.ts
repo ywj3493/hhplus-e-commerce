@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GetCartUseCase } from './get-cart.use-case';
-import { CartRepository } from '../../domain/repositories/cart.repository';
-import { GetCartInput } from '../dtos/get-cart.dto';
-import { createTestCart, createTestCartWithItems } from '../../infrastructure/fixtures/cart.fixtures';
+import { GetCartUseCase } from '@/order/application/use-cases/get-cart.use-case';
+import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { GetCartInput } from '@/order/application/dtos/get-cart.dto';
+import { createTestCart, createTestCartWithItems } from '@/order/infrastructure/fixtures/cart.fixtures';
 
 describe('GetCartUseCase', () => {
   let useCase: GetCartUseCase;

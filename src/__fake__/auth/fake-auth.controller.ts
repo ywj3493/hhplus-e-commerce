@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtService } from '@nestjs/jwt';
-import { FAKE_USERS } from './fake-users';
+import { FAKE_USERS } from '@/__fake__/auth/fake-users';
 
 @ApiTags('Fake Auth')
 @Controller('fake-auth')

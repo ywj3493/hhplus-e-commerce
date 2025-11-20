@@ -1,12 +1,12 @@
-import { Order } from './order.entity';
-import { OrderItem } from './order-item.entity';
-import { OrderStatus } from './order-status.enum';
-import { Money } from '../../../product/domain/entities/money.vo';
+import { Order } from '@/order/domain/entities/order.entity';
+import { OrderItem } from '@/order/domain/entities/order-item.entity';
+import { OrderStatus } from '@/order/domain/entities/order-status.enum';
+import { Money } from '@/product/domain/entities/money.vo';
 import {
   MinimumOrderAmountException,
   OrderAlreadyCompletedException,
   InvalidOrderStateException,
-} from '../order.exceptions';
+} from '@/order/domain/order.exceptions';
 
 describe('Order Entity', () => {
   // 테스트용 OrderItem 생성 헬퍼

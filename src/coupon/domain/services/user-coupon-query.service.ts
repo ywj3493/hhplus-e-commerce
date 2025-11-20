@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserCoupon, CouponStatus } from '../entities/user-coupon.entity';
+import { UserCoupon, CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
 
 /**
  * 사용자 쿠폰 조회 관련 도메인 서비스

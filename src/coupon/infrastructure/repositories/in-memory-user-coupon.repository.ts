@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { UserCoupon } from '../../domain/entities/user-coupon.entity';
-import { UserCouponRepository } from '../../domain/repositories/user-coupon.repository';
+import { UserCoupon } from '@/coupon/domain/entities/user-coupon.entity';
+import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.repository';
 
 /**
  * UserCoupon 영속성 데이터

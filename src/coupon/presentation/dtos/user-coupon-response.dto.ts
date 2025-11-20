@@ -1,6 +1,6 @@
-import { CouponType } from '../../domain/entities/coupon.entity';
-import { CouponStatus } from '../../domain/entities/user-coupon.entity';
-import { IssueCouponOutput } from '../../application/dtos/issue-coupon.dto';
+import { CouponType } from '@/coupon/domain/entities/coupon.entity';
+import { CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
+import { IssueCouponOutput } from '@/coupon/application/dtos/issue-coupon.dto';
 
 /**
  * 사용자 쿠폰 응답 DTO

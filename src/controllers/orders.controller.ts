@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
-import * as stubData from '../__stub__/data/orders.json';
-import { FakeJwtAuthGuard } from '../__fake__/auth/fake-jwt-auth.guard';
+import * as stubData from '@/__stub__/data/orders.json';
+import { FakeJwtAuthGuard } from '@/__fake__/auth/fake-jwt-auth.guard';
 
 @ApiTags('Orders')
 @ApiBearerAuth('access-token')

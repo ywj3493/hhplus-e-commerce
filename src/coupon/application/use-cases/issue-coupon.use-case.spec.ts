@@ -1,16 +1,16 @@
-import { IssueCouponUseCase } from './issue-coupon.use-case';
-import { CouponService } from '../../domain/services/coupon.service';
-import { CouponRepository } from '../../domain/repositories/coupon.repository';
-import { UserCouponRepository } from '../../domain/repositories/user-coupon.repository';
-import { Coupon, CouponType } from '../../domain/entities/coupon.entity';
-import { UserCoupon } from '../../domain/entities/user-coupon.entity';
+import { IssueCouponUseCase } from '@/coupon/application/use-cases/issue-coupon.use-case';
+import { CouponService } from '@/coupon/domain/services/coupon.service';
+import { CouponRepository } from '@/coupon/domain/repositories/coupon.repository';
+import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.repository';
+import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
+import { UserCoupon } from '@/coupon/domain/entities/user-coupon.entity';
 import {
   CouponNotFoundException,
   CouponAlreadyIssuedException,
   CouponExhaustedException,
   CouponExpiredException,
-} from '../../domain/coupon.exceptions';
-import { IssueCouponInput } from '../dtos/issue-coupon.dto';
+} from '@/coupon/domain/coupon.exceptions';
+import { IssueCouponInput } from '@/coupon/application/dtos/issue-coupon.dto';
 
 describe('IssueCouponUseCase', () => {
   let useCase: IssueCouponUseCase;

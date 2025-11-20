@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   CouponExhaustedException,
   CouponExpiredException,
-} from '../coupon.exceptions';
+} from '@/coupon/domain/coupon.exceptions';
 
 /**
  * 쿠폰 타입

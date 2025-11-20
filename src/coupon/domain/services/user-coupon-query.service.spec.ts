@@ -1,6 +1,6 @@
-import { UserCouponQueryService } from './user-coupon-query.service';
-import { UserCoupon, CouponStatus } from '../entities/user-coupon.entity';
-import { Coupon, CouponType } from '../entities/coupon.entity';
+import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon-query.service';
+import { UserCoupon, CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
+import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
 
 describe('UserCouponQueryService', () => {
   let service: UserCouponQueryService;

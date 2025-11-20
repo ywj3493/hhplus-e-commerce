@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CartController } from './cart.controller';
-import { AddCartItemUseCase } from '../../application/use-cases/add-cart-item.use-case';
-import { GetCartUseCase } from '../../application/use-cases/get-cart.use-case';
-import { UpdateCartItemUseCase } from '../../application/use-cases/update-cart-item.use-case';
-import { RemoveCartItemUseCase } from '../../application/use-cases/remove-cart-item.use-case';
-import { ClearCartUseCase } from '../../application/use-cases/clear-cart.use-case';
-import { AddCartItemOutput } from '../../application/dtos/add-cart-item.dto';
-import { GetCartOutput, CartItemData } from '../../application/dtos/get-cart.dto';
-import { UpdateCartItemOutput } from '../../application/dtos/update-cart-item.dto';
-import { RemoveCartItemOutput } from '../../application/dtos/remove-cart-item.dto';
-import { ClearCartOutput } from '../../application/dtos/clear-cart.dto';
+import { CartController } from '@/order/presentation/controllers/cart.controller';
+import { AddCartItemUseCase } from '@/order/application/use-cases/add-cart-item.use-case';
+import { GetCartUseCase } from '@/order/application/use-cases/get-cart.use-case';
+import { UpdateCartItemUseCase } from '@/order/application/use-cases/update-cart-item.use-case';
+import { RemoveCartItemUseCase } from '@/order/application/use-cases/remove-cart-item.use-case';
+import { ClearCartUseCase } from '@/order/application/use-cases/clear-cart.use-case';
+import { AddCartItemOutput } from '@/order/application/dtos/add-cart-item.dto';
+import { GetCartOutput, CartItemData } from '@/order/application/dtos/get-cart.dto';
+import { UpdateCartItemOutput } from '@/order/application/dtos/update-cart-item.dto';
+import { RemoveCartItemOutput } from '@/order/application/dtos/remove-cart-item.dto';
+import { ClearCartOutput } from '@/order/application/dtos/clear-cart.dto';
 
 describe('CartController', () => {
   let controller: CartController;

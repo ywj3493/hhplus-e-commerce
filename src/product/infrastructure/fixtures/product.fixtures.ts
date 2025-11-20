@@ -1,7 +1,7 @@
-import { Product } from '../../domain/entities/product.entity';
-import { ProductOption } from '../../domain/entities/product-option.entity';
-import { Stock } from '../../domain/entities/stock.entity';
-import { Money } from '../../domain/entities/money.vo';
+import { Product } from '@/product/domain/entities/product.entity';
+import { ProductOption } from '@/product/domain/entities/product-option.entity';
+import { Stock } from '@/product/domain/entities/stock.entity';
+import { Money } from '@/product/domain/entities/money.vo';
 
 /**
  * 테스트 및 초기 데이터를 위한 Product 픽스처

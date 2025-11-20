@@ -1,4 +1,4 @@
-import { Payment } from '../entities/payment.entity';
+import { Payment } from '@/order/domain/entities/payment.entity';
 
 /**
  * PAYMENT_REPOSITORY Symbol Token

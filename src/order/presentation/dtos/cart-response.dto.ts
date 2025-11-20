@@ -1,4 +1,4 @@
-import { GetCartOutput, CartItemData } from '../../application/dtos/get-cart.dto';
+import { GetCartOutput, CartItemData } from '@/order/application/dtos/get-cart.dto';
 
 export class CartResponseDto {
   items: CartItemData[];

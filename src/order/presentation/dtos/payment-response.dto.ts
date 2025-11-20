@@ -1,5 +1,5 @@
-import { PaymentMethod } from '../../domain/entities/payment-method.enum';
-import { ProcessPaymentOutput } from '../../application/dtos/process-payment.dto';
+import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
+import { ProcessPaymentOutput } from '@/order/application/dtos/process-payment.dto';
 
 /**
  * PaymentResponseDto

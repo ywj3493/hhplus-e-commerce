@@ -1,4 +1,4 @@
-import { Money } from './money.vo';
+import { Money } from '@/product/domain/entities/money.vo';
 
 describe('Money', () => {
   describe('생성', () => {

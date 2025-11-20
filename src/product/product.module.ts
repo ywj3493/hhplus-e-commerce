@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ProductController } from './presentation/controllers/product.controller';
-import { GetProductsUseCase } from './application/use-cases/get-products.use-case';
-import { GetProductDetailUseCase } from './application/use-cases/get-product-detail.use-case';
-import { PRODUCT_REPOSITORY } from './domain/repositories/product.repository';
-import { InMemoryProductRepository } from './infrastructure/repositories/in-memory-product.repository';
+import { ProductController } from '@/product/presentation/controllers/product.controller';
+import { GetProductsUseCase } from '@/product/application/use-cases/get-products.use-case';
+import { GetProductDetailUseCase } from '@/product/application/use-cases/get-product-detail.use-case';
+import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/product.repository';
+import { InMemoryProductRepository } from '@/product/infrastructure/repositories/in-memory-product.repository';
 
 /**
  * Product Module

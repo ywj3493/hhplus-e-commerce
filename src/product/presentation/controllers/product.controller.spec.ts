@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { ProductController } from './product.controller';
-import { GetProductsUseCase } from '../../application/use-cases/get-products.use-case';
-import { GetProductDetailUseCase } from '../../application/use-cases/get-product-detail.use-case';
-import { GetProductsOutput, ProductListItem } from '../../application/dtos/get-products.dto';
+import { ProductController } from '@/product/presentation/controllers/product.controller';
+import { GetProductsUseCase } from '@/product/application/use-cases/get-products.use-case';
+import { GetProductDetailUseCase } from '@/product/application/use-cases/get-product-detail.use-case';
+import { GetProductsOutput, ProductListItem } from '@/product/application/dtos/get-products.dto';
 import {
   GetProductDetailOutput,
   ProductOptionGroup,
   ProductOptionDetail,
-} from '../../application/dtos/get-product-detail.dto';
-import { Money } from '../../domain/entities/money.vo';
-import { StockStatus } from '../../domain/entities/stock-status.vo';
-import { ProductNotFoundException } from '../../domain/product.exceptions';
+} from '@/product/application/dtos/get-product-detail.dto';
+import { Money } from '@/product/domain/entities/money.vo';
+import { StockStatus } from '@/product/domain/entities/stock-status.vo';
+import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 
 describe('ProductController', () => {
   let controller: ProductController;

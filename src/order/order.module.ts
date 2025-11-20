@@ -2,51 +2,51 @@ import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
 // Controllers
-import { CartController } from './presentation/controllers/cart.controller';
-import { OrderController } from './presentation/controllers/order.controller';
-import { PaymentController } from './presentation/controllers/payment.controller';
+import { CartController } from '@/order/presentation/controllers/cart.controller';
+import { OrderController } from '@/order/presentation/controllers/order.controller';
+import { PaymentController } from '@/order/presentation/controllers/payment.controller';
 
 // Use Cases - Cart
-import { AddCartItemUseCase } from './application/use-cases/add-cart-item.use-case';
-import { GetCartUseCase } from './application/use-cases/get-cart.use-case';
-import { UpdateCartItemUseCase } from './application/use-cases/update-cart-item.use-case';
-import { RemoveCartItemUseCase } from './application/use-cases/remove-cart-item.use-case';
-import { ClearCartUseCase } from './application/use-cases/clear-cart.use-case';
+import { AddCartItemUseCase } from '@/order/application/use-cases/add-cart-item.use-case';
+import { GetCartUseCase } from '@/order/application/use-cases/get-cart.use-case';
+import { UpdateCartItemUseCase } from '@/order/application/use-cases/update-cart-item.use-case';
+import { RemoveCartItemUseCase } from '@/order/application/use-cases/remove-cart-item.use-case';
+import { ClearCartUseCase } from '@/order/application/use-cases/clear-cart.use-case';
 
 // Use Cases - Order
-import { CreateOrderUseCase } from './application/use-cases/create-order.use-case';
-import { GetOrderUseCase } from './application/use-cases/get-order.use-case';
-import { GetOrdersUseCase } from './application/use-cases/get-orders.use-case';
+import { CreateOrderUseCase } from '@/order/application/use-cases/create-order.use-case';
+import { GetOrderUseCase } from '@/order/application/use-cases/get-order.use-case';
+import { GetOrdersUseCase } from '@/order/application/use-cases/get-orders.use-case';
 
 // Use Cases - Payment
-import { ProcessPaymentUseCase } from './application/use-cases/process-payment.use-case';
+import { ProcessPaymentUseCase } from '@/order/application/use-cases/process-payment.use-case';
 
 // Domain Services
-import { CartStockValidationService } from './domain/services/cart-stock-validation.service';
-import { StockReservationService } from './domain/services/stock-reservation.service';
+import { CartStockValidationService } from '@/order/domain/services/cart-stock-validation.service';
+import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
 
 // Event Handlers
-import { PaymentCompletedHandler } from './application/event-handlers/payment-completed.handler';
+import { PaymentCompletedHandler } from '@/order/application/event-handlers/payment-completed.handler';
 
 // Batch Jobs
-import { ReleaseExpiredReservationJob } from './application/jobs/release-expired-reservation.job';
+import { ReleaseExpiredReservationJob } from '@/order/application/jobs/release-expired-reservation.job';
 
 // Repositories
-import { InMemoryCartRepository } from './infrastructure/repositories/in-memory-cart.repository';
-import { InMemoryOrderRepository } from './infrastructure/repositories/in-memory-order.repository';
-import { InMemoryPaymentRepository } from './infrastructure/repositories/in-memory-payment.repository';
+import { InMemoryCartRepository } from '@/order/infrastructure/repositories/in-memory-cart.repository';
+import { InMemoryOrderRepository } from '@/order/infrastructure/repositories/in-memory-order.repository';
+import { InMemoryPaymentRepository } from '@/order/infrastructure/repositories/in-memory-payment.repository';
 
 // External Clients
-import { MockPaymentApiClient } from './infrastructure/clients/mock-payment-api.client';
-import { PAYMENT_API_CLIENT } from './infrastructure/clients/payment-api.interface';
+import { MockPaymentApiClient } from '@/order/infrastructure/clients/mock-payment-api.client';
+import { PAYMENT_API_CLIENT } from '@/order/infrastructure/clients/payment-api.interface';
 
 // Symbols
-import { ORDER_REPOSITORY, CART_REPOSITORY } from './application/use-cases/create-order.use-case';
-import { PAYMENT_REPOSITORY } from './domain/repositories/payment.repository';
+import { ORDER_REPOSITORY, CART_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
+import { PAYMENT_REPOSITORY } from '@/order/domain/repositories/payment.repository';
 
 // Import other modules
-import { CouponModule } from '../coupon/coupon.module';
-import { ProductModule } from '../product/product.module';
+import { CouponModule } from '@/coupon/coupon.module';
+import { ProductModule } from '@/product/product.module';
 
 /**
  * Order Module (Unified with Cart and Payment)

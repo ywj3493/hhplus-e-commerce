@@ -1,8 +1,8 @@
-import { Product } from './product.entity';
-import { ProductOption } from './product-option.entity';
-import { Stock } from './stock.entity';
-import { Money } from './money.vo';
-import { StockStatusType } from './stock-status.vo';
+import { Product } from '@/product/domain/entities/product.entity';
+import { ProductOption } from '@/product/domain/entities/product-option.entity';
+import { Stock } from '@/product/domain/entities/stock.entity';
+import { Money } from '@/product/domain/entities/money.vo';
+import { StockStatusType } from '@/product/domain/entities/stock-status.vo';
 
 describe('Product', () => {
   const createTestProduct = (options: ProductOption[] = []): Product => {

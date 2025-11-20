@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   IProductRepository,
   PRODUCT_REPOSITORY,
-} from '../../domain/repositories/product.repository';
-import { GetProductsInput } from '../dtos/get-products.dto';
-import { GetProductsOutput, ProductListItem } from '../dtos/get-products.dto';
+} from '@/product/domain/repositories/product.repository';
+import { GetProductsInput } from '@/product/application/dtos/get-products.dto';
+import { GetProductsOutput, ProductListItem } from '@/product/application/dtos/get-products.dto';
 
 /**
  * Get Products Use Case

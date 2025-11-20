@@ -1,29 +1,29 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Payment } from '../../domain/entities/payment.entity';
+import { Payment } from '@/order/domain/entities/payment.entity';
 import {
   AlreadyPaidException,
   InvalidOrderStatusException,
   OrderExpiredException,
   PaymentFailedException,
-} from '../../domain/order.exceptions';
+} from '@/order/domain/order.exceptions';
 import {
   PaymentRepository,
   PAYMENT_REPOSITORY,
-} from '../../domain/repositories/payment.repository';
-import { PaymentCompletedEvent } from '../../domain/events/payment-completed.event';
+} from '@/order/domain/repositories/payment.repository';
+import { PaymentCompletedEvent } from '@/order/domain/events/payment-completed.event';
 import {
   IPaymentApiClient,
   PAYMENT_API_CLIENT,
-} from '../../infrastructure/clients/payment-api.interface';
+} from '@/order/infrastructure/clients/payment-api.interface';
 import {
   ProcessPaymentInput,
   ProcessPaymentOutput,
-} from '../dtos/process-payment.dto';
-import { Order } from '../../domain/entities/order.entity';
-import { OrderStatus } from '../../domain/entities/order-status.enum';
-import { OrderRepository } from '../../domain/repositories/order.repository';
-import { ORDER_REPOSITORY } from './create-order.use-case';
+} from '@/order/application/dtos/process-payment.dto';
+import { Order } from '@/order/domain/entities/order.entity';
+import { OrderStatus } from '@/order/domain/entities/order-status.enum';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { ORDER_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
 
 /**
  * ProcessPaymentUseCase

@@ -1,5 +1,5 @@
-import { Money } from '../../domain/entities/money.vo';
-import { StockStatus } from '../../domain/entities/stock-status.vo';
+import { Money } from '@/product/domain/entities/money.vo';
+import { StockStatus } from '@/product/domain/entities/stock-status.vo';
 
 /**
  * 상품 상세의 옵션 정보

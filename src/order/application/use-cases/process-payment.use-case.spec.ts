@@ -1,31 +1,31 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ProcessPaymentUseCase } from './process-payment.use-case';
+import { ProcessPaymentUseCase } from '@/order/application/use-cases/process-payment.use-case';
 import {
   ProcessPaymentInput,
   ProcessPaymentOutput,
-} from '../dtos/process-payment.dto';
-import { PaymentMethod } from '../../domain/entities/payment-method.enum';
-import { PaymentRepository } from '../../domain/repositories/payment.repository';
-import { PAYMENT_REPOSITORY } from '../../domain/repositories/payment.repository';
+} from '@/order/application/dtos/process-payment.dto';
+import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
+import { PaymentRepository } from '@/order/domain/repositories/payment.repository';
+import { PAYMENT_REPOSITORY } from '@/order/domain/repositories/payment.repository';
 import {
   IPaymentApiClient,
   PAYMENT_API_CLIENT,
-} from '../../infrastructure/clients/payment-api.interface';
-import { OrderRepository } from '../../domain/repositories/order.repository';
-import { ORDER_REPOSITORY } from './create-order.use-case';
-import { Order } from '../../domain/entities/order.entity';
-import { OrderStatus } from '../../domain/entities/order-status.enum';
-import { OrderItem } from '../../domain/entities/order-item.entity';
-import { Payment } from '../../domain/entities/payment.entity';
+} from '@/order/infrastructure/clients/payment-api.interface';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { ORDER_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
+import { Order } from '@/order/domain/entities/order.entity';
+import { OrderStatus } from '@/order/domain/entities/order-status.enum';
+import { OrderItem } from '@/order/domain/entities/order-item.entity';
+import { Payment } from '@/order/domain/entities/payment.entity';
 import {
   AlreadyPaidException,
   OrderExpiredException,
   InvalidOrderStatusException,
   PaymentFailedException,
-} from '../../domain/order.exceptions';
-import { PaymentCompletedEvent } from '../../domain/events/payment-completed.event';
-import { Money } from '../../../product/domain/entities/money.vo';
+} from '@/order/domain/order.exceptions';
+import { PaymentCompletedEvent } from '@/order/domain/events/payment-completed.event';
+import { Money } from '@/product/domain/entities/money.vo';
 
 describe('ProcessPaymentUseCase', () => {
   let useCase: ProcessPaymentUseCase;

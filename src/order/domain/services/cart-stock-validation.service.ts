@@ -2,9 +2,9 @@ import { Injectable, Inject } from '@nestjs/common';
 import {
   IProductRepository,
   PRODUCT_REPOSITORY,
-} from '../../../product/domain/repositories/product.repository';
-import { InsufficientStockException } from '../order.exceptions';
-import { ProductNotFoundException } from '../../../product/domain/product.exceptions';
+} from '@/product/domain/repositories/product.repository';
+import { InsufficientStockException } from '@/order/domain/order.exceptions';
+import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 
 /**
  * 장바구니 재고 검증 도메인 서비스

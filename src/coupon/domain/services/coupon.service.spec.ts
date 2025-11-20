@@ -1,11 +1,11 @@
-import { CouponService } from './coupon.service';
-import { Coupon, CouponType } from '../entities/coupon.entity';
-import { UserCoupon } from '../entities/user-coupon.entity';
+import { CouponService } from '@/coupon/domain/services/coupon.service';
+import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
+import { UserCoupon } from '@/coupon/domain/entities/user-coupon.entity';
 import {
   CouponAlreadyUsedException,
   CouponExhaustedException,
   CouponExpiredException,
-} from '../coupon.exceptions';
+} from '@/coupon/domain/coupon.exceptions';
 
 describe('CouponService', () => {
   let service: CouponService;

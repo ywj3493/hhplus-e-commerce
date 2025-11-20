@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CartRepository } from '../../domain/repositories/cart.repository';
-import { ClearCartInput, ClearCartOutput } from '../dtos/clear-cart.dto';
+import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { ClearCartInput, ClearCartOutput } from '@/order/application/dtos/clear-cart.dto';
 
 /**
  * 장바구니 전체 삭제 Use Case

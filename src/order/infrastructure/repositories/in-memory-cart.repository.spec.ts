@@ -1,6 +1,6 @@
-import { InMemoryCartRepository } from './in-memory-cart.repository';
-import { Cart } from '../../domain/entities/cart.entity';
-import { Money } from '../../../product/domain/entities/money.vo';
+import { InMemoryCartRepository } from '@/order/infrastructure/repositories/in-memory-cart.repository';
+import { Cart } from '@/order/domain/entities/cart.entity';
+import { Money } from '@/product/domain/entities/money.vo';
 
 describe('InMemoryCartRepository', () => {
   let repository: InMemoryCartRepository;

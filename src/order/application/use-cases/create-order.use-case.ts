@@ -1,16 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { OrderRepository } from '../../domain/repositories/order.repository';
-import { CartRepository } from '../../domain/repositories/cart.repository';
-import { Order } from '../../domain/entities/order.entity';
-import { OrderItem } from '../../domain/entities/order-item.entity';
-import { StockReservationService } from '../../domain/services/stock-reservation.service';
-import { CouponApplicationService } from '../../../coupon/application/services/coupon-application.service';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { Order } from '@/order/domain/entities/order.entity';
+import { OrderItem } from '@/order/domain/entities/order-item.entity';
+import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { CouponApplicationService } from '@/coupon/application/services/coupon-application.service';
 import {
   IProductRepository,
   PRODUCT_REPOSITORY,
-} from '../../../product/domain/repositories/product.repository';
-import { CreateOrderInput, CreateOrderOutput } from '../dtos/create-order.dto';
-import { EmptyCartException } from '../../domain/order.exceptions';
+} from '@/product/domain/repositories/product.repository';
+import { CreateOrderInput, CreateOrderOutput } from '@/order/application/dtos/create-order.dto';
+import { EmptyCartException } from '@/order/domain/order.exceptions';
 
 export const ORDER_REPOSITORY = Symbol('ORDER_REPOSITORY');
 export const CART_REPOSITORY = Symbol('CART_REPOSITORY');

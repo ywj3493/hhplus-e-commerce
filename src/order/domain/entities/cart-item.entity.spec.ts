@@ -1,6 +1,6 @@
-import { Cart } from './cart.entity';
-import { Money } from '../../../product/domain/entities/money.vo';
-import { InvalidQuantityException } from '../order.exceptions';
+import { Cart } from '@/order/domain/entities/cart.entity';
+import { Money } from '@/product/domain/entities/money.vo';
+import { InvalidQuantityException } from '@/order/domain/order.exceptions';
 
 describe('CartItem', () => {
   describe('생성', () => {

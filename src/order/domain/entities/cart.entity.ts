@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import { CartItem } from './cart-item.entity';
-import { Money } from '../../../product/domain/entities/money.vo';
-import { CartItemNotFoundException } from '../order.exceptions';
+import { CartItem } from '@/order/domain/entities/cart-item.entity';
+import { Money } from '@/product/domain/entities/money.vo';
+import { CartItemNotFoundException } from '@/order/domain/order.exceptions';
 
 export interface AddItemData {
   productId: string;

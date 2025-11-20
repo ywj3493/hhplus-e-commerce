@@ -1,5 +1,5 @@
-import { UserCoupon, CouponStatus } from './user-coupon.entity';
-import { Coupon, CouponType } from './coupon.entity';
+import { UserCoupon, CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
+import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
 
 describe('UserCoupon', () => {
   const createTestCoupon = (): Coupon => {

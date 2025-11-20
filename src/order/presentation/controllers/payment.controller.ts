@@ -6,10 +6,10 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
-import { ProcessPaymentUseCase } from '../../application/use-cases/process-payment.use-case';
-import { ProcessPaymentInput } from '../../application/dtos/process-payment.dto';
-import { ProcessPaymentRequestDto } from '../dtos/process-payment-request.dto';
-import { PaymentResponseDto } from '../dtos/payment-response.dto';
+import { ProcessPaymentUseCase } from '@/order/application/use-cases/process-payment.use-case';
+import { ProcessPaymentInput } from '@/order/application/dtos/process-payment.dto';
+import { ProcessPaymentRequestDto } from '@/order/presentation/dtos/process-payment-request.dto';
+import { PaymentResponseDto } from '@/order/presentation/dtos/payment-response.dto';
 
 /**
  * PaymentController

@@ -1,6 +1,6 @@
-import { Cart } from '../../domain/entities/cart.entity';
-import { CartItem, CartItemCreateData } from '../../domain/entities/cart-item.entity';
-import { Money } from '../../../product/domain/entities/money.vo';
+import { Cart } from '@/order/domain/entities/cart.entity';
+import { CartItem, CartItemCreateData } from '@/order/domain/entities/cart-item.entity';
+import { Money } from '@/product/domain/entities/money.vo';
 
 /**
  * 테스트용 Cart 생성 헬퍼

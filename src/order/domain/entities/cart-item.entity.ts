@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Money } from '../../../product/domain/entities/money.vo';
-import { InvalidQuantityException } from '../order.exceptions';
+import { Money } from '@/product/domain/entities/money.vo';
+import { InvalidQuantityException } from '@/order/domain/order.exceptions';
 
 export interface CartItemCreateData {
   cartId: string;

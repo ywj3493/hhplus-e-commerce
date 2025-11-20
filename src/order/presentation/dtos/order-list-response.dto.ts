@@ -1,4 +1,4 @@
-import { GetOrdersOutput } from '../../application/dtos/get-orders.dto';
+import { GetOrdersOutput } from '@/order/application/dtos/get-orders.dto';
 
 /**
  * 주문 목록 응답 DTO

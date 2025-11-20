@@ -1,4 +1,4 @@
-import { Order } from '../entities/order.entity';
+import { Order } from '@/order/domain/entities/order.entity';
 
 /**
  * Pagination 인터페이스

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Coupon, CouponType } from '../entities/coupon.entity';
-import { UserCoupon } from '../entities/user-coupon.entity';
+import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
+import { UserCoupon } from '@/coupon/domain/entities/user-coupon.entity';
 import {
   CouponAlreadyUsedException,
   CouponExpiredException,
-} from '../coupon.exceptions';
+} from '@/coupon/domain/coupon.exceptions';
 
 /**
  * 쿠폰 도메인 서비스

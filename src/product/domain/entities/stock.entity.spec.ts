@@ -1,5 +1,5 @@
-import { Stock } from './stock.entity';
-import { StockStatusType } from './stock-status.vo';
+import { Stock } from '@/product/domain/entities/stock.entity';
+import { StockStatusType } from '@/product/domain/entities/stock-status.vo';
 
 describe('Stock', () => {
   describe('생성', () => {

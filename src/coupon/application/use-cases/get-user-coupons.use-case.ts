@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CouponRepository } from '../../domain/repositories/coupon.repository';
-import { UserCouponRepository } from '../../domain/repositories/user-coupon.repository';
-import { CouponStatus } from '../../domain/entities/user-coupon.entity';
+import { CouponRepository } from '@/coupon/domain/repositories/coupon.repository';
+import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.repository';
+import { CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
 import {
   GetUserCouponsInput,
   GetUserCouponsOutput,
-} from '../dtos/get-user-coupons.dto';
-import { Coupon } from '../../domain/entities/coupon.entity';
-import { UserCouponQueryService } from '../../domain/services/user-coupon-query.service';
+} from '@/coupon/application/dtos/get-user-coupons.dto';
+import { Coupon } from '@/coupon/domain/entities/coupon.entity';
+import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon-query.service';
 
 /**
  * 사용자 쿠폰 조회 Use Case

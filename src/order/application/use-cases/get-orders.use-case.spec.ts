@@ -1,7 +1,7 @@
-import { GetOrdersUseCase } from './get-orders.use-case';
-import { OrderRepository } from '../../domain/repositories/order.repository';
-import { OrderFixtures } from '../../infrastructure/fixtures/order.fixtures';
-import { GetOrdersInput } from '../dtos/get-orders.dto';
+import { GetOrdersUseCase } from '@/order/application/use-cases/get-orders.use-case';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { OrderFixtures } from '@/order/infrastructure/fixtures/order.fixtures';
+import { GetOrdersInput } from '@/order/application/dtos/get-orders.dto';
 
 describe('GetOrdersUseCase', () => {
   let useCase: GetOrdersUseCase;

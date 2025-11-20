@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UpdateCartItemUseCase } from './update-cart-item.use-case';
-import { CartRepository } from '../../domain/repositories/cart.repository';
-import { CartStockValidationService } from '../../domain/services/cart-stock-validation.service';
-import { UpdateCartItemInput } from '../dtos/update-cart-item.dto';
-import { CartNotFoundException, CartItemNotFoundException } from '../../domain/order.exceptions';
-import { createTestCart } from '../../infrastructure/fixtures/cart.fixtures';
-import { Money } from '../../../product/domain/entities/money.vo';
+import { UpdateCartItemUseCase } from '@/order/application/use-cases/update-cart-item.use-case';
+import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { CartStockValidationService } from '@/order/domain/services/cart-stock-validation.service';
+import { UpdateCartItemInput } from '@/order/application/dtos/update-cart-item.dto';
+import { CartNotFoundException, CartItemNotFoundException } from '@/order/domain/order.exceptions';
+import { createTestCart } from '@/order/infrastructure/fixtures/cart.fixtures';
+import { Money } from '@/product/domain/entities/money.vo';
 
 describe('UpdateCartItemUseCase', () => {
   let useCase: UpdateCartItemUseCase;

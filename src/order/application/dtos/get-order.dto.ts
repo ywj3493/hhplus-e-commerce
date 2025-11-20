@@ -1,5 +1,5 @@
-import { Order } from '../../domain/entities/order.entity';
-import { OrderItem } from '../../domain/entities/order-item.entity';
+import { Order } from '@/order/domain/entities/order.entity';
+import { OrderItem } from '@/order/domain/entities/order-item.entity';
 
 /**
  * OrderItemData

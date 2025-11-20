@@ -1,4 +1,4 @@
-import { StockStatus } from './stock-status.vo';
+import { StockStatus } from '@/product/domain/entities/stock-status.vo';
 
 /**
  * Stock Entity

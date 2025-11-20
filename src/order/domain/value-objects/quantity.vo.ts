@@ -1,4 +1,4 @@
-import { InvalidQuantityException } from '../order.exceptions';
+import { InvalidQuantityException } from '@/order/domain/order.exceptions';
 
 /**
  * Quantity Value Object

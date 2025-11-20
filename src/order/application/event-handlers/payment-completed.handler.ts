@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { PaymentCompletedEvent } from '../../domain/events/payment-completed.event';
-import { StockReservationService } from '../../domain/services/stock-reservation.service';
+import { PaymentCompletedEvent } from '@/order/domain/events/payment-completed.event';
+import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
 
 /**
  * PaymentCompletedHandler

@@ -1,9 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
-import { Coupon, CouponType } from '../../domain/entities/coupon.entity';
+import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
 import {
   CouponStatus,
   UserCoupon,
-} from '../../domain/entities/user-coupon.entity';
+} from '@/coupon/domain/entities/user-coupon.entity';
 
 /**
  * 쿠폰 발급 Input 데이터

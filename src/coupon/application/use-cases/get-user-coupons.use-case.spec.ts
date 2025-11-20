@@ -1,10 +1,10 @@
-import { GetUserCouponsUseCase } from './get-user-coupons.use-case';
-import { CouponRepository } from '../../domain/repositories/coupon.repository';
-import { UserCouponRepository } from '../../domain/repositories/user-coupon.repository';
-import { Coupon, CouponType } from '../../domain/entities/coupon.entity';
-import { UserCoupon, CouponStatus } from '../../domain/entities/user-coupon.entity';
-import { GetUserCouponsInput } from '../dtos/get-user-coupons.dto';
-import { UserCouponQueryService } from '../../domain/services/user-coupon-query.service';
+import { GetUserCouponsUseCase } from '@/coupon/application/use-cases/get-user-coupons.use-case';
+import { CouponRepository } from '@/coupon/domain/repositories/coupon.repository';
+import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.repository';
+import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
+import { UserCoupon, CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
+import { GetUserCouponsInput } from '@/coupon/application/dtos/get-user-coupons.dto';
+import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon-query.service';
 
 describe('GetUserCouponsUseCase', () => {
   let useCase: GetUserCouponsUseCase;

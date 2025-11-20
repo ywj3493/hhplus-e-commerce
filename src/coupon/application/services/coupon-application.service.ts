@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { UserCouponRepository } from '../../domain/repositories/user-coupon.repository';
-import { CouponRepository } from '../../domain/repositories/coupon.repository';
-import { CouponService } from '../../domain/services/coupon.service';
+import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.repository';
+import { CouponRepository } from '@/coupon/domain/repositories/coupon.repository';
+import { CouponService } from '@/coupon/domain/services/coupon.service';
 
 /**
  * 쿠폰 적용 결과

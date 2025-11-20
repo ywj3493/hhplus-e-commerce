@@ -1,7 +1,7 @@
-import { Order } from '../../domain/entities/order.entity';
-import { OrderItem } from '../../domain/entities/order-item.entity';
-import { OrderStatus } from '../../domain/entities/order-status.enum';
-import { Money } from '../../../product/domain/entities/money.vo';
+import { Order } from '@/order/domain/entities/order.entity';
+import { OrderItem } from '@/order/domain/entities/order-item.entity';
+import { OrderStatus } from '@/order/domain/entities/order-status.enum';
+import { Money } from '@/product/domain/entities/money.vo';
 
 /**
  * Order Fixtures

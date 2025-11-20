@@ -1,6 +1,6 @@
-import { OrderItem } from './order-item.entity';
-import { Money } from '../../../product/domain/entities/money.vo';
-import { CartItem } from './cart-item.entity';
+import { OrderItem } from '@/order/domain/entities/order-item.entity';
+import { Money } from '@/product/domain/entities/money.vo';
+import { CartItem } from '@/order/domain/entities/cart-item.entity';
 
 describe('OrderItem Entity', () => {
   describe('생성', () => {

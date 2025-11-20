@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
-import { PaymentCompletedHandler } from './payment-completed.handler';
-import { StockReservationService } from '../../domain/services/stock-reservation.service';
-import { PaymentCompletedEvent } from '../../domain/events/payment-completed.event';
+import { PaymentCompletedHandler } from '@/order/application/event-handlers/payment-completed.handler';
+import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { PaymentCompletedEvent } from '@/order/domain/events/payment-completed.event';
 
 describe('PaymentCompletedHandler', () => {
   let handler: PaymentCompletedHandler;

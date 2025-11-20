@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ClearCartUseCase } from './clear-cart.use-case';
-import { CartRepository } from '../../domain/repositories/cart.repository';
-import { ClearCartInput } from '../dtos/clear-cart.dto';
-import { createTestCart, createTestCartWithItems } from '../../infrastructure/fixtures/cart.fixtures';
-import { Money } from '../../../product/domain/entities/money.vo';
+import { ClearCartUseCase } from '@/order/application/use-cases/clear-cart.use-case';
+import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { ClearCartInput } from '@/order/application/dtos/clear-cart.dto';
+import { createTestCart, createTestCartWithItems } from '@/order/infrastructure/fixtures/cart.fixtures';
+import { Money } from '@/product/domain/entities/money.vo';
 
 describe('ClearCartUseCase', () => {
   let useCase: ClearCartUseCase;

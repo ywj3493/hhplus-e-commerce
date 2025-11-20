@@ -1,5 +1,5 @@
-import { AddCartItemOutput } from '../../application/dtos/add-cart-item.dto';
-import { UpdateCartItemOutput } from '../../application/dtos/update-cart-item.dto';
+import { AddCartItemOutput } from '@/order/application/dtos/add-cart-item.dto';
+import { UpdateCartItemOutput } from '@/order/application/dtos/update-cart-item.dto';
 
 export class CartItemResponseDto {
   cartItemId: string;

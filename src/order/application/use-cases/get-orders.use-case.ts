@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { OrderRepository } from '../../domain/repositories/order.repository';
-import { GetOrdersInput, GetOrdersOutput } from '../dtos/get-orders.dto';
-import { ORDER_REPOSITORY } from './create-order.use-case';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { GetOrdersInput, GetOrdersOutput } from '@/order/application/dtos/get-orders.dto';
+import { ORDER_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
 
 /**
  * GetOrdersUseCase

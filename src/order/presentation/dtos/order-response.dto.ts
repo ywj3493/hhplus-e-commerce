@@ -1,5 +1,5 @@
-import { GetOrderOutput, OrderItemData } from '../../application/dtos/get-order.dto';
-import { CreateOrderOutput } from '../../application/dtos/create-order.dto';
+import { GetOrderOutput, OrderItemData } from '@/order/application/dtos/get-order.dto';
+import { CreateOrderOutput } from '@/order/application/dtos/create-order.dto';
 
 /**
  * 주문 생성 응답 DTO

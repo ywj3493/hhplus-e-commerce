@@ -1,6 +1,6 @@
-import { Payment } from '../../domain/entities/payment.entity';
-import { PaymentMethod } from '../../domain/entities/payment-method.enum';
-import { InMemoryPaymentRepository } from './in-memory-payment.repository';
+import { Payment } from '@/order/domain/entities/payment.entity';
+import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
+import { InMemoryPaymentRepository } from '@/order/infrastructure/repositories/in-memory-payment.repository';
 
 describe('InMemoryPaymentRepository', () => {
   let repository: InMemoryPaymentRepository;

@@ -1,7 +1,7 @@
 import {
   GetUserCouponsOutput,
   UserCouponData,
-} from '../../application/dtos/get-user-coupons.dto';
+} from '@/coupon/application/dtos/get-user-coupons.dto';
 
 /**
  * 사용자 쿠폰 목록 응답 DTO

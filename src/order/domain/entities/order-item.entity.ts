@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Money } from '../../../product/domain/entities/money.vo';
-import { CartItem } from './cart-item.entity';
+import { Money } from '@/product/domain/entities/money.vo';
+import { CartItem } from '@/order/domain/entities/cart-item.entity';
 
 /**
  * OrderItem 생성을 위한 데이터 인터페이스

@@ -4,7 +4,7 @@ import {
   IPaymentApiClient,
   PaymentRequest,
   PaymentResponse,
-} from './payment-api.interface';
+} from '@/order/infrastructure/clients/payment-api.interface';
 
 /**
  * Mock Payment API Client

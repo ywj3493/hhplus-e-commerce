@@ -1,4 +1,4 @@
-import { StockStatus } from '../../domain/entities/stock-status.vo';
+import { StockStatus } from '@/product/domain/entities/stock-status.vo';
 
 /**
  * 상품 목록의 상품 아이템

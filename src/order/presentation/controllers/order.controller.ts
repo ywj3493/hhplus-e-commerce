@@ -7,19 +7,19 @@ import {
   Query,
   HttpCode,
 } from '@nestjs/common';
-import { CreateOrderUseCase } from '../../application/use-cases/create-order.use-case';
-import { GetOrderUseCase } from '../../application/use-cases/get-order.use-case';
-import { GetOrdersUseCase } from '../../application/use-cases/get-orders.use-case';
-import { CreateOrderInput } from '../../application/dtos/create-order.dto';
-import { GetOrderInput } from '../../application/dtos/get-order.dto';
-import { GetOrdersInput } from '../../application/dtos/get-orders.dto';
-import { CreateOrderRequestDto } from '../dtos/create-order-request.dto';
-import { PaginationQueryDto } from '../dtos/pagination-query.dto';
+import { CreateOrderUseCase } from '@/order/application/use-cases/create-order.use-case';
+import { GetOrderUseCase } from '@/order/application/use-cases/get-order.use-case';
+import { GetOrdersUseCase } from '@/order/application/use-cases/get-orders.use-case';
+import { CreateOrderInput } from '@/order/application/dtos/create-order.dto';
+import { GetOrderInput } from '@/order/application/dtos/get-order.dto';
+import { GetOrdersInput } from '@/order/application/dtos/get-orders.dto';
+import { CreateOrderRequestDto } from '@/order/presentation/dtos/create-order-request.dto';
+import { PaginationQueryDto } from '@/order/presentation/dtos/pagination-query.dto';
 import {
   CreateOrderResponseDto,
   OrderResponseDto,
-} from '../dtos/order-response.dto';
-import { OrderListResponseDto } from '../dtos/order-list-response.dto';
+} from '@/order/presentation/dtos/order-response.dto';
+import { OrderListResponseDto } from '@/order/presentation/dtos/order-list-response.dto';
 
 /**
  * 주문 컨트롤러

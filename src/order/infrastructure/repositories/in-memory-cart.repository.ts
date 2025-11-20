@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CartRepository } from '../../domain/repositories/cart.repository';
-import { Cart } from '../../domain/entities/cart.entity';
+import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { Cart } from '@/order/domain/entities/cart.entity';
 
 /**
  * 인메모리 장바구니 저장소

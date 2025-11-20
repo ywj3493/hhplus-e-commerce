@@ -6,13 +6,13 @@ import {
   Query,
   HttpCode,
 } from '@nestjs/common';
-import { IssueCouponUseCase } from '../../application/use-cases/issue-coupon.use-case';
-import { GetUserCouponsUseCase } from '../../application/use-cases/get-user-coupons.use-case';
-import { IssueCouponInput } from '../../application/dtos/issue-coupon.dto';
-import { GetUserCouponsInput } from '../../application/dtos/get-user-coupons.dto';
-import { UserCouponResponseDto } from '../dtos/user-coupon-response.dto';
-import { UserCouponsResponseDto } from '../dtos/user-coupons-response.dto';
-import { CouponStatus } from '../../domain/entities/user-coupon.entity';
+import { IssueCouponUseCase } from '@/coupon/application/use-cases/issue-coupon.use-case';
+import { GetUserCouponsUseCase } from '@/coupon/application/use-cases/get-user-coupons.use-case';
+import { IssueCouponInput } from '@/coupon/application/dtos/issue-coupon.dto';
+import { GetUserCouponsInput } from '@/coupon/application/dtos/get-user-coupons.dto';
+import { UserCouponResponseDto } from '@/coupon/presentation/dtos/user-coupon-response.dto';
+import { UserCouponsResponseDto } from '@/coupon/presentation/dtos/user-coupons-response.dto';
+import { CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
 
 /**
  * 쿠폰 컨트롤러

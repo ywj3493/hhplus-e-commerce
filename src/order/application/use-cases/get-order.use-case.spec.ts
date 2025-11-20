@@ -1,11 +1,11 @@
-import { GetOrderUseCase } from './get-order.use-case';
-import { OrderRepository } from '../../domain/repositories/order.repository';
-import { OrderFixtures } from '../../infrastructure/fixtures/order.fixtures';
+import { GetOrderUseCase } from '@/order/application/use-cases/get-order.use-case';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { OrderFixtures } from '@/order/infrastructure/fixtures/order.fixtures';
 import {
   OrderNotFoundException,
   OrderOwnershipException,
-} from '../../domain/order.exceptions';
-import { GetOrderInput } from '../dtos/get-order.dto';
+} from '@/order/domain/order.exceptions';
+import { GetOrderInput } from '@/order/application/dtos/get-order.dto';
 
 describe('GetOrderUseCase', () => {
   let useCase: GetOrderUseCase;

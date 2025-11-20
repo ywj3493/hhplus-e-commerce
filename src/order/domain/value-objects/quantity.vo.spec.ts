@@ -1,5 +1,5 @@
-import { Quantity } from './quantity.vo';
-import { InvalidQuantityException } from '../order.exceptions';
+import { Quantity } from '@/order/domain/value-objects/quantity.vo';
+import { InvalidQuantityException } from '@/order/domain/order.exceptions';
 
 describe('Quantity', () => {
   describe('생성', () => {

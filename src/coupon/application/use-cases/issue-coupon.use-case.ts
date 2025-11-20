@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CouponRepository } from '../../domain/repositories/coupon.repository';
-import { UserCouponRepository } from '../../domain/repositories/user-coupon.repository';
-import { CouponService } from '../../domain/services/coupon.service';
+import { CouponRepository } from '@/coupon/domain/repositories/coupon.repository';
+import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.repository';
+import { CouponService } from '@/coupon/domain/services/coupon.service';
 import {
   CouponAlreadyIssuedException,
   CouponNotFoundException,
-} from '../../domain/coupon.exceptions';
+} from '@/coupon/domain/coupon.exceptions';
 import {
   IssueCouponInput,
   IssueCouponOutput,
-} from '../dtos/issue-coupon.dto';
+} from '@/coupon/application/dtos/issue-coupon.dto';
 
 /**
  * 쿠폰 발급 Use Case

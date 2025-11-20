@@ -1,12 +1,12 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CartItem } from '../entities/cart-item.entity';
+import { CartItem } from '@/order/domain/entities/cart-item.entity';
 import {
   IProductRepository,
   PRODUCT_REPOSITORY,
-} from '../../../product/domain/repositories/product.repository';
-import { OrderItem } from '../entities/order-item.entity';
-import { OrderRepository } from '../repositories/order.repository';
-import { ORDER_REPOSITORY } from '../../application/use-cases/create-order.use-case';
+} from '@/product/domain/repositories/product.repository';
+import { OrderItem } from '@/order/domain/entities/order-item.entity';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { ORDER_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
 
 /**
  * StockReservationService

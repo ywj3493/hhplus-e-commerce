@@ -1,5 +1,5 @@
-import { Coupon, CouponType } from '../../domain/entities/coupon.entity';
-import { UserCoupon } from '../../domain/entities/user-coupon.entity';
+import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
+import { UserCoupon } from '@/coupon/domain/entities/user-coupon.entity';
 
 /**
  * 테스트용 쿠폰 생성 헬퍼

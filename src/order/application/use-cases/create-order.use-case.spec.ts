@@ -1,17 +1,17 @@
-import { CreateOrderUseCase } from './create-order.use-case';
-import { OrderRepository } from '../../domain/repositories/order.repository';
-import { CartRepository } from '../../domain/repositories/cart.repository';
-import { IProductRepository } from '../../../product/domain/repositories/product.repository';
-import { StockReservationService } from '../../domain/services/stock-reservation.service';
-import { CouponApplicationService } from '../../../coupon/application/services/coupon-application.service';
-import { Cart } from '../../domain/entities/cart.entity';
-import { CartItem } from '../../domain/entities/cart-item.entity';
-import { Product } from '../../../product/domain/entities/product.entity';
-import { ProductOption } from '../../../product/domain/entities/product-option.entity';
-import { Stock } from '../../../product/domain/entities/stock.entity';
-import { Money } from '../../../product/domain/entities/money.vo';
-import { CreateOrderInput } from '../dtos/create-order.dto';
-import { EmptyCartException } from '../../domain/order.exceptions';
+import { CreateOrderUseCase } from '@/order/application/use-cases/create-order.use-case';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { IProductRepository } from '@/product/domain/repositories/product.repository';
+import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { CouponApplicationService } from '@/coupon/application/services/coupon-application.service';
+import { Cart } from '@/order/domain/entities/cart.entity';
+import { CartItem } from '@/order/domain/entities/cart-item.entity';
+import { Product } from '@/product/domain/entities/product.entity';
+import { ProductOption } from '@/product/domain/entities/product-option.entity';
+import { Stock } from '@/product/domain/entities/stock.entity';
+import { Money } from '@/product/domain/entities/money.vo';
+import { CreateOrderInput } from '@/order/application/dtos/create-order.dto';
+import { EmptyCartException } from '@/order/domain/order.exceptions';
 
 describe('CreateOrderUseCase', () => {
   let useCase: CreateOrderUseCase;

@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
-import { OrderStatus } from './order-status.enum';
-import { OrderItem } from './order-item.entity';
-import { Money } from '../../../product/domain/entities/money.vo';
+import { OrderStatus } from '@/order/domain/entities/order-status.enum';
+import { OrderItem } from '@/order/domain/entities/order-item.entity';
+import { Money } from '@/product/domain/entities/money.vo';
 import {
   OrderAlreadyCompletedException,
   InvalidOrderStateException,
   MinimumOrderAmountException,
-} from '../order.exceptions';
+} from '@/order/domain/order.exceptions';
 
 /**
  * Order 생성을 위한 데이터 인터페이스

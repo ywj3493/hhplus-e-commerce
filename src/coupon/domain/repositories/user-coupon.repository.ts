@@ -1,4 +1,4 @@
-import { UserCoupon } from '../entities/user-coupon.entity';
+import { UserCoupon } from '@/coupon/domain/entities/user-coupon.entity';
 
 /**
  * 사용자 쿠폰 저장소 인터페이스

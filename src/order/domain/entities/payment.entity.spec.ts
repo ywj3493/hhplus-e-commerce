@@ -1,5 +1,5 @@
-import { Payment, PaymentCreateData } from './payment.entity';
-import { PaymentMethod } from './payment-method.enum';
+import { Payment, PaymentCreateData } from '@/order/domain/entities/payment.entity';
+import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
 
 describe('Payment Entity', () => {
   describe('생성', () => {

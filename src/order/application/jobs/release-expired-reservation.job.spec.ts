@@ -1,8 +1,8 @@
-import { ReleaseExpiredReservationJob } from './release-expired-reservation.job';
-import { OrderRepository } from '../../domain/repositories/order.repository';
-import { StockReservationService } from '../../domain/services/stock-reservation.service';
-import { OrderFixtures } from '../../infrastructure/fixtures/order.fixtures';
-import { OrderStatus } from '../../domain/entities/order-status.enum';
+import { ReleaseExpiredReservationJob } from '@/order/application/jobs/release-expired-reservation.job';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { OrderFixtures } from '@/order/infrastructure/fixtures/order.fixtures';
+import { OrderStatus } from '@/order/domain/entities/order-status.enum';
 
 describe('ReleaseExpiredReservationJob', () => {
   let job: ReleaseExpiredReservationJob;

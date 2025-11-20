@@ -1,4 +1,4 @@
-import { PaymentMethod } from '../../domain/entities/payment-method.enum';
+import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
 
 /**
  * ProcessPaymentInput

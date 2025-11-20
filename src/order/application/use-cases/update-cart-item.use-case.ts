@@ -1,14 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CartRepository } from '../../domain/repositories/cart.repository';
-import { CartStockValidationService } from '../../domain/services/cart-stock-validation.service';
+import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { CartStockValidationService } from '@/order/domain/services/cart-stock-validation.service';
 import {
   CartNotFoundException,
   CartItemNotFoundException,
-} from '../../domain/order.exceptions';
+} from '@/order/domain/order.exceptions';
 import {
   UpdateCartItemInput,
   UpdateCartItemOutput,
-} from '../dtos/update-cart-item.dto';
+} from '@/order/application/dtos/update-cart-item.dto';
 
 /**
  * 장바구니 아이템 수량 변경 Use Case

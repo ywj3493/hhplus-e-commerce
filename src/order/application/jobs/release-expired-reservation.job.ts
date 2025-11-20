@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { OrderRepository } from '../../domain/repositories/order.repository';
-import { StockReservationService } from '../../domain/services/stock-reservation.service';
-import { ORDER_REPOSITORY } from '../use-cases/create-order.use-case';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { ORDER_REPOSITORY } from '@/order/application/use-cases/create-order.use-case';
 
 /**
  * ReleaseExpiredReservationJob

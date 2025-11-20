@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import {
   OrderRepository,
   Pagination,
-} from '../../domain/repositories/order.repository';
-import { Order } from '../../domain/entities/order.entity';
-import { OrderStatus } from '../../domain/entities/order-status.enum';
+} from '@/order/domain/repositories/order.repository';
+import { Order } from '@/order/domain/entities/order.entity';
+import { OrderStatus } from '@/order/domain/entities/order-status.enum';
 
 /**
  * 인메모리 주문 저장소

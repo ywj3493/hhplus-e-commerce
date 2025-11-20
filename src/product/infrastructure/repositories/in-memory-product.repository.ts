@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Product } from '../../domain/entities/product.entity';
+import { Product } from '@/product/domain/entities/product.entity';
 import {
   IProductRepository,
   PaginationResult,
-} from '../../domain/repositories/product.repository';
-import { ProductFixtures } from '../fixtures/product.fixtures';
+} from '@/product/domain/repositories/product.repository';
+import { ProductFixtures } from '@/product/infrastructure/fixtures/product.fixtures';
 
 /**
  * In-Memory Product Repository Implementation

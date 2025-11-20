@@ -1,10 +1,10 @@
-import { Cart } from './cart.entity';
-import { CartItem } from './cart-item.entity';
-import { Money } from '../../../product/domain/entities/money.vo';
+import { Cart } from '@/order/domain/entities/cart.entity';
+import { CartItem } from '@/order/domain/entities/cart-item.entity';
+import { Money } from '@/product/domain/entities/money.vo';
 import {
   CartItemNotFoundException,
   InsufficientStockException,
-} from '../order.exceptions';
+} from '@/order/domain/order.exceptions';
 
 describe('Cart', () => {
   describe('생성', () => {

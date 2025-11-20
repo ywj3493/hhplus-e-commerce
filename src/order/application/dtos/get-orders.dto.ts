@@ -1,4 +1,4 @@
-import { Order } from '../../domain/entities/order.entity';
+import { Order } from '@/order/domain/entities/order.entity';
 
 /**
  * OrderSummaryData

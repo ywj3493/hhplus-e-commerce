@@ -1,8 +1,8 @@
-import { InMemoryProductRepository } from './in-memory-product.repository';
-import { Product } from '../../domain/entities/product.entity';
-import { ProductOption } from '../../domain/entities/product-option.entity';
-import { Stock } from '../../domain/entities/stock.entity';
-import { Money } from '../../domain/entities/money.vo';
+import { InMemoryProductRepository } from '@/product/infrastructure/repositories/in-memory-product.repository';
+import { Product } from '@/product/domain/entities/product.entity';
+import { ProductOption } from '@/product/domain/entities/product-option.entity';
+import { Stock } from '@/product/domain/entities/stock.entity';
+import { Money } from '@/product/domain/entities/money.vo';
 
 describe('InMemoryProductRepository', () => {
   let repository: InMemoryProductRepository;

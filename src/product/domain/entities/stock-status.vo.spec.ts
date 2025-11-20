@@ -1,4 +1,4 @@
-import { StockStatus, StockStatusType } from './stock-status.vo';
+import { StockStatus, StockStatusType } from '@/product/domain/entities/stock-status.vo';
 
 describe('StockStatus', () => {
   describe('가용 수량으로부터 생성', () => {

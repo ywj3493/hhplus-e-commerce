@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PaymentController } from './payment.controller';
-import { ProcessPaymentUseCase } from '../../application/use-cases/process-payment.use-case';
-import { ProcessPaymentRequestDto } from '../dtos/process-payment-request.dto';
-import { PaymentResponseDto } from '../dtos/payment-response.dto';
-import { PaymentMethod } from '../../domain/entities/payment-method.enum';
-import { ProcessPaymentOutput } from '../../application/dtos/process-payment.dto';
+import { PaymentController } from '@/order/presentation/controllers/payment.controller';
+import { ProcessPaymentUseCase } from '@/order/application/use-cases/process-payment.use-case';
+import { ProcessPaymentRequestDto } from '@/order/presentation/dtos/process-payment-request.dto';
+import { PaymentResponseDto } from '@/order/presentation/dtos/payment-response.dto';
+import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
+import { ProcessPaymentOutput } from '@/order/application/dtos/process-payment.dto';
 import {
   AlreadyPaidException,
   OrderExpiredException,
   InvalidOrderStatusException,
   PaymentFailedException,
-} from '../../domain/order.exceptions';
+} from '@/order/domain/order.exceptions';
 
 describe('PaymentController', () => {
   let controller: PaymentController;

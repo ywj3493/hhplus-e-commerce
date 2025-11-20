@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CartRepository } from '../../domain/repositories/cart.repository';
-import { GetCartInput, GetCartOutput } from '../dtos/get-cart.dto';
+import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { GetCartInput, GetCartOutput } from '@/order/application/dtos/get-cart.dto';
 
 /**
  * 장바구니 조회 Use Case

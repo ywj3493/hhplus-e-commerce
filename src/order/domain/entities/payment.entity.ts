@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { PaymentMethod } from './payment-method.enum';
+import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
 
 /**
  * Payment 엔티티 생성 데이터

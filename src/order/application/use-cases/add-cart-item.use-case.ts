@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CartRepository } from '../../domain/repositories/cart.repository';
-import { IProductRepository, PRODUCT_REPOSITORY } from '../../../product/domain/repositories/product.repository';
-import { CartStockValidationService } from '../../domain/services/cart-stock-validation.service';
-import { Cart } from '../../domain/entities/cart.entity';
-import { ProductNotFoundException } from '../../../product/domain/product.exceptions';
-import { AddCartItemInput, AddCartItemOutput } from '../dtos/add-cart-item.dto';
+import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { IProductRepository, PRODUCT_REPOSITORY } from '@/product/domain/repositories/product.repository';
+import { CartStockValidationService } from '@/order/domain/services/cart-stock-validation.service';
+import { Cart } from '@/order/domain/entities/cart.entity';
+import { ProductNotFoundException } from '@/product/domain/product.exceptions';
+import { AddCartItemInput, AddCartItemOutput } from '@/order/application/dtos/add-cart-item.dto';
 
 /**
  * 장바구니 아이템 추가 Use Case

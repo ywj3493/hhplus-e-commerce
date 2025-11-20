@@ -1,8 +1,8 @@
-import { Coupon, CouponType } from './coupon.entity';
+import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
 import {
   CouponExhaustedException,
   CouponExpiredException,
-} from '../coupon.exceptions';
+} from '@/coupon/domain/coupon.exceptions';
 
 describe('Coupon', () => {
   describe('생성', () => {

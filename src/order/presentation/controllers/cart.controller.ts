@@ -10,21 +10,21 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { AddCartItemUseCase } from '../../application/use-cases/add-cart-item.use-case';
-import { GetCartUseCase } from '../../application/use-cases/get-cart.use-case';
-import { UpdateCartItemUseCase } from '../../application/use-cases/update-cart-item.use-case';
-import { RemoveCartItemUseCase } from '../../application/use-cases/remove-cart-item.use-case';
-import { ClearCartUseCase } from '../../application/use-cases/clear-cart.use-case';
-import { AddCartItemInput } from '../../application/dtos/add-cart-item.dto';
-import { GetCartInput } from '../../application/dtos/get-cart.dto';
-import { UpdateCartItemInput } from '../../application/dtos/update-cart-item.dto';
-import { RemoveCartItemInput } from '../../application/dtos/remove-cart-item.dto';
-import { ClearCartInput } from '../../application/dtos/clear-cart.dto';
-import { AddCartItemRequestDto } from '../dtos/add-cart-item-request.dto';
-import { UpdateCartItemRequestDto } from '../dtos/update-cart-item-request.dto';
-import { GetCartItemParamDto } from '../dtos/get-cart-item-param.dto';
-import { CartItemResponseDto } from '../dtos/cart-item-response.dto';
-import { CartResponseDto } from '../dtos/cart-response.dto';
+import { AddCartItemUseCase } from '@/order/application/use-cases/add-cart-item.use-case';
+import { GetCartUseCase } from '@/order/application/use-cases/get-cart.use-case';
+import { UpdateCartItemUseCase } from '@/order/application/use-cases/update-cart-item.use-case';
+import { RemoveCartItemUseCase } from '@/order/application/use-cases/remove-cart-item.use-case';
+import { ClearCartUseCase } from '@/order/application/use-cases/clear-cart.use-case';
+import { AddCartItemInput } from '@/order/application/dtos/add-cart-item.dto';
+import { GetCartInput } from '@/order/application/dtos/get-cart.dto';
+import { UpdateCartItemInput } from '@/order/application/dtos/update-cart-item.dto';
+import { RemoveCartItemInput } from '@/order/application/dtos/remove-cart-item.dto';
+import { ClearCartInput } from '@/order/application/dtos/clear-cart.dto';
+import { AddCartItemRequestDto } from '@/order/presentation/dtos/add-cart-item-request.dto';
+import { UpdateCartItemRequestDto } from '@/order/presentation/dtos/update-cart-item-request.dto';
+import { GetCartItemParamDto } from '@/order/presentation/dtos/get-cart-item-param.dto';
+import { CartItemResponseDto } from '@/order/presentation/dtos/cart-item-response.dto';
+import { CartResponseDto } from '@/order/presentation/dtos/cart-response.dto';
 
 /**
  * Cart Controller

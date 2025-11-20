@@ -1,6 +1,6 @@
-import { InMemoryOrderRepository } from './in-memory-order.repository';
-import { OrderFixtures } from '../fixtures/order.fixtures';
-import { OrderStatus } from '../../domain/entities/order-status.enum';
+import { InMemoryOrderRepository } from '@/order/infrastructure/repositories/in-memory-order.repository';
+import { OrderFixtures } from '@/order/infrastructure/fixtures/order.fixtures';
+import { OrderStatus } from '@/order/domain/entities/order-status.enum';
 
 describe('InMemoryOrderRepository', () => {
   let repository: InMemoryOrderRepository;

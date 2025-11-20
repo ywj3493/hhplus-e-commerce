@@ -9,15 +9,15 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { GetProductsUseCase } from '../../application/use-cases/get-products.use-case';
-import { GetProductDetailUseCase } from '../../application/use-cases/get-product-detail.use-case';
-import { GetProductsInput } from '../../application/dtos/get-products.dto';
-import { GetProductDetailInput } from '../../application/dtos/get-product-detail.dto';
-import { GetProductsQuery } from '../dtos/get-products-query.dto';
-import { ProductListResponse } from '../dtos/product-list-response.dto';
-import { GetProductDetailParam } from '../dtos/get-product-detail-param.dto';
-import { ProductDetailResponse } from '../dtos/product-detail-response.dto';
-import { ProductNotFoundException } from '../../domain/product.exceptions';
+import { GetProductsUseCase } from '@/product/application/use-cases/get-products.use-case';
+import { GetProductDetailUseCase } from '@/product/application/use-cases/get-product-detail.use-case';
+import { GetProductsInput } from '@/product/application/dtos/get-products.dto';
+import { GetProductDetailInput } from '@/product/application/dtos/get-product-detail.dto';
+import { GetProductsQuery } from '@/product/presentation/dtos/get-products-query.dto';
+import { ProductListResponse } from '@/product/presentation/dtos/product-list-response.dto';
+import { GetProductDetailParam } from '@/product/presentation/dtos/get-product-detail-param.dto';
+import { ProductDetailResponse } from '@/product/presentation/dtos/product-detail-response.dto';
+import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 
 /**
  * Product Controller

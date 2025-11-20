@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
-import * as stubData from '../__stub__/data/products.json';
+import * as stubData from '@/__stub__/data/products.json';
 
 @ApiTags('Products')
 @Controller('products')

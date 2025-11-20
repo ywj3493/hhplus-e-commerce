@@ -1,12 +1,12 @@
-import { GetProductDetailUseCase } from './get-product-detail.use-case';
-import { GetProductDetailInput } from '../dtos/get-product-detail.dto';
-import { IProductRepository } from '../../domain/repositories/product.repository';
-import { Product } from '../../domain/entities/product.entity';
-import { ProductOption } from '../../domain/entities/product-option.entity';
-import { Stock } from '../../domain/entities/stock.entity';
-import { Money } from '../../domain/entities/money.vo';
-import { StockStatusType } from '../../domain/entities/stock-status.vo';
-import { ProductNotFoundException } from '../../domain/product.exceptions';
+import { GetProductDetailUseCase } from '@/product/application/use-cases/get-product-detail.use-case';
+import { GetProductDetailInput } from '@/product/application/dtos/get-product-detail.dto';
+import { IProductRepository } from '@/product/domain/repositories/product.repository';
+import { Product } from '@/product/domain/entities/product.entity';
+import { ProductOption } from '@/product/domain/entities/product-option.entity';
+import { Stock } from '@/product/domain/entities/stock.entity';
+import { Money } from '@/product/domain/entities/money.vo';
+import { StockStatusType } from '@/product/domain/entities/stock-status.vo';
+import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 
 describe('GetProductDetailUseCase', () => {
   let useCase: GetProductDetailUseCase;
