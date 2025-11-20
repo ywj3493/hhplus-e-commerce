@@ -84,6 +84,7 @@ describe('CreateOrderUseCase', () => {
       Price.from(10000),
       '설명',
       'https://example.com/image.jpg',
+      'category-test', // categoryId
       [option],
       new Date(),
       new Date(),

@@ -42,6 +42,7 @@ describe('GetProductsUseCase', () => {
       Price.from(price),
       `Description for ${name}`,
       `https://example.com/${id}.jpg`,
+      'category-test', // categoryId
       [option],
       new Date('2024-01-01'),
       new Date('2024-01-01'),

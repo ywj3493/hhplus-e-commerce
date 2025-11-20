@@ -76,6 +76,7 @@ describe('GetProductDetailUseCase', () => {
       Price.from(50000),
       'Test product with multiple options',
       'https://example.com/product-1.jpg',
+      'category-test', // categoryId
       [...colorOptions, ...sizeOptions],
       new Date('2024-01-01'),
       new Date('2024-01-01'),
@@ -199,6 +200,7 @@ describe('GetProductDetailUseCase', () => {
         Price.from(10000),
         'Description',
         'https://example.com/product.jpg',
+        'category-test', // categoryId
         [], // 옵션 없음
         new Date(),
         new Date(),
@@ -229,6 +231,7 @@ describe('GetProductDetailUseCase', () => {
         Price.from(10000),
         'Description',
         'https://example.com/product.jpg',
+        'category-test', // categoryId
         [option],
         new Date(),
         new Date(),

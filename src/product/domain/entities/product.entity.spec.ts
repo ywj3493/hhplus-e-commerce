@@ -12,6 +12,7 @@ describe('Product', () => {
       Price.from(10000),
       'Test Description',
       'https://example.com/image.jpg',
+      'category-test', // categoryId
       options,
       new Date('2024-01-01'),
       new Date('2024-01-01'),
@@ -61,6 +62,7 @@ describe('Product', () => {
         price,
         description,
         imageUrl,
+        'category-test', // categoryId
         [],
         createdAt,
         updatedAt,
@@ -86,6 +88,7 @@ describe('Product', () => {
           Price.from(10000),
           'Desc',
           'https://example.com/image.jpg',
+          'category-test', // categoryId
           [],
           new Date(),
           new Date(),
@@ -102,6 +105,7 @@ describe('Product', () => {
           Price.from(10000),
           'Desc',
           'https://example.com/image.jpg',
+          'category-test', // categoryId
           [],
           new Date(),
           new Date(),
@@ -118,6 +122,7 @@ describe('Product', () => {
           Price.from(10000),
           'Desc',
           '',
+          'category-test', // categoryId
           [],
           new Date(),
           new Date(),

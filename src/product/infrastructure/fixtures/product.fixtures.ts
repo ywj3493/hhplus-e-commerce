@@ -19,6 +19,7 @@ export class ProductFixtures {
         Price.from(29000),
         'Comfortable cotton t-shirt for everyday wear',
         'https://example.com/images/basic-tshirt.jpg',
+        'category-fashion', // categoryId
         [
           ProductOption.create(
             'opt-001-color-white',
@@ -56,6 +57,7 @@ export class ProductFixtures {
         Price.from(79000),
         'High-quality hoodie with soft interior lining',
         'https://example.com/images/premium-hoodie.jpg',
+        'category-fashion', // categoryId
         [
           ProductOption.create(
             'opt-002-size-s',
@@ -101,6 +103,7 @@ export class ProductFixtures {
         Price.from(59000),
         'Durable denim jeans with classic fit',
         'https://example.com/images/denim-jeans.jpg',
+        'category-fashion', // categoryId
         [
           ProductOption.create(
             'opt-003-size-28',
@@ -138,6 +141,7 @@ export class ProductFixtures {
         Price.from(89000),
         'Comfortable sneakers for casual wear',
         'https://example.com/images/sneakers.jpg',
+        'category-fashion', // categoryId
         [
           ProductOption.create(
             'opt-004-size-250',
@@ -175,6 +179,7 @@ export class ProductFixtures {
         Price.from(25000),
         'Stylish baseball cap with adjustable strap',
         'https://example.com/images/baseball-cap.jpg',
+        'category-fashion', // categoryId
         [
           ProductOption.create(
             'opt-005-color-black',
@@ -207,6 +212,7 @@ export class ProductFixtures {
           Price.from(10000 + idx * 1000),
           `Description for product ${idx}`,
           `https://example.com/images/product-${idx}.jpg`,
+          'category-general', // categoryId
           [
             ProductOption.create(
               `opt-${idx}-default`,

@@ -28,6 +28,7 @@ export class Product {
   private readonly _price: Price;
   private readonly _description: string;
   private readonly _imageUrl: string;
+  private readonly _categoryId: string;
   private readonly _options: ProductOption[];
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
@@ -38,6 +39,7 @@ export class Product {
     price: Price,
     description: string,
     imageUrl: string,
+    categoryId: string,
     options: ProductOption[],
     createdAt: Date,
     updatedAt: Date,
@@ -47,6 +49,7 @@ export class Product {
     this._price = price;
     this._description = description;
     this._imageUrl = imageUrl;
+    this._categoryId = categoryId;
     this._options = options;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
@@ -63,11 +66,12 @@ export class Product {
     price: Price,
     description: string,
     imageUrl: string,
+    categoryId: string,
     options: ProductOption[],
     createdAt: Date,
     updatedAt: Date,
   ): Product {
-    return new Product(id, name, price, description, imageUrl, options, createdAt, updatedAt);
+    return new Product(id, name, price, description, imageUrl, categoryId, options, createdAt, updatedAt);
   }
 
   private validate(): void {
@@ -79,6 +83,9 @@ export class Product {
     }
     if (!this._imageUrl || this._imageUrl.trim() === '') {
       throw new Error('상품 이미지 URL은 필수입니다');
+    }
+    if (!this._categoryId || this._categoryId.trim() === '') {
+      throw new Error('카테고리 ID는 필수입니다');
     }
   }
 
@@ -167,6 +174,10 @@ export class Product {
 
   get imageUrl(): string {
     return this._imageUrl;
+  }
+
+  get categoryId(): string {
+    return this._categoryId;
   }
 
   get options(): ProductOption[] {

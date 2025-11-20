@@ -2,8 +2,9 @@ import { Module } from '@nestjs/common';
 import { ProductController } from '@/product/presentation/controllers/product.controller';
 import { GetProductsUseCase } from '@/product/application/use-cases/get-products.use-case';
 import { GetProductDetailUseCase } from '@/product/application/use-cases/get-product-detail.use-case';
-import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
+import { PRODUCT_REPOSITORY, CATEGORY_REPOSITORY } from '@/product/domain/repositories/tokens';
 import { InMemoryProductRepository } from '@/product/infrastructure/repositories/in-memory-product.repository';
+import { InMemoryCategoryRepository } from '@/product/infrastructure/repositories/in-memory-category.repository';
 import { StockManagementService } from '@/product/domain/services/stock-management.service';
 
 /**
@@ -20,10 +21,14 @@ import { StockManagementService } from '@/product/domain/services/stock-manageme
     // Domain Services
     StockManagementService,
 
-    // Repository
+    // Repositories
     {
       provide: PRODUCT_REPOSITORY,
       useClass: InMemoryProductRepository,
+    },
+    {
+      provide: CATEGORY_REPOSITORY,
+      useClass: InMemoryCategoryRepository,
     },
   ],
   exports: [

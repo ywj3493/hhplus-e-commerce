@@ -31,6 +31,7 @@ describe('InMemoryProductRepository', () => {
       Price.from(10000),
       'Test description',
       'https://example.com/image.jpg',
+      'category-test', // categoryId
       [option],
       createdAt,
       createdAt,
@@ -236,6 +237,7 @@ describe('InMemoryProductRepository', () => {
         Price.from(10000),
         'Test',
         'https://example.com/image.jpg',
+        'category-test', // categoryId
         [option1, option2],
         new Date(),
         new Date(),
