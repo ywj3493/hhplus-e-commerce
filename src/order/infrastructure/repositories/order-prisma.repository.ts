@@ -131,7 +131,6 @@ export class OrderPrismaRepository implements OrderRepository {
     // OrderItem 데이터 준비
     const itemsData = order.items.map((item) => ({
       id: item.id,
-      orderId: order.id,
       productId: item.productId,
       productName: item.productName,
       productOptionId: item.productOptionId,
@@ -142,22 +141,38 @@ export class OrderPrismaRepository implements OrderRepository {
       createdAt: item.createdAt,
     }));
 
-    // Upsert를 사용하여 생성 또는 업데이트
-    const savedOrder = await this.prisma.order.upsert({
+    // 기존 주문 확인
+    const existingOrder = await this.prisma.order.findUnique({
       where: { id: order.id },
-      update: orderData,
-      create: {
-        id: order.id,
-        ...orderData,
-        createdAt: order.createdAt,
-        items: {
-          create: itemsData,
-        },
-      },
-      include: {
-        items: true,
-      },
     });
+
+    let savedOrder;
+
+    if (existingOrder) {
+      // 기존 주문 업데이트 (items는 변경하지 않음)
+      savedOrder = await this.prisma.order.update({
+        where: { id: order.id },
+        data: orderData,
+        include: {
+          items: true,
+        },
+      });
+    } else {
+      // 새 주문 생성
+      savedOrder = await this.prisma.order.create({
+        data: {
+          id: order.id,
+          ...orderData,
+          createdAt: order.createdAt,
+          items: {
+            create: itemsData,
+          },
+        },
+        include: {
+          items: true,
+        },
+      });
+    }
 
     return this.toDomain(savedOrder);
   }
@@ -177,7 +192,7 @@ export class OrderPrismaRepository implements OrderRepository {
         productName: item.productName,
         productOptionId: item.productOptionId,
         productOptionName: item.productOptionName,
-        price: new Price(Number(item.unitPrice)),
+        price: Price.from(Number(item.unitPrice)),
         quantity: item.quantity,
         createdAt: item.createdAt,
       };
