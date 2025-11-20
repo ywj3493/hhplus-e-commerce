@@ -9,6 +9,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
+    "prisma:seed": "ts-node prisma/seed.ts",
     "test": "jest",
     "test:unit": "jest --testMatch='**/src/**/*.spec.ts' --testPathIgnorePatterns='integration.spec.ts' --testPathIgnorePatterns='e2e.spec.ts'",
     "test:unit:watch": "jest --watch --testMatch='**/src/**/*.spec.ts' --testPathIgnorePatterns='integration.spec.ts' --testPathIgnorePatterns='e2e.spec.ts'",
@@ -18,6 +19,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",

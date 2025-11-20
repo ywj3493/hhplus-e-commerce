@@ -27,3 +27,85 @@ model User {
   @@index([createdAt]) // 생성일 인덱스
   @@map("users") // 테이블명: users
 }
+
+// ============================================================================
+// Product 도메인
+// ============================================================================
+
+/// 카테고리 엔티티
+/// - 단일 계층 구조
+/// - 카테고리명은 고유해야 함
+model Category {
+  id        String   @id @default(uuid()) // 카테고리 고유 ID (UUID)
+  name      String   @unique // 카테고리명 (고유)
+  createdAt DateTime @default(now()) // 생성 일시
+  updatedAt DateTime @updatedAt // 수정 일시
+
+  products Product[] // 이 카테고리에 속한 상품들
+
+  @@map("categories") // 테이블명: categories
+}
+
+/// 상품 엔티티
+/// - 카테고리에 속함
+/// - 옵션 유무에 따라 hasOptions 플래그 사용
+model Product {
+  id          String   @id @default(uuid()) // 상품 고유 ID (UUID)
+  name        String // 상품명
+  description String   @db.Text // 상품 설명
+  price       Decimal  @db.Decimal(10, 2) // 기본 가격
+  categoryId  String // 카테고리 ID (FK)
+  hasOptions  Boolean  @default(false) // 옵션 여부
+  createdAt   DateTime @default(now()) // 생성 일시
+  updatedAt   DateTime @updatedAt // 수정 일시
+
+  category Category         @relation(fields: [categoryId], references: [id]) // 카테고리
+  options  ProductOption[] // 상품 옵션들
+  stocks   Stock[] // 재고 정보
+
+  @@index([categoryId]) // 카테고리별 조회 최적화
+  @@index([createdAt]) // 최신순 정렬 최적화
+  @@map("products") // 테이블명: products
+}
+
+/// 상품 옵션 엔티티
+/// - 색상, 사이즈 등의 옵션
+/// - 옵션별 추가 가격 설정 가능
+model ProductOption {
+  id              String   @id @default(uuid()) // 옵션 고유 ID (UUID)
+  productId       String // 상품 ID (FK)
+  type            String // 옵션 타입 (색상, 사이즈 등)
+  name            String // 옵션명 (Red, XL 등)
+  additionalPrice Decimal  @db.Decimal(10, 2) // 추가 가격
+  createdAt       DateTime @default(now()) // 생성 일시
+  updatedAt       DateTime @updatedAt // 수정 일시
+
+  product Product @relation(fields: [productId], references: [id]) // 상품
+  stocks  Stock[] // 이 옵션의 재고 정보
+
+  @@index([productId]) // 상품별 옵션 조회 최적화
+  @@map("product_options") // 테이블명: product_options
+}
+
+/// 재고 엔티티 (동시성 제어 대상)
+/// - 상품별 또는 옵션별 재고 관리
+/// - productOptionId가 null이면 옵션이 없는 상품의 재고
+/// - 비관적 락(SELECT FOR UPDATE)을 통한 동시성 제어
+model Stock {
+  id                String   @id @default(uuid()) // 재고 고유 ID (UUID)
+  productId         String // 상품 ID (FK)
+  productOptionId   String? // 옵션 ID (FK, nullable)
+  totalQuantity     Int // 총 수량
+  availableQuantity Int // 구매 가능 수량
+  reservedQuantity  Int      @default(0) // 예약된 수량 (주문 중)
+  soldQuantity      Int      @default(0) // 판매 완료 수량
+  updatedAt         DateTime @updatedAt // 수정 일시
+
+  product       Product        @relation(fields: [productId], references: [id]) // 상품
+  productOption ProductOption? @relation(fields: [productOptionId], references: [id]) // 옵션 (nullable)
+
+  @@unique([productId, productOptionId]) // 상품+옵션 조합은 고유
+  @@index([productId]) // 상품별 재고 조회 최적화
+  @@index([productOptionId]) // 옵션별 재고 조회 최적화
+  @@map("stocks") // 테이블명: stocks
+}
