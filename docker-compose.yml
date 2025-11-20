@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hhplus-ecommerce-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: dev_password
+      MYSQL_DATABASE: ecommerce_dev
+      MYSQL_USER: dev_user
+      MYSQL_PASSWORD: dev_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - hhplus-network
+
+  # Future services (uncomment when needed)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: hhplus-ecommerce-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - hhplus-network
+
+  # kafka:
+  #   image: confluentinc/cp-kafka:7.5.0
+  #   container_name: hhplus-ecommerce-kafka
+  #   restart: unless-stopped
+  #   # ... kafka configuration
+  #   networks:
+  #     - hhplus-network
+
+volumes:
+  mysql_data:
+    driver: local
+  # redis_data:
+  #   driver: local
+
+networks:
+  hhplus-network:
+    driver: bridge
