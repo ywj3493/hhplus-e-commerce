@@ -128,6 +128,7 @@ erDiagram
     User {
         string id PK "사용자 ID (UUID)"
         string name "사용자 이름"
+        string email UK "이메일 (NULL 허용)"
         timestamp createdAt "생성일시"
         timestamp updatedAt "수정일시"
     }
@@ -419,6 +420,7 @@ erDiagram
 |--------|------------|---------|------|
 | `id` | VARCHAR(36) | PRIMARY KEY | 사용자 ID (UUID) |
 | `name` | VARCHAR(100) | NOT NULL | 사용자 이름 |
+| `email` | VARCHAR(255) | UNIQUE, NULL | 이메일 (향후 인증용) |
 | `createdAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 생성일시 |
 | `updatedAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 수정일시 |
 
@@ -427,6 +429,9 @@ erDiagram
 ```sql
 -- 기본 키 (자동 생성)
 PRIMARY KEY (id)
+
+-- 이메일 UNIQUE 인덱스
+UNIQUE INDEX idx_user_email (email)
 ```
 
 #### 관계
@@ -434,6 +439,22 @@ PRIMARY KEY (id)
 - **1:1** → Cart (한 사용자는 하나의 장바구니를 가짐)
 - **1:N** → Order (한 사용자는 여러 주문을 생성)
 - **1:N** → UserCoupon (한 사용자는 여러 쿠폰을 보유)
+
+#### 테스트 데이터
+
+```sql
+INSERT INTO "User" (id, name, email, createdAt, updatedAt) VALUES
+  ('user-uuid-1', '홍길동', 'hong@example.com', NOW(), NOW()),
+  ('user-uuid-2', '김철수', 'kim@example.com', NOW(), NOW()),
+  ('user-uuid-3', '이영희', 'lee@example.com', NOW(), NOW());
+```
+
+#### 비즈니스 로직
+
+- **Dashboard 제품 범위**: 사용자 정보 조회만 제공 (GET /api/users/me)
+- **Admin 제품 범위** (향후): 사용자 목록 조회, 생성, 수정, 삭제
+- **인증**: 현재는 Master Token 방식, 향후 JWT 기반 인증으로 전환 예정
+- `email` 필드는 NULL 허용 (향후 확장을 위한 예약 필드)
 
 ---
 
@@ -751,6 +772,8 @@ UNIQUE INDEX idx_cart_item_product_option (cartId, productId, COALESCE(optionId,
 
 주문 정보를 저장하는 엔티티입니다.
 
+> **재고 예약 관리**: 재고 예약은 Order 레벨에서 관리됩니다. 주문 생성 시 `reservationExpiresAt` (생성 시간 + 10분)이 설정되며, 모든 OrderItem이 동일한 예약 만료 시간을 공유합니다.
+
 #### 컬럼
 
 | 컬럼명 | 데이터 타입 | 제약조건 | 설명 |
@@ -762,6 +785,7 @@ UNIQUE INDEX idx_cart_item_product_option (cartId, productId, COALESCE(optionId,
 | `discountAmount` | DECIMAL(10, 2) | NOT NULL, DEFAULT 0, CHECK (discountAmount >= 0) | 할인 금액 |
 | `finalAmount` | DECIMAL(10, 2) | NOT NULL, CHECK (finalAmount >= 0) | 최종 결제 금액 |
 | `userCouponId` | VARCHAR(36) | NULL, FOREIGN KEY | 사용자 쿠폰 ID |
+| `reservationExpiresAt` | TIMESTAMP | NOT NULL | 재고 예약 만료 시간 (생성 시간 + 10분) |
 | `createdAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 생성일시 |
 | `paidAt` | TIMESTAMP | NULL | 결제일시 |
 | `updatedAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 수정일시 |
@@ -791,9 +815,10 @@ CHECK (finalAmount = totalAmount - discountAmount);
 
 ```sql
 PRIMARY KEY (id)
-INDEX idx_order_user_status (userId, status)      -- 사용자별 주문 조회
-INDEX idx_order_created_at (createdAt DESC)       -- 최신순 정렬
-INDEX idx_order_status_paid_at (status, paidAt)   -- 인기 상품 통계
+INDEX idx_order_user_status (userId, status)                -- 사용자별 주문 조회
+INDEX idx_order_created_at (createdAt DESC)                 -- 최신순 정렬
+INDEX idx_order_status_paid_at (status, paidAt)             -- 인기 상품 통계
+INDEX idx_order_reservation_expires (status, reservationExpiresAt)  -- 재고 예약 만료 배치 작업
 ```
 
 #### 관계
@@ -842,7 +867,9 @@ function validateStatusTransition(currentStatus, newStatus) {
 
 ### 9. OrderItem (주문 항목)
 
-주문에 포함된 상품 항목을 저장하는 엔티티입니다. **스냅샷 패턴**을 사용하여 주문 시점의 상품 정보를 저장하며, **재고 예약 정보**도 함께 관리합니다.
+주문에 포함된 상품 항목을 저장하는 엔티티입니다. **스냅샷 패턴**을 사용하여 주문 시점의 상품 정보를 저장합니다.
+
+> **재고 예약 관리**: 재고 예약은 Order 엔티티 레벨에서 관리됩니다 (Order.reservationExpiresAt). OrderItem은 주문 시점의 상품 정보 스냅샷만 저장합니다.
 
 #### 컬럼
 
@@ -852,16 +879,11 @@ function validateStatusTransition(currentStatus, newStatus) {
 | `orderId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 주문 ID |
 | `productId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 상품 ID (참조용) |
 | `optionId` | VARCHAR(36) | NULL, FOREIGN KEY | 옵션 ID (참조용) |
-| `stockId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 재고 ID (재고 예약용) |
 | `productName` | VARCHAR(200) | NOT NULL | 상품명 (스냅샷) |
 | `optionName` | VARCHAR(50) | NULL | 옵션명 (스냅샷) |
 | `quantity` | INT | NOT NULL, CHECK (quantity >= 1) | 수량 |
-| `productPrice` | DECIMAL(10, 2) | NOT NULL, CHECK (productPrice >= 0) | 상품 가격 (스냅샷) |
-| `optionAdditionalPrice` | DECIMAL(10, 2) | NOT NULL, DEFAULT 0, CHECK (optionAdditionalPrice >= 0) | 옵션 추가 가격 (스냅샷) |
-| `unitPrice` | DECIMAL(10, 2) | NOT NULL, CHECK (unitPrice >= 0) | 단가 (productPrice + optionAdditionalPrice) |
-| `subtotal` | DECIMAL(10, 2) | NOT NULL, CHECK (subtotal >= 0) | 소계 (unitPrice × quantity) |
-| `reservedAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 재고 예약 시간 |
-| `reservationExpiresAt` | TIMESTAMP | NOT NULL | 예약 만료 시간 (reservedAt + 10분) |
+| `price` | DECIMAL(10, 2) | NOT NULL, CHECK (price >= 0) | 단가 (상품 가격 + 옵션 추가 가격) |
+| `subtotal` | DECIMAL(10, 2) | NOT NULL, CHECK (subtotal >= 0) | 소계 (price × quantity) |
 | `createdAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 생성일시 |
 
 #### 인덱스
@@ -870,8 +892,6 @@ function validateStatusTransition(currentStatus, newStatus) {
 PRIMARY KEY (id)
 INDEX idx_order_item_order (orderId)
 INDEX idx_order_item_product (productId)  -- 인기 상품 통계
-INDEX idx_order_item_reservation_expires (reservationExpiresAt)  -- 만료 배치 작업
-INDEX idx_order_item_stock (stockId)  -- 재고 관리
 ```
 
 #### 관계
@@ -879,30 +899,28 @@ INDEX idx_order_item_stock (stockId)  -- 재고 관리
 - **N:1** → Order (여러 항목은 하나의 주문에 속함)
 - **N:1** → Product (여러 항목은 하나의 상품을 참조)
 - **N:1** → ProductOption (여러 항목은 하나의 옵션을 참조)
-- **N:1** → Stock (여러 항목은 하나의 재고를 예약)
 
 #### 비즈니스 로직
 
 **스냅샷 패턴**:
-- `productName`, `optionName`, `productPrice`, `optionAdditionalPrice` 필드는 주문 시점의 값을 저장
-- `unitPrice`는 `productPrice + optionAdditionalPrice`로 계산됨
+- `productName`, `optionName`, `price` 필드는 주문 시점의 값을 저장
+- `price`는 상품 가격 + 옵션 추가 가격의 합계
 - 상품 정보가 변경되어도 주문 내역은 영향받지 않음
-- 가격 분석 시 상품 가격과 옵션 가격을 개별적으로 추적 가능
+- 주문 완료 후 가격 변경이나 상품 삭제에도 주문 이력은 유지됨
 
-**재고 예약 추적**:
-- `stockId`: 예약한 재고 ID 저장
-- `reservedAt`: 재고 예약 시간 기록
-- `reservationExpiresAt`: `reservedAt + 10분`으로 자동 계산
-- 배치 작업이 `reservationExpiresAt`를 기준으로 만료된 예약을 찾아 재고 복원
+**재고 예약 관리**:
+- 재고 예약은 Order 엔티티에서 관리됨 (`Order.reservationExpiresAt`)
+- 한 주문의 모든 OrderItem은 동일한 예약 만료 시간을 공유
+- 배치 작업은 Order 단위로 만료를 확인하고 재고를 복원함
 
 **재고 예약 만료 처리**:
 ```sql
--- 만료된 주문 항목 조회 (배치 작업)
-SELECT oi.*, o.id as orderId
-FROM OrderItem oi
-JOIN Order o ON oi.orderId = o.id
+-- 만료된 주문 조회 (배치 작업)
+SELECT o.*, oi.*
+FROM "Order" o
+JOIN OrderItem oi ON o.id = oi.orderId
 WHERE o.status = 'PENDING'
-  AND oi.reservationExpiresAt < NOW();
+  AND o.reservationExpiresAt < NOW();
 ```
 
 ---
@@ -1272,15 +1290,15 @@ UNIQUE INDEX idx_user_coupon_user_coupon (userId, couponId)
 
 ### 4. 배치 작업 인덱스
 
-#### 재고 확보 만료
+#### 재고 예약 만료
 ```sql
-INDEX idx_order_item_reservation_expires (reservationExpiresAt)
+INDEX idx_order_reservation_expires (status, reservationExpiresAt)
 
--- 배치 쿼리: 만료된 주문 항목 조회
-SELECT oi.*, o.id as orderId, o.status
-FROM OrderItem oi
-JOIN "Order" o ON oi.orderId = o.id
-WHERE o.status = 'PENDING' AND oi.reservationExpiresAt < NOW();
+-- 배치 쿼리: 만료된 주문 조회
+SELECT o.*, oi.*
+FROM "Order" o
+JOIN OrderItem oi ON o.id = oi.orderId
+WHERE o.status = 'PENDING' AND o.reservationExpiresAt < NOW();
 ```
 
 #### 쿠폰 만료
@@ -1332,18 +1350,24 @@ IF affected_rows = 0 THEN
   THROW 'OUT_OF_STOCK';
 END IF;
 
--- 주문 항목 생성 (재고 예약 정보 포함)
-INSERT INTO OrderItem (
-  orderId, stockId, productId, optionId,
-  productName, optionName, quantity,
-  productPrice, optionAdditionalPrice, unitPrice, subtotal,
-  reservedAt, reservationExpiresAt
+-- 주문 생성 (재고 예약 만료 시간 설정)
+INSERT INTO "Order" (
+  id, userId, status, totalAmount, discountAmount, finalAmount,
+  userCouponId, reservationExpiresAt, createdAt, updatedAt
 )
 VALUES (
-  :orderId, :stockId, :productId, :optionId,
-  :productName, :optionName, :quantity,
-  :productPrice, :optionAdditionalPrice, :unitPrice, :subtotal,
-  NOW(), NOW() + INTERVAL '10 minutes'
+  :orderId, :userId, 'PENDING', :totalAmount, :discountAmount, :finalAmount,
+  :userCouponId, NOW() + INTERVAL '10 minutes', NOW(), NOW()
+);
+
+-- 주문 항목 생성 (스냅샷 정보만 저장)
+INSERT INTO OrderItem (
+  orderId, productId, optionId,
+  productName, optionName, quantity, price, subtotal
+)
+VALUES (
+  :orderId, :productId, :optionId,
+  :productName, :optionName, :quantity, :price, :subtotal
 );
 
 -- 트랜잭션 커밋
@@ -1353,7 +1377,7 @@ COMMIT;
 **효과**:
 - 다른 트랜잭션은 `SELECT FOR UPDATE`가 완료될 때까지 대기
 - 100명이 동시 요청 시 순차적으로 처리되어 정확한 가용 재고 수량 보장
-- StockReservation 테이블 불필요, OrderItem에서 예약 정보 관리
+- 재고 예약 만료는 Order 레벨에서 관리하여 구조 간소화
 
 #### 쿠폰 발급
 
@@ -1596,30 +1620,40 @@ VALUES
 ```typescript
 // 재고 예약 만료 배치 (1분마다)
 async function expireStockReservations() {
-  // 만료된 OrderItem 조회
-  const expiredItems = await db.orderItem.findMany({
+  // 만료된 주문 조회 (Order 레벨)
+  const expiredOrders = await db.order.findMany({
     where: {
-      order: { status: 'PENDING' },
+      status: 'PENDING',
       reservationExpiresAt: { lt: new Date() }
     },
-    include: { order: true }
+    include: {
+      items: {
+        include: {
+          product: {
+            include: { stock: true }
+          }
+        }
+      }
+    }
   });
 
-  // OrderItem별로 재고 복원 수량 계산
-  const stockUpdates = expiredItems.reduce((acc, item) => {
-    if (!acc[item.stockId]) {
-      acc[item.stockId] = 0;
-    }
-    acc[item.stockId] += item.quantity;
-    return acc;
-  }, {} as Record<string, number>);
+  if (expiredOrders.length === 0) return;
 
-  const expiredOrderIds = [...new Set(expiredItems.map(item => item.orderId))];
+  // 각 주문별로 재고 복원 수량 계산
+  const stockUpdates = new Map<string, number>();
+
+  for (const order of expiredOrders) {
+    for (const item of order.items) {
+      const stockId = item.product.stock.id;
+      const currentQty = stockUpdates.get(stockId) || 0;
+      stockUpdates.set(stockId, currentQty + item.quantity);
+    }
+  }
 
   // 벌크 업데이트
   await db.$transaction([
     // 재고 복원 (각 Stock별로)
-    ...Object.entries(stockUpdates).map(([stockId, quantity]) =>
+    ...Array.from(stockUpdates.entries()).map(([stockId, quantity]) =>
       db.stock.update({
         where: { id: stockId },
         data: {
@@ -1630,7 +1664,9 @@ async function expireStockReservations() {
     ),
     // 주문 상태 변경
     db.order.updateMany({
-      where: { id: { in: expiredOrderIds } },
+      where: {
+        id: { in: expiredOrders.map(o => o.id) }
+      },
       data: { status: 'EXPIRED' }
     })
   ]);

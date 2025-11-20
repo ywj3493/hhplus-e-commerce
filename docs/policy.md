@@ -96,11 +96,109 @@ Documents must be created and maintained in this order:
 ### Current Stack
 - **Framework**: NestJS
 - **ORM**: Prisma
-- **Language**: TypeScript (assumed)
+- **Language**: TypeScript
+- **Package Manager**: pnpm (REQUIRED)
 
 ### Architecture
 - Architecture pattern: TBD (To Be Decided)
 - Will be documented as decisions are made
+
+## Code Organization
+
+### DTO Structure (Application Layer)
+Application Layer의 DTO는 Use Case별로 하나의 파일에 통합합니다.
+
+**파일 명명 규칙:**
+- `{use-case-name}.dto.ts` (예: `get-product-detail.dto.ts`, `get-products.dto.ts`)
+
+**파일 구성 순서:**
+```typescript
+// {use-case-name}.dto.ts
+
+// 1. Import statements
+import { ... } from '...';
+
+// 2. 관련 보조 클래스/VO (필요한 경우)
+export class SomeDetailClass { ... }
+
+// 3. Input DTO
+export class {UseCaseName}Input {
+  constructor() { ... }
+  private validate(): void { ... }
+}
+
+// 4. Output DTO
+export class {UseCaseName}Output {
+  constructor() { ... }
+}
+```
+
+**장점:**
+- Use Case 관련 모든 DTO를 한 파일에서 확인 가능
+- Input과 Output 간의 연관성 명확화
+- 파일 수 감소로 코드 탐색 용이성 향상
+
+**예시:**
+- ✅ `src/product/application/dtos/get-product-detail.dto.ts` (Input + Output 통합)
+- ❌ `src/product/application/dtos/get-product-detail.input.ts` (개별 파일)
+- ❌ `src/product/application/dtos/get-product-detail.output.ts` (개별 파일)
+
+## Package Management
+
+### pnpm Usage (REQUIRED)
+This project **exclusively uses pnpm** as the package manager.
+
+**Common Commands:**
+```bash
+pnpm install          # Install dependencies
+pnpm test             # Run all tests
+pnpm test:watch       # Run tests in watch mode
+pnpm run start:dev    # Start development server
+pnpm run build        # Build the project
+pnpm run lint         # Run linter
+```
+
+**DO NOT use npm or yarn** - all team members must use pnpm to ensure consistency in lock files and dependency resolution.
+
+## Testing Standards
+
+### Test File Structure
+- Test files must be colocated with source files: `*.spec.ts`
+- Integration tests: `/test/{module}/integration/*.integration.spec.ts`
+- E2E tests: `/test/{module}/e2e/*.e2e.spec.ts`
+
+### Test Language Conventions
+All test files must follow Korean language conventions:
+
+**describe blocks**: Use Korean to describe the test subject
+```typescript
+describe('생성', () => {})           // For creation tests
+describe('실행', () => {})           // For execution tests
+describe('입력 검증', () => {})      // For input validation tests
+describe('재고 상태 조회', () => {}) // For specific domain operations
+```
+
+**it blocks**: Use Korean action-oriented sentences ending in "해야 함"
+```typescript
+it('유효한 파라미터로 인스턴스를 생성해야 함', () => {})
+it('재고가 있을 때 true를 반환해야 함', () => {})
+it('음수 금액에 대해 에러를 발생시켜야 함', () => {})
+```
+
+**Comments**:
+- Given-When-Then keywords: Keep in English (`// Given`, `// When`, `// Then`, `// When & Then`)
+- Inline comments: Use Korean (e.g., `// 품절`, `// 재고 있음`, `// 초기 재고`)
+- Business requirement references: Keep as-is (e.g., `BR-PROD-01`)
+
+**Code elements**: Keep in English
+- Variable names, function names, class names
+- Error messages are in Korean (already implemented)
+
+### Test Coverage
+- Unit tests for all business logic
+- Integration tests for layer interactions
+- E2E tests for API endpoints
+- Maintain >80% code coverage
 
 ## Version Control
 
@@ -111,17 +209,53 @@ Documents must be created and maintained in this order:
 4. Squash merges preferred for clean history
 
 ### Commit Message Format
-```
-[#issue-number] Brief description
+All commit messages must be written in Korean (except for the type prefix):
 
-Detailed explanation if needed
+**Format:**
+```
+<type>: <subject in Korean>
+
+<body in Korean>
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-Example:
-```
-[#001] Add user authentication endpoints
+**Types** (keep in English):
+- `feat`: 새로운 기능 추가
+- `fix`: 버그 수정
+- `refactor`: 코드 리팩토링
+- `test`: 테스트 추가 또는 수정
+- `docs`: 문서 수정
+- `style`: 코드 포맷팅
+- `chore`: 빌드 설정 등 기타 변경사항
 
-Implement login and registration API endpoints
+**Examples:**
+```
+test: 테스트 한글화 완료
+
+Domain, Application, Infrastructure 레이어의 모든 테스트 파일을 한글로 변환했습니다.
+- describe/it 블록을 한글로 작성
+- Given-When-Then 주석은 영문 유지
+- 인라인 주석은 한글로 작성
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+```
+feat: 상품 상세 조회 API 구현
+
+상품 상세 정보와 옵션 그룹을 조회하는 API를 구현했습니다.
+- BR-PROD-05: 옵션 타입별 그룹화
+- BR-PROD-06: 재고 상태 포함
+- BR-PROD-08: 품절 옵션 선택 불가 표시
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 ## Code Review

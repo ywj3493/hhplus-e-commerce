@@ -24,8 +24,9 @@
 7. [EPIC-3: 주문 및 결제 API](#epic-3-주문-및-결제-api)
 8. [EPIC-4: 쿠폰 활용 API](#epic-4-쿠폰-활용-api)
 9. [EPIC-5: 데이터 연동](#epic-5-데이터-연동)
-10. [데이터 스키마](#데이터-스키마)
-11. [요구사항 추적 매트릭스](#요구사항-추적-매트릭스)
+10. [EPIC-6: 사용자 관리 API](#epic-6-사용자-관리-api)
+11. [데이터 스키마](#데이터-스키마)
+12. [요구사항 추적 매트릭스](#요구사항-추적-매트릭스)
 
 ---
 
@@ -71,6 +72,7 @@ http://localhost:3000/api/v1
 > **참고**: 과제 특성상 인증/인가 구현은 생략하지만, 각 엔드포인트의 인증 필요 여부는 다음과 같이 구분합니다.
 
 **인증이 필요한 엔드포인트** (실제 서비스에서는 JWT 등으로 인증 필요):
+- 사용자 정보 조회 API
 - 장바구니 관련 모든 API
 - 주문 및 결제 관련 모든 API
 - 쿠폰 발급 및 조회 API
@@ -1437,6 +1439,152 @@ EPIC-5는 공개 API 엔드포인트가 없으며, 내부 시스템 동작으로
 - Outbox 상태를 `FAILED_PERMANENT`로 변경
 - 모니터링 시스템으로 알림 발송
 
+
+---
+
+## EPIC-6: 사용자 관리 API
+
+사용자 정보를 조회하는 API 엔드포인트입니다.
+
+### 개요
+
+EPIC-6는 인증된 사용자가 자신의 프로필 정보를 조회할 수 있는 기능을 제공합니다.
+
+#### 관련 스토리
+- [US-USER-01](user-stories.md#us-user-01-사용자-정보-조회): 사용자 정보 조회
+
+#### 엔드포인트 목록
+
+| 메서드 | 엔드포인트 | 설명 | 인증 |
+|--------|-----------|------|------|
+| GET | `/users/me` | 내 프로필 조회 | ✅ Required |
+
+---
+
+### 6.1. GET /users/me
+
+인증된 사용자의 프로필 정보를 조회합니다.
+
+#### 요청
+
+**HTTP 메서드**: `GET`
+
+**URL**: `/api/v1/users/me`
+
+**Headers**:
+```http
+Authorization: Bearer {masterToken}
+```
+
+**Query Parameters**: 없음
+
+**Request Body**: 없음
+
+#### 응답
+
+**Success (200 OK)**:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "user-uuid-1",
+    "name": "홍길동",
+    "email": "hong@example.com",
+    "createdAt": "2025-01-15T10:00:00Z"
+  },
+  "timestamp": "2025-01-20T14:30:00Z"
+}
+```
+
+**Response Schema**:
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | string | ✅ | 사용자 ID (UUID) |
+| `name` | string | ✅ | 사용자 이름 |
+| `email` | string \| null | ✅ | 이메일 주소 |
+| `createdAt` | string | ✅ | 계정 생성일시 (ISO 8601) |
+
+#### 에러 응답
+
+**Unauthorized (401)**:
+
+인증 토큰이 없거나 유효하지 않은 경우:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "유효하지 않은 토큰입니다"
+  },
+  "timestamp": "2025-01-20T14:30:00Z"
+}
+```
+
+**Not Found (404)**:
+
+사용자가 존재하지 않는 경우:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "USER_NOT_FOUND",
+    "message": "사용자를 찾을 수 없습니다"
+  },
+  "timestamp": "2025-01-20T14:30:00Z"
+}
+```
+
+#### 비즈니스 규칙
+
+- **BR-USER-01**: 사용자는 본인의 정보만 조회할 수 있음
+- **NFR-USER-PERF**: 응답 시간 100ms 이내
+- **NFR-USER-RELI**: 토큰 검증 및 본인 확인 필수
+
+#### 구현 노트
+
+**인증 방식** (임시):
+- Master Token을 사용한 간단한 인증
+- 토큰-사용자 매핑:
+  ```typescript
+  const TOKEN_USER_MAP = {
+    'test-master-token-12345': { userId: 'user-uuid-1' },
+    'test-token-user2': { userId: 'user-uuid-2' },
+    'test-token-user3': { userId: 'user-uuid-3' }
+  };
+  ```
+
+**향후 전환**:
+- JWT 기반 인증으로 전환 예정
+- FakeAuthGuard → JwtAuthGuard 교체
+- TOKEN_USER_MAP → JWT 토큰 검증으로 대체
+
+#### 예제
+
+**cURL**:
+
+```bash
+curl -X GET http://localhost:3000/api/v1/users/me \
+  -H "Authorization: Bearer test-master-token-12345"
+```
+
+**응답**:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "user-uuid-1",
+    "name": "홍길동",
+    "email": "hong@example.com",
+    "createdAt": "2025-01-15T10:00:00Z"
+  },
+  "timestamp": "2025-01-20T14:30:00Z"
+}
+```
 
 ---
 
