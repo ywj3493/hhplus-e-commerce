@@ -33,6 +33,7 @@ import { InMemoryOrderRepository } from '@/order/infrastructure/repositories/in-
 import { InMemoryPaymentRepository } from '@/order/infrastructure/repositories/in-memory-payment.repository';
 
 // Repositories - Prisma
+import { CartPrismaRepository } from '@/order/infrastructure/repositories/cart-prisma.repository';
 import { OrderPrismaRepository } from '@/order/infrastructure/repositories/order-prisma.repository';
 import { PaymentPrismaRepository } from '@/order/infrastructure/repositories/payment-prisma.repository';
 
@@ -95,7 +96,10 @@ import { ProductModule } from '@/product/product.module';
     // Repositories
     {
       provide: CART_REPOSITORY,
-      useClass: InMemoryCartRepository,
+      useClass:
+        process.env.NODE_ENV === 'test'
+          ? InMemoryCartRepository
+          : CartPrismaRepository,
     },
     {
       provide: ORDER_REPOSITORY,
