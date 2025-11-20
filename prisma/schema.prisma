@@ -24,8 +24,9 @@ model User {
   createdAt DateTime  @default(now()) // 생성 일시
   updatedAt DateTime  @updatedAt // 수정 일시
 
-  orders   Order[] // 사용자의 주문들
-  payments Payment[] // 사용자의 결제 내역들
+  orders      Order[] // 사용자의 주문들
+  payments    Payment[] // 사용자의 결제 내역들
+  userCoupons UserCoupon[] // 사용자가 발급받은 쿠폰들
 
   @@index([createdAt]) // 생성일 인덱스
   @@map("users") // 테이블명: users
@@ -191,4 +192,56 @@ model Payment {
   @@index([userId]) // 사용자별 조회 최적화
   @@index([transactionId]) // 거래 번호 조회 최적화
   @@map("payments") // 테이블명: payments
+}
+
+// ============================================================================
+// Coupon 도메인
+// ============================================================================
+
+/// 쿠폰 엔티티 (동시성 제어 대상)
+/// - 선착순 발급 (totalQuantity 제한)
+/// - 비관적 락(SELECT FOR UPDATE)을 통한 동시성 제어
+/// - 할인 타입: PERCENTAGE (퍼센트), FIXED (정액)
+model Coupon {
+  id             String   @id @default(uuid()) // 쿠폰 고유 ID (UUID)
+  name           String // 쿠폰명
+  description    String   @db.Text // 쿠폰 설명
+  discountType   String // 할인 타입 (PERCENTAGE, FIXED)
+  discountValue  Decimal  @db.Decimal(10, 2) // 할인 값 (퍼센트 또는 금액)
+  minAmount      Decimal? @db.Decimal(10, 2) // 최소 주문 금액 (nullable)
+  totalQuantity  Int // 총 발급 가능 수량
+  issuedQuantity Int      @default(0) // 발급된 수량
+  validFrom      DateTime // 유효 시작일
+  validUntil     DateTime // 유효 종료일
+  createdAt      DateTime @default(now()) // 생성 일시
+  updatedAt      DateTime @updatedAt // 수정 일시
+
+  userCoupons UserCoupon[] // 발급된 사용자 쿠폰들
+
+  @@index([validFrom, validUntil]) // 유효기간 조회 최적화
+  @@index([issuedQuantity]) // 발급 수량 조회 최적화
+  @@map("coupons") // 테이블명: coupons
+}
+
+/// 사용자 쿠폰 엔티티
+/// - 사용자에게 발급된 쿠폰
+/// - 사용 여부 및 만료 상태 관리
+/// - 중복 발급 방지: @@unique([userId, couponId])
+model UserCoupon {
+  id        String    @id @default(uuid()) // 사용자 쿠폰 고유 ID (UUID)
+  userId    String // 사용자 ID (FK)
+  couponId  String // 쿠폰 ID (FK)
+  isUsed    Boolean   @default(false) // 사용 여부
+  usedAt    DateTime? // 사용 일시 (nullable)
+  issuedAt  DateTime  @default(now()) // 발급 일시
+  expiresAt DateTime // 만료 일시
+
+  user   User   @relation(fields: [userId], references: [id]) // 사용자
+  coupon Coupon @relation(fields: [couponId], references: [id]) // 쿠폰
+
+  @@unique([userId, couponId]) // 중복 발급 방지 (BR-COUPON-01)
+  @@index([userId]) // 사용자별 조회 최적화
+  @@index([couponId]) // 쿠폰별 조회 최적화
+  @@index([isUsed]) // 사용 여부 조회 최적화
+  @@map("user_coupons") // 테이블명: user_coupons
 }

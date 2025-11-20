@@ -625,6 +625,203 @@ async function main() {
 
   console.log('✅ Created 3 orders with items and payments');
 
+  // ============================================================================
+  // Coupon 도메인 - 쿠폰 5개 및 사용자 쿠폰 발급
+  // ============================================================================
+  console.log('🎟️  Creating coupons...');
+
+  const now = new Date();
+  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+  // 쿠폰 1: 정액 할인 (10,000원) - 일반 쿠폰
+  await prisma.coupon.upsert({
+    where: { id: 'coupon-001' },
+    update: {},
+    create: {
+      id: 'coupon-001',
+      name: '신규 가입 축하 쿠폰',
+      description: '신규 회원 가입 시 지급되는 10,000원 할인 쿠폰',
+      discountType: 'FIXED',
+      discountValue: 10000,
+      minAmount: 50000, // 최소 주문 금액 5만원
+      totalQuantity: 1000,
+      issuedQuantity: 3, // 3명에게 발급됨
+      validFrom: yesterday,
+      validUntil: nextMonth,
+    },
+  });
+
+  // 쿠폰 2: 정률 할인 (10%) - 일반 쿠폰
+  await prisma.coupon.upsert({
+    where: { id: 'coupon-002' },
+    update: {},
+    create: {
+      id: 'coupon-002',
+      name: '주말 특별 할인',
+      description: '주말 한정 10% 할인 쿠폰',
+      discountType: 'PERCENTAGE',
+      discountValue: 10,
+      minAmount: 100000, // 최소 주문 금액 10만원
+      totalQuantity: 500,
+      issuedQuantity: 2, // 2명에게 발급됨
+      validFrom: yesterday,
+      validUntil: nextWeek,
+    },
+  });
+
+  // 쿠폰 3: 무제한 쿠폰 (정액 5,000원)
+  await prisma.coupon.upsert({
+    where: { id: 'coupon-003' },
+    update: {},
+    create: {
+      id: 'coupon-003',
+      name: '첫 구매 할인 쿠폰',
+      description: '첫 구매 시 5,000원 할인',
+      discountType: 'FIXED',
+      discountValue: 5000,
+      minAmount: null, // 최소 금액 제한 없음
+      totalQuantity: 999999, // 사실상 무제한
+      issuedQuantity: 1,
+      validFrom: yesterday,
+      validUntil: nextMonth,
+    },
+  });
+
+  // 쿠폰 4: 만료된 쿠폰
+  await prisma.coupon.upsert({
+    where: { id: 'coupon-004' },
+    update: {},
+    create: {
+      id: 'coupon-004',
+      name: '지난달 프로모션 쿠폰',
+      description: '이미 만료된 쿠폰 (테스트용)',
+      discountType: 'FIXED',
+      discountValue: 20000,
+      minAmount: 100000,
+      totalQuantity: 100,
+      issuedQuantity: 0,
+      validFrom: new Date('2025-10-01T00:00:00Z'),
+      validUntil: new Date('2025-10-31T23:59:59Z'), // 이미 만료됨
+    },
+  });
+
+  // 쿠폰 5: 소진된 쿠폰 (동시성 테스트용)
+  await prisma.coupon.upsert({
+    where: { id: 'coupon-005' },
+    update: {},
+    create: {
+      id: 'coupon-005',
+      name: '선착순 10명 한정 쿠폰',
+      description: '이미 소진된 쿠폰 (동시성 테스트용)',
+      discountType: 'PERCENTAGE',
+      discountValue: 20,
+      minAmount: 50000,
+      totalQuantity: 10,
+      issuedQuantity: 10, // 이미 전부 발급됨
+      validFrom: yesterday,
+      validUntil: nextWeek,
+    },
+  });
+
+  console.log('✅ Created 5 coupons');
+
+  // ============================================================================
+  // 사용자 쿠폰 발급
+  // ============================================================================
+  console.log('👥 Issuing coupons to users...');
+
+  // user-001: 3개 쿠폰 보유 (신규 가입, 주말 할인, 첫 구매)
+  await prisma.userCoupon.upsert({
+    where: { id: 'user-coupon-001' },
+    update: {},
+    create: {
+      id: 'user-coupon-001',
+      userId: 'user-001',
+      couponId: 'coupon-001',
+      isUsed: false,
+      usedAt: null,
+      issuedAt: new Date('2025-11-10T10:00:00Z'),
+      expiresAt: nextMonth, // coupon-001의 validUntil과 동일
+    },
+  });
+
+  await prisma.userCoupon.upsert({
+    where: { id: 'user-coupon-002' },
+    update: {},
+    create: {
+      id: 'user-coupon-002',
+      userId: 'user-001',
+      couponId: 'coupon-002',
+      isUsed: true, // 이미 사용됨
+      usedAt: new Date('2025-11-15T10:35:00Z'), // order-001에서 사용
+      issuedAt: new Date('2025-11-14T10:00:00Z'),
+      expiresAt: nextWeek, // coupon-002의 validUntil과 동일
+    },
+  });
+
+  await prisma.userCoupon.upsert({
+    where: { id: 'user-coupon-003' },
+    update: {},
+    create: {
+      id: 'user-coupon-003',
+      userId: 'user-001',
+      couponId: 'coupon-003',
+      isUsed: false,
+      usedAt: null,
+      issuedAt: new Date('2025-11-10T10:00:00Z'),
+      expiresAt: nextMonth,
+    },
+  });
+
+  // user-002: 2개 쿠폰 보유 (신규 가입, 주말 할인)
+  await prisma.userCoupon.upsert({
+    where: { id: 'user-coupon-004' },
+    update: {},
+    create: {
+      id: 'user-coupon-004',
+      userId: 'user-002',
+      couponId: 'coupon-001',
+      isUsed: false,
+      usedAt: null,
+      issuedAt: new Date('2025-11-12T14:00:00Z'),
+      expiresAt: nextMonth,
+    },
+  });
+
+  await prisma.userCoupon.upsert({
+    where: { id: 'user-coupon-005' },
+    update: {},
+    create: {
+      id: 'user-coupon-005',
+      userId: 'user-002',
+      couponId: 'coupon-002',
+      isUsed: false,
+      usedAt: null,
+      issuedAt: new Date('2025-11-18T09:00:00Z'),
+      expiresAt: nextWeek,
+    },
+  });
+
+  // user-003: 1개 쿠폰 보유 (신규 가입)
+  await prisma.userCoupon.upsert({
+    where: { id: 'user-coupon-006' },
+    update: {},
+    create: {
+      id: 'user-coupon-006',
+      userId: 'user-003',
+      couponId: 'coupon-001',
+      isUsed: false,
+      usedAt: null,
+      issuedAt: new Date('2025-11-19T16:30:00Z'),
+      expiresAt: nextMonth,
+    },
+  });
+
+  console.log('✅ Issued 6 user coupons');
+
   console.log('🎉 Seeding completed!');
 }
 

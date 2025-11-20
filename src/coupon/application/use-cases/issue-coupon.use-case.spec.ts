@@ -17,6 +17,7 @@ describe('IssueCouponUseCase', () => {
   let couponRepository: jest.Mocked<CouponRepository>;
   let userCouponRepository: jest.Mocked<UserCouponRepository>;
   let couponService: CouponService;
+  let mockPrisma: any;
 
   beforeEach(() => {
     // Mock repositories
@@ -37,11 +38,17 @@ describe('IssueCouponUseCase', () => {
     // Real service
     couponService = new CouponService();
 
+    // Mock PrismaService with transaction support
+    mockPrisma = {
+      $transaction: jest.fn((callback) => callback(mockPrisma)),
+    };
+
     // Create use case
     useCase = new IssueCouponUseCase(
       couponRepository,
       userCouponRepository,
       couponService,
+      mockPrisma,
     );
   });
 
@@ -91,14 +98,15 @@ describe('IssueCouponUseCase', () => {
       expect(output.discountType).toBe(CouponType.PERCENTAGE);
       expect(output.discountValue).toBe(10);
 
-      // Verify repository calls
+      // Verify repository calls (트랜잭션 파라미터 포함)
       expect(couponRepository.findByIdForUpdate).toHaveBeenCalledWith(
         couponId,
+        mockPrisma,
       );
       expect(
         userCouponRepository.existsByUserIdAndCouponId,
-      ).toHaveBeenCalledWith(userId, couponId);
-      expect(couponRepository.save).toHaveBeenCalledWith(coupon);
+      ).toHaveBeenCalledWith(userId, couponId, mockPrisma);
+      expect(couponRepository.save).toHaveBeenCalledWith(coupon, mockPrisma);
       expect(userCouponRepository.save).toHaveBeenCalled();
 
       // Verify coupon quantity increased
@@ -141,7 +149,7 @@ describe('IssueCouponUseCase', () => {
       );
       expect(
         userCouponRepository.existsByUserIdAndCouponId,
-      ).toHaveBeenCalledWith(userId, couponId);
+      ).toHaveBeenCalledWith(userId, couponId, mockPrisma);
       expect(couponRepository.save).not.toHaveBeenCalled();
       expect(userCouponRepository.save).not.toHaveBeenCalled();
     });
