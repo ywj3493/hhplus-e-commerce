@@ -19,6 +19,8 @@ export interface CartItemData {
   productOptionId: string | null;
   price: Price;
   quantity: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export class CartItem {
@@ -29,6 +31,8 @@ export class CartItem {
   private readonly _productOptionId: string | null;
   private readonly _price: Price;
   private _quantity: number;
+  private readonly _createdAt: Date;
+  private _updatedAt: Date;
 
   private constructor(
     id: string,
@@ -38,6 +42,8 @@ export class CartItem {
     productOptionId: string | null,
     price: Price,
     quantity: number,
+    createdAt: Date,
+    updatedAt: Date,
   ) {
     this._id = id;
     this._cartId = cartId;
@@ -46,6 +52,8 @@ export class CartItem {
     this._productOptionId = productOptionId;
     this._price = price;
     this._quantity = quantity;
+    this._createdAt = createdAt;
+    this._updatedAt = updatedAt;
   }
 
   /**
@@ -53,6 +61,7 @@ export class CartItem {
    * BR-CART-03: 수량은 1 이상이어야 함
    */
   static create(data: CartItemCreateData): CartItem {
+    const now = new Date();
     const item = new CartItem(
       uuidv4(),
       data.cartId,
@@ -61,6 +70,8 @@ export class CartItem {
       data.productOptionId,
       data.price,
       data.quantity,
+      now,
+      now,
     );
 
     item.validate();
@@ -80,6 +91,8 @@ export class CartItem {
       data.productOptionId,
       data.price,
       data.quantity,
+      data.createdAt,
+      data.updatedAt,
     );
   }
 
@@ -110,6 +123,7 @@ export class CartItem {
       throw new InvalidQuantityException('증가량은 1 이상이어야 합니다.');
     }
     this._quantity += amount;
+    this._updatedAt = new Date();
   }
 
   /**
@@ -121,6 +135,7 @@ export class CartItem {
       throw new InvalidQuantityException('수량은 1 이상이어야 합니다.');
     }
     this._quantity = quantity;
+    this._updatedAt = new Date();
   }
 
   /**
@@ -160,5 +175,13 @@ export class CartItem {
 
   get quantity(): number {
     return this._quantity;
+  }
+
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this._updatedAt;
   }
 }
