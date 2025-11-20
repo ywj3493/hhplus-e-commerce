@@ -54,6 +54,7 @@ model Product {
   name        String // 상품명
   description String   @db.Text // 상품 설명
   price       Decimal  @db.Decimal(10, 2) // 기본 가격
+  imageUrl    String // 상품 이미지 URL
   categoryId  String // 카테고리 ID (FK)
   hasOptions  Boolean  @default(false) // 옵션 여부
   createdAt   DateTime @default(now()) // 생성 일시
