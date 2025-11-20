@@ -4,6 +4,7 @@ import {
   IPaymentGateway,
   ProcessPaymentRequest,
   ProcessPaymentResponse,
+  RefundPaymentResponse,
 } from '@/order/domain/ports/payment.port';
 
 /**
@@ -29,6 +30,22 @@ export class FakePaymentAdapter implements IPaymentGateway {
     return {
       success: true,
       transactionId: `FAKE-TXN-${uuidv4()}`,
+    };
+  }
+
+  /**
+   * 결제 환불 처리
+   * @param transactionId 환불할 거래 ID
+   * @returns 환불 처리 결과
+   */
+  async refund(transactionId: string): Promise<RefundPaymentResponse> {
+    await this.simulateDelay(100);
+
+    // Fake 구현이므로 항상 성공
+    console.log(`[FakePaymentAdapter] 환불 처리: ${transactionId}`);
+
+    return {
+      success: true,
     };
   }
 

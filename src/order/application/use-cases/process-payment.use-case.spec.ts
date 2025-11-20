@@ -39,6 +39,7 @@ describe('ProcessPaymentUseCase', () => {
       findById: jest.fn(),
       findByOrderId: jest.fn(),
       save: jest.fn(),
+      refund: jest.fn(),
     };
 
     const mockOrderRepository: jest.Mocked<OrderRepository> = {
@@ -51,6 +52,7 @@ describe('ProcessPaymentUseCase', () => {
 
     const mockPaymentGateway: jest.Mocked<IPaymentGateway> = {
       processPayment: jest.fn(),
+      refund: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({

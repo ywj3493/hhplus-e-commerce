@@ -15,6 +15,11 @@ export interface ProcessPaymentResponse {
   errorMessage?: string;
 }
 
+export interface RefundPaymentResponse {
+  success: boolean;
+  errorMessage?: string;
+}
+
 /**
  * Payment Port
  *
@@ -26,4 +31,12 @@ export interface IPaymentGateway {
     request: ProcessPaymentRequest,
     shouldFail?: boolean,
   ): Promise<ProcessPaymentResponse>;
+
+  /**
+   * 결제 환불 처리
+   *
+   * @param transactionId 환불할 거래 ID
+   * @returns 환불 처리 결과
+   */
+  refund(transactionId: string): Promise<RefundPaymentResponse>;
 }

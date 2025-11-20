@@ -224,20 +224,24 @@ model OrderItem {
 /// - 주문에 대한 결제 정보
 /// - 주문과 1:1 관계
 /// - 결제 수단: CREDIT_CARD (현재 1가지)
+/// - 결제 상태: COMPLETED (완료), REFUNDED (환불)
 model Payment {
-  id            String   @id @default(uuid()) // 결제 고유 ID (UUID)
-  orderId       String   @unique // 주문 ID (FK, unique - 1:1 관계)
+  id            String    @id @default(uuid()) // 결제 고유 ID (UUID)
+  orderId       String    @unique // 주문 ID (FK, unique - 1:1 관계)
   userId        String // 사용자 ID (FK)
-  amount        Decimal  @db.Decimal(10, 2) // 결제 금액
+  amount        Decimal   @db.Decimal(10, 2) // 결제 금액
   method        String // 결제 수단 (CREDIT_CARD)
   transactionId String // 외부 결제 거래 번호
-  createdAt     DateTime @default(now()) // 생성 일시
+  status        String    @default("COMPLETED") // 결제 상태 (COMPLETED, REFUNDED)
+  createdAt     DateTime  @default(now()) // 생성 일시
+  refundedAt    DateTime? // 환불 일시 (nullable)
 
   order Order @relation(fields: [orderId], references: [id]) // 주문
   user  User  @relation(fields: [userId], references: [id]) // 사용자
 
   @@index([userId]) // 사용자별 조회 최적화
   @@index([transactionId]) // 거래 번호 조회 최적화
+  @@index([status]) // 상태별 조회 최적화
   @@map("payments") // 테이블명: payments
 }
 

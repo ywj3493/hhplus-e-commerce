@@ -38,6 +38,20 @@ export class InMemoryPaymentRepository implements PaymentRepository {
   }
 
   /**
+   * Payment 환불 처리
+   */
+  async refund(paymentId: string): Promise<void> {
+    const payment = await this.findById(paymentId);
+
+    if (!payment) {
+      throw new Error('결제를 찾을 수 없습니다.');
+    }
+
+    payment.refund();
+    await this.save(payment);
+  }
+
+  /**
    * Deep Copy (불변성 보장)
    */
   private deepCopy(payment: Payment): Payment {
@@ -48,7 +62,9 @@ export class InMemoryPaymentRepository implements PaymentRepository {
       amount: payment.amount,
       paymentMethod: payment.paymentMethod,
       transactionId: payment.transactionId,
+      status: payment.status,
       createdAt: new Date(payment.createdAt.getTime()),
+      refundedAt: payment.refundedAt ? new Date(payment.refundedAt.getTime()) : undefined,
     });
   }
 
