@@ -450,6 +450,181 @@ async function main() {
 
   console.log('✅ Created product options and stocks');
 
+  // ============================================================================
+  // Order 도메인 - 주문 3개 (PAID, PENDING, CANCELLED)
+  // ============================================================================
+  console.log('🛒 Creating orders...');
+
+  // 주문 1: PAID 상태 (user-001, 스마트폰 + 무선 이어폰)
+  const order001 = await prisma.order.upsert({
+    where: { id: 'order-001' },
+    update: {},
+    create: {
+      id: 'order-001',
+      userId: 'user-001',
+      status: 'PAID',
+      totalAmount: 1450000, // 1,200,000 (스마트폰) + 250,000 (이어폰)
+      discountAmount: 50000, // 할인 5만원
+      finalAmount: 1400000,
+      userCouponId: null,
+      reservationExpiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10분 후
+      createdAt: new Date('2025-11-15T10:30:00Z'),
+      paidAt: new Date('2025-11-15T10:35:00Z'),
+    },
+  });
+
+  // 주문 1의 아이템들
+  await prisma.orderItem.upsert({
+    where: { id: 'order-item-001-01' },
+    update: {},
+    create: {
+      id: 'order-item-001-01',
+      orderId: 'order-001',
+      productId: 'product-001',
+      productName: '스마트폰 갤럭시 S24', // 스냅샷
+      productOptionId: 'option-001-black',
+      productOptionName: '미드나잇 블랙', // 스냅샷
+      quantity: 1,
+      unitPrice: 1200000, // 스냅샷
+      totalPrice: 1200000,
+    },
+  });
+
+  await prisma.orderItem.upsert({
+    where: { id: 'order-item-001-02' },
+    update: {},
+    create: {
+      id: 'order-item-001-02',
+      orderId: 'order-001',
+      productId: 'product-003',
+      productName: '무선 이어폰', // 스냅샷
+      productOptionId: null,
+      productOptionName: null,
+      quantity: 1,
+      unitPrice: 250000, // 스냅샷
+      totalPrice: 250000,
+    },
+  });
+
+  // 주문 1의 결제 정보
+  await prisma.payment.upsert({
+    where: { id: 'payment-001' },
+    update: {},
+    create: {
+      id: 'payment-001',
+      orderId: 'order-001',
+      userId: 'user-001',
+      amount: 1400000,
+      method: 'CREDIT_CARD',
+      transactionId: 'txn-20251115-103500-abc123',
+      createdAt: new Date('2025-11-15T10:35:00Z'),
+    },
+  });
+
+  // 주문 1의 재고 반영 (soldQuantity 증가)
+  await prisma.stock.update({
+    where: { id: 'stock-option-001-black' },
+    data: {
+      availableQuantity: 99, // 100 -> 99
+      soldQuantity: 1, // 0 -> 1
+    },
+  });
+
+  await prisma.stock.update({
+    where: { id: 'stock-product-003' },
+    data: {
+      availableQuantity: 199, // 200 -> 199
+      soldQuantity: 1, // 0 -> 1
+    },
+  });
+
+  console.log('✅ Created order-001 (PAID)');
+
+  // 주문 2: PENDING 상태 (user-002, 노트북 대기 중)
+  const order002 = await prisma.order.upsert({
+    where: { id: 'order-002' },
+    update: {},
+    create: {
+      id: 'order-002',
+      userId: 'user-002',
+      status: 'PENDING',
+      totalAmount: 2800000, // 2,500,000 (노트북) + 300,000 (1TB 추가)
+      discountAmount: 0,
+      finalAmount: 2800000,
+      userCouponId: null,
+      reservationExpiresAt: new Date(Date.now() + 8 * 60 * 1000), // 8분 후 만료 예정
+      createdAt: new Date('2025-11-20T09:00:00Z'),
+      paidAt: null,
+    },
+  });
+
+  await prisma.orderItem.upsert({
+    where: { id: 'order-item-002-01' },
+    update: {},
+    create: {
+      id: 'order-item-002-01',
+      orderId: 'order-002',
+      productId: 'product-002',
+      productName: '노트북 맥북 프로', // 스냅샷
+      productOptionId: 'option-002-1tb',
+      productOptionName: '1TB', // 스냅샷
+      quantity: 1,
+      unitPrice: 2800000, // 2,500,000 + 300,000 (스냅샷)
+      totalPrice: 2800000,
+    },
+  });
+
+  // 주문 2의 재고 예약 (reservedQuantity 증가)
+  await prisma.stock.update({
+    where: { id: 'stock-option-002-1tb' },
+    data: {
+      availableQuantity: 29, // 30 -> 29
+      reservedQuantity: 1, // 0 -> 1
+    },
+  });
+
+  console.log('✅ Created order-002 (PENDING)');
+
+  // 주문 3: CANCELLED 상태 (user-001, 태블릿 취소)
+  const order003 = await prisma.order.upsert({
+    where: { id: 'order-003' },
+    update: {},
+    create: {
+      id: 'order-003',
+      userId: 'user-001',
+      status: 'CANCELLED',
+      totalAmount: 820000, // 800,000 (태블릿) + 20,000 (핑크 골드 추가)
+      discountAmount: 0,
+      finalAmount: 820000,
+      userCouponId: null,
+      reservationExpiresAt: new Date('2025-11-18T15:10:00Z'),
+      createdAt: new Date('2025-11-18T15:00:00Z'),
+      paidAt: null,
+    },
+  });
+
+  await prisma.orderItem.upsert({
+    where: { id: 'order-item-003-01' },
+    update: {},
+    create: {
+      id: 'order-item-003-01',
+      orderId: 'order-003',
+      productId: 'product-004',
+      productName: '태블릿 PC', // 스냅샷
+      productOptionId: 'option-004-pink',
+      productOptionName: '핑크 골드', // 스냅샷
+      quantity: 1,
+      unitPrice: 820000, // 800,000 + 20,000 (스냅샷)
+      totalPrice: 820000,
+    },
+  });
+
+  // 주문 3은 취소되어 재고가 원복되었으므로 Stock 업데이트 없음
+
+  console.log('✅ Created order-003 (CANCELLED)');
+
+  console.log('✅ Created 3 orders with items and payments');
+
   console.log('🎉 Seeding completed!');
 }
 
