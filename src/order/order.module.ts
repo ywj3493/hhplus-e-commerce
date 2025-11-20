@@ -20,9 +20,11 @@ import { GetOrdersUseCase } from '@/order/application/use-cases/get-orders.use-c
 
 // Use Cases - Payment
 import { ProcessPaymentUseCase } from '@/order/application/use-cases/process-payment.use-case';
+import { ConfirmStockUseCase } from '@/order/application/use-cases/confirm-stock.use-case';
+import { CompleteOrderUseCase } from '@/order/application/use-cases/complete-order.use-case';
 
-// Event Handlers
-import { PaymentCompletedHandler } from '@/order/application/event-handlers/payment-completed.handler';
+// Facades
+import { PaymentFacadeService } from '@/order/application/facades/payment-facade.service';
 
 // Batch Jobs
 import { ReleaseExpiredReservationJob } from '@/order/application/jobs/release-expired-reservation.job';
@@ -37,9 +39,10 @@ import { CartPrismaRepository } from '@/order/infrastructure/repositories/cart-p
 import { OrderPrismaRepository } from '@/order/infrastructure/repositories/order-prisma.repository';
 import { PaymentPrismaRepository } from '@/order/infrastructure/repositories/payment-prisma.repository';
 
-// External Clients
-import { MockPaymentApiClient } from '@/order/infrastructure/clients/mock-payment-api.client';
-import { PAYMENT_API_CLIENT } from '@/order/infrastructure/clients/payment-api.interface';
+// Payment Gateway
+import { FakePaymentAdapter } from '@/order/infrastructure/gateways/fake-payment.adapter';
+import { FakePaymentApiAdapter } from '@/__fake__/payment/fake-payment-api.adapter';
+import { PAYMENT_GATEWAY } from '@/order/domain/ports/payment.port';
 
 // Symbols
 import { ORDER_REPOSITORY, CART_REPOSITORY, PAYMENT_REPOSITORY } from '@/order/domain/repositories/tokens';
@@ -86,9 +89,11 @@ import { ProductModule } from '@/product/product.module';
 
     // Payment Use Cases
     ProcessPaymentUseCase,
+    ConfirmStockUseCase,
+    CompleteOrderUseCase,
 
-    // Event Handlers
-    PaymentCompletedHandler,
+    // Facades
+    PaymentFacadeService,
 
     // Batch Jobs
     ReleaseExpiredReservationJob,
@@ -116,10 +121,15 @@ import { ProductModule } from '@/product/product.module';
           : PaymentPrismaRepository,
     },
 
-    // External Clients
+    // Payment Gateway
     {
-      provide: PAYMENT_API_CLIENT,
-      useClass: MockPaymentApiClient,
+      provide: PAYMENT_GATEWAY,
+      useClass:
+        process.env.NODE_ENV === 'test'
+          ? FakePaymentAdapter
+          : process.env.NODE_ENV === 'production'
+          ? FakePaymentApiAdapter
+          : FakePaymentAdapter,
     },
   ],
   exports: [

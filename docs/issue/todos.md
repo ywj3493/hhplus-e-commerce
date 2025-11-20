@@ -63,41 +63,97 @@
 
 ## 💳 Payment Infrastructure 리팩터링
 
-### 3. Payment Gateway Port/Adapter 패턴 적용
-- **현재 상태**:
-  - IPaymentApiClient (Infrastructure Layer Interface) 존재
-  - MockPaymentApiClient 구현 (랜덤 실패 포함)
-- **목표**: Port-Adapter 패턴으로 Domain Layer 독립성 확보
-- **필요 작업**:
-  - [ ] **Task 1: Domain Layer Port 정의**
-    - `src/order/domain/ports/payment-gateway.port.ts` 생성
+### 3. Payment Gateway Port/Adapter 패턴 적용 ✅ **완료 (Issue #024 - Part 1)**
+
+- **완료 날짜**: 2025-11-21
+- **구현 내용**:
+  - [x] **Task 1: Domain Layer Port 정의**
+    - `src/order/domain/ports/payment.port.ts` 생성
     - IPaymentGateway 인터페이스 정의
     - ProcessPaymentRequest, ProcessPaymentResponse DTO
     - PAYMENT_GATEWAY 토큰 생성
-  - [ ] **Task 2: FakePaymentGateway 구현**
-    - `src/order/infrastructure/gateways/fake-payment-gateway.ts`
-    - 결정적 동작 (항상 성공)
-    - testFail 플래그 지원 (명시적 실패 테스트용)
-    - Swagger 및 E2E 테스트 용도
-  - [ ] **Task 3: PaymentApiAdapter 구현**
-    - MockPaymentApiClient → PaymentApiAdapter로 이름 변경
-    - `src/order/infrastructure/gateways/payment-api-adapter.ts`
-    - IPaymentGateway 구현
-    - 실제 PG사 API 연동 준비 (Toss Payments, KakaoPay 등)
-  - [ ] **Task 4: ProcessPaymentUseCase 수정**
+  - [x] **Task 2: FakePaymentAdapter 구현**
+    - `src/order/infrastructure/gateways/fake-payment.adapter.ts`
+    - 결정적 동작 (랜덤 실패 제거)
+    - shouldFail 파라미터 지원 (X-Test-Fail 헤더 기반)
+    - Swagger UI 및 E2E 테스트용
+  - [x] **Task 3: FakePaymentApiAdapter 구현**
+    - `src/__fake__/payment/fake-payment-api.adapter.ts`
+    - 실제 PG API 호출 모사 (프로덕션 준비)
+  - [x] **Task 4: ProcessPaymentUseCase 수정**
     - IPaymentApiClient → IPaymentGateway 의존성 변경
     - Infrastructure 계층 인터페이스 의존 제거
-  - [ ] **Task 5: OrderModule Provider 분기**
-    - `NODE_ENV === 'test'` → FakePaymentGateway
-    - `NODE_ENV === 'production'` → PaymentApiAdapter (실제 API)
-    - 그 외 → PaymentApiAdapter (Mock 동작)
-- **우선순위**: Medium
-- **예상 난이도**: Low (리팩터링)
+  - [x] **Task 5: OrderModule Provider 분기**
+    - `NODE_ENV === 'test'` → FakePaymentAdapter
+    - `NODE_ENV === 'production'` → FakePaymentApiAdapter
+    - 그 외 (development) → FakePaymentAdapter
+  - [x] **구 파일 제거**
+    - `mock-payment-api.client.ts` 삭제
+    - `payment-api.interface.ts` 삭제
 
-**참고사항**:
-- 현재 MockPaymentApiClient는 랜덤 실패를 포함하여 테스트에 부적합
-- FakePaymentGateway는 항상 성공하여 테스트 일관성 확보
-- 실제 PG사 연동 시 PaymentApiAdapter만 수정하면 됨
+**결과**:
+
+- ✅ Domain Layer 독립성 확보
+- ✅ 테스트 일관성 보장 (랜덤 실패 0%)
+- ✅ X-Test-Fail 헤더 사양 유지
+- ✅ 환경별 자동 구현체 주입
+
+### 4. Payment Facade 패턴 적용 ✅ **완료 (Issue #024 - Part 2)**
+
+- **완료 날짜**: 2025-11-21
+- **목적**: 보상 트랜잭션(Saga Pattern) 구현 준비
+- **구현 내용**:
+  - [x] **PaymentFacadeService 생성**
+    - `src/order/application/facades/payment-facade.service.ts`
+    - 결제 프로세스 전체 조율 (결제 → 재고 확정 → 주문 완료)
+  - [x] **ConfirmStockUseCase 생성**
+    - `src/order/application/use-cases/confirm-stock.use-case.ts`
+    - 재고 확정 로직 분리 (reserved → sold)
+  - [x] **CompleteOrderUseCase 생성**
+    - `src/order/application/use-cases/complete-order.use-case.ts`
+    - 주문 완료 로직 분리 (PENDING → COMPLETED)
+  - [x] **ProcessPaymentUseCase 리팩토링**
+    - EventEmitter 의존성 제거
+    - 결제 처리만 담당 (단일 책임)
+  - [x] **이벤트 기반 아키텍처 제거**
+    - `PaymentCompletedHandler` 삭제
+    - `PaymentCompletedEvent` 삭제
+    - 동기적 Facade 호출로 변경
+  - [x] **Controller 수정**
+    - `PaymentController`에서 Facade 호출
+  - [x] **Module 설정**
+    - 새로운 UseCase와 Facade Provider 추가
+  - [x] **테스트 수정**
+    - 모든 관련 테스트 파일 업데이트
+
+**아키텍처 변경**:
+
+Before (Event-Driven):
+
+```text
+ProcessPaymentUseCase
+  → PaymentCompletedEvent 발행
+  → PaymentCompletedHandler 수신
+    → StockManagementService.confirmSale()
+    → Order.complete()
+```
+
+After (Facade Pattern):
+
+```text
+PaymentFacadeService
+  ├─ ProcessPaymentUseCase (결제 처리)
+  ├─ ConfirmStockUseCase (재고 확정)
+  └─ CompleteOrderUseCase (주문 완료)
+```
+
+**결과**:
+
+- ✅ 트랜잭션 경계 명확화
+- ✅ 보상 트랜잭션 구현 준비 완료
+- ✅ 각 UseCase 단일 책임 분리
+- ✅ 테스트 독립성 향상
+- ✅ 전체 테스트 통과 (Unit: 40/40, Integration: 11/11, E2E: 1/1)
 
 ---
 
