@@ -10,12 +10,11 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "prisma:seed": "ts-node prisma/seed.ts",
-    "test": "jest",
     "test:unit": "jest --testMatch='**/src/**/*.spec.ts' --testPathIgnorePatterns='integration.spec.ts' --testPathIgnorePatterns='e2e.spec.ts'",
     "test:unit:watch": "jest --watch --testMatch='**/src/**/*.spec.ts' --testPathIgnorePatterns='integration.spec.ts' --testPathIgnorePatterns='e2e.spec.ts'",
     "test:integration": "jest --testMatch='**/test/**/*.integration.spec.ts'",
     "test:e2e": "jest --testMatch='**/test/**/*.e2e.spec.ts'",
-    "test:all": "jest --testMatch='**/*.spec.ts'",
+    "test": "pnpm test:unit && pnpm test:integration && pnpm test:e2e",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
