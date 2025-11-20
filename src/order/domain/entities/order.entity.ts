@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { OrderStatus } from '@/order/domain/entities/order-status.enum';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import {
   OrderAlreadyCompletedException,
   InvalidOrderStateException,

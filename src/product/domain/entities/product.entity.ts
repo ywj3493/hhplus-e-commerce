@@ -1,4 +1,4 @@
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { StockStatus } from '@/product/domain/entities/stock-status.vo';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 
@@ -11,7 +11,7 @@ export interface GroupedOptions {
   options: Array<{
     id: string;
     name: string;
-    additionalPrice: Money;
+    additionalPrice: Price;
     stockStatus: StockStatus;
     isSelectable: boolean;
   }>;
@@ -25,7 +25,7 @@ export interface GroupedOptions {
 export class Product {
   private readonly _id: string;
   private readonly _name: string;
-  private readonly _price: Money;
+  private readonly _price: Price;
   private readonly _description: string;
   private readonly _imageUrl: string;
   private readonly _options: ProductOption[];
@@ -35,7 +35,7 @@ export class Product {
   private constructor(
     id: string,
     name: string,
-    price: Money,
+    price: Price,
     description: string,
     imageUrl: string,
     options: ProductOption[],
@@ -60,7 +60,7 @@ export class Product {
   static create(
     id: string,
     name: string,
-    price: Money,
+    price: Price,
     description: string,
     imageUrl: string,
     options: ProductOption[],
@@ -134,7 +134,7 @@ export class Product {
    * 옵션을 포함한 총 가격 계산
    * BR-PROD-07: 총 금액 계산 = (상품 가격 + 옵션 추가 가격) × 수량
    */
-  calculateTotalPrice(optionId: string, quantity: number): Money {
+  calculateTotalPrice(optionId: string, quantity: number): Price {
     if (quantity <= 0) {
       throw new Error('수량은 양수여야 합니다');
     }
@@ -157,7 +157,7 @@ export class Product {
     return this._name;
   }
 
-  get price(): Money {
+  get price(): Price {
     return this._price;
   }
 

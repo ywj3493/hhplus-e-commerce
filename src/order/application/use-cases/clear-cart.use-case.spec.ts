@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ClearCartUseCase } from '@/order/application/use-cases/clear-cart.use-case';
 import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { ClearCartInput } from '@/order/application/dtos/clear-cart.dto';
 import { createTestCart, createTestCartWithItems } from '@/order/infrastructure/fixtures/cart.fixtures';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 
 describe('ClearCartUseCase', () => {
   let useCase: ClearCartUseCase;
@@ -20,14 +21,14 @@ describe('ClearCartUseCase', () => {
       providers: [
         ClearCartUseCase,
         {
-          provide: 'CartRepository',
+          provide: CART_REPOSITORY,
           useValue: mockCartRepository,
         },
       ],
     }).compile();
 
     useCase = module.get<ClearCartUseCase>(ClearCartUseCase);
-    cartRepository = module.get('CartRepository');
+    cartRepository = module.get(CART_REPOSITORY);
   });
 
   describe('실행', () => {
@@ -57,21 +58,21 @@ describe('ClearCartUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
       cart.addItem({
         productId: 'prod-2',
         productName: '상품 B',
         productOptionId: 'opt-2',
-        price: Money.from(5000),
+        price: Price.from(5000),
         quantity: 3,
       });
       cart.addItem({
         productId: 'prod-3',
         productName: '상품 C',
         productOptionId: null,
-        price: Money.from(7000),
+        price: Price.from(7000),
         quantity: 1,
       });
 
@@ -147,7 +148,7 @@ describe('ClearCartUseCase', () => {
           productId: `prod-${i}`,
           productName: `상품 ${i}`,
           productOptionId: `opt-${i}`,
-          price: Money.from(10000),
+          price: Price.from(10000),
           quantity: 1,
         });
       }

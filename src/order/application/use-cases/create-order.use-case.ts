@@ -4,7 +4,7 @@ import type { CartRepository } from '@/order/domain/repositories/cart.repository
 import { ORDER_REPOSITORY, CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { Order } from '@/order/domain/entities/order.entity';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
-import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { CouponApplicationService } from '@/coupon/application/services/coupon-application.service';
 import {
   IProductRepository,
@@ -19,7 +19,7 @@ import { EmptyCartException } from '@/order/domain/order.exceptions';
  *
  * 플로우:
  * 1. 장바구니 조회 및 검증 (CartRepository)
- * 2. 재고 예약 (StockReservationService)
+ * 2. 재고 예약 (Product 도메인 서비스)
  * 3. 쿠폰 적용 (CouponApplicationService)
  * 4. Order.create() 호출
  * 5. 장바구니 비우기 (CartRepository)
@@ -33,7 +33,7 @@ export class CreateOrderUseCase {
     private readonly orderRepository: OrderRepository,
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: IProductRepository,
-    private readonly stockReservationService: StockReservationService,
+    private readonly stockManagementService: StockManagementService,
     private readonly couponApplicationService: CouponApplicationService,
   ) {}
 
@@ -46,8 +46,14 @@ export class CreateOrderUseCase {
 
     const cartItems = cart.getItems();
 
-    // 2. 재고 예약
-    await this.stockReservationService.reserveStockForCart(cartItems);
+    // 2. 재고 예약 (Product 도메인 서비스)
+    for (const cartItem of cartItems) {
+      await this.stockManagementService.reserveStock(
+        cartItem.productId,
+        cartItem.productOptionId,
+        cartItem.quantity,
+      );
+    }
 
     try {
       // 3. 쿠폰 적용 (Application Service)
@@ -127,11 +133,13 @@ export class CreateOrderUseCase {
       );
     } catch (error) {
       // 오류 발생 시 예약된 재고 해제
-      const orderItems = await this.convertCartItemsToOrderItems(
-        'rollback',
-        cartItems,
-      );
-      await this.stockReservationService.releaseReservedStock(orderItems);
+      for (const cartItem of cartItems) {
+        await this.stockManagementService.releaseStock(
+          cartItem.productId,
+          cartItem.productOptionId,
+          cartItem.quantity,
+        );
+      }
       throw error;
     }
   }

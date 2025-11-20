@@ -4,6 +4,7 @@ import { GetProductsUseCase } from '@/product/application/use-cases/get-products
 import { GetProductDetailUseCase } from '@/product/application/use-cases/get-product-detail.use-case';
 import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/product.repository';
 import { InMemoryProductRepository } from '@/product/infrastructure/repositories/in-memory-product.repository';
+import { StockManagementService } from '@/product/domain/services/stock-management.service';
 
 /**
  * Product Module
@@ -16,6 +17,9 @@ import { InMemoryProductRepository } from '@/product/infrastructure/repositories
     GetProductsUseCase,
     GetProductDetailUseCase,
 
+    // Domain Services
+    StockManagementService,
+
     // Repository
     {
       provide: PRODUCT_REPOSITORY,
@@ -26,6 +30,10 @@ import { InMemoryProductRepository } from '@/product/infrastructure/repositories
     // Export use cases if needed by other modules
     GetProductsUseCase,
     GetProductDetailUseCase,
+
+    // Export domain services for other modules (Order)
+    StockManagementService,
+
     PRODUCT_REPOSITORY,
   ],
 })

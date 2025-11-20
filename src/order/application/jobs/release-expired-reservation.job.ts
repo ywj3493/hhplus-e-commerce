@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { OrderRepository } from '@/order/domain/repositories/order.repository';
-import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { ORDER_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 /**
@@ -19,7 +19,7 @@ export class ReleaseExpiredReservationJob {
   constructor(
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: OrderRepository,
-    private readonly stockReservationService: StockReservationService,
+    private readonly stockManagementService: StockManagementService,
   ) {}
 
   /**
@@ -50,8 +50,14 @@ export class ReleaseExpiredReservationJob {
       // 2. BR-ORDER-16: 각 주문별로 재고 해제 및 취소 처리
       for (const order of expiredOrders) {
         try {
-          // 재고 해제
-          await this.stockReservationService.releaseReservedStock(order.items);
+          // 재고 해제 (Product 도메인 서비스)
+          for (const orderItem of order.items) {
+            await this.stockManagementService.releaseStock(
+              orderItem.productId,
+              orderItem.productOptionId,
+              orderItem.quantity,
+            );
+          }
 
           // 주문 취소
           order.cancel();

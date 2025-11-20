@@ -1,5 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { UserRepository } from '@/user/domain/repositories/user.repository';
+import {
+  UserRepository,
+  USER_REPOSITORY,
+} from '@/user/domain/repositories/user.repository';
 import { UserNotFoundException } from '@/user/domain/user.exceptions';
 import {
   GetUserProfileInput,
@@ -14,7 +17,7 @@ import {
 @Injectable()
 export class GetUserProfileUseCase {
   constructor(
-    @Inject('USER_REPOSITORY')
+    @Inject(USER_REPOSITORY)
     private readonly userRepository: UserRepository,
   ) {}
 

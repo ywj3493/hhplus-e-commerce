@@ -1,6 +1,6 @@
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { CartItem } from '@/order/domain/entities/cart-item.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import {
   CartItemNotFoundException,
   InsufficientStockException,
@@ -36,7 +36,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
       const items = tempCart.getItems();
@@ -68,7 +68,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -85,7 +85,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -94,7 +94,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 3,
       });
 
@@ -112,7 +112,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 1,
       });
 
@@ -121,7 +121,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-2',
-        price: Money.from(12000),
+        price: Price.from(12000),
         quantity: 1,
       });
 
@@ -139,7 +139,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -159,7 +159,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -190,7 +190,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -219,14 +219,14 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
       cart.addItem({
         productId: 'prod-2',
         productName: 'Product 2',
         productOptionId: 'opt-2',
-        price: Money.from(20000),
+        price: Price.from(20000),
         quantity: 1,
       });
 
@@ -259,14 +259,14 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
       cart.addItem({
         productId: 'prod-2',
         productName: 'Product 2',
         productOptionId: 'opt-2',
-        price: Money.from(20000),
+        price: Price.from(20000),
         quantity: 3,
       });
 
@@ -297,7 +297,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 

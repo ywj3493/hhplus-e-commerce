@@ -1,13 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AddCartItemUseCase } from '@/order/application/use-cases/add-cart-item.use-case';
 import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { IProductRepository, PRODUCT_REPOSITORY } from '@/product/domain/repositories/product.repository';
-import { CartStockValidationService } from '@/order/domain/services/cart-stock-validation.service';
+import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { AddCartItemInput } from '@/order/application/dtos/add-cart-item.dto';
 import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 
@@ -15,7 +16,7 @@ describe('AddCartItemUseCase', () => {
   let useCase: AddCartItemUseCase;
   let cartRepository: jest.Mocked<CartRepository>;
   let productRepository: jest.Mocked<IProductRepository>;
-  let stockValidationService: jest.Mocked<CartStockValidationService>;
+  let stockManagementService: jest.Mocked<StockManagementService>;
 
   beforeEach(async () => {
     const mockCartRepository: jest.Mocked<CartRepository> = {
@@ -32,15 +33,15 @@ describe('AddCartItemUseCase', () => {
       exists: jest.fn(),
     };
 
-    const mockStockValidationService: Partial<CartStockValidationService> = {
-      validateAvailability: jest.fn(),
+    const mockStockManagementService: Partial<StockManagementService> = {
+      validateStockAvailability: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AddCartItemUseCase,
         {
-          provide: 'CartRepository',
+          provide: CART_REPOSITORY,
           useValue: mockCartRepository,
         },
         {
@@ -48,16 +49,16 @@ describe('AddCartItemUseCase', () => {
           useValue: mockProductRepository,
         },
         {
-          provide: CartStockValidationService,
-          useValue: mockStockValidationService,
+          provide: StockManagementService,
+          useValue: mockStockManagementService,
         },
       ],
     }).compile();
 
     useCase = module.get<AddCartItemUseCase>(AddCartItemUseCase);
-    cartRepository = module.get('CartRepository');
+    cartRepository = module.get(CART_REPOSITORY);
     productRepository = module.get(PRODUCT_REPOSITORY);
-    stockValidationService = module.get(CartStockValidationService);
+    stockManagementService = module.get(StockManagementService);
   });
 
   const createTestProduct = (): Product => {
@@ -67,14 +68,14 @@ describe('AddCartItemUseCase', () => {
       'product-1',
       '색상',
       '빨강',
-      Money.from(0),
+      Price.from(0),
       stock,
     );
 
     return Product.create(
       'product-1',
       'Test Product',
-      Money.from(10000),
+      Price.from(10000),
       'Test Description',
       'https://example.com/image.jpg',
       [option],
@@ -96,7 +97,7 @@ describe('AddCartItemUseCase', () => {
 
       productRepository.findById.mockResolvedValue(product);
       cartRepository.findByUserId.mockResolvedValue(null); // 장바구니 없음
-      stockValidationService.validateAvailability.mockResolvedValue();
+      stockManagementService.validateStockAvailability.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When
@@ -122,7 +123,7 @@ describe('AddCartItemUseCase', () => {
 
       productRepository.findById.mockResolvedValue(product);
       cartRepository.findByUserId.mockResolvedValue(existingCart);
-      stockValidationService.validateAvailability.mockResolvedValue();
+      stockManagementService.validateStockAvailability.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When
@@ -167,14 +168,14 @@ describe('AddCartItemUseCase', () => {
 
       productRepository.findById.mockResolvedValue(product);
       cartRepository.findByUserId.mockResolvedValue(null);
-      stockValidationService.validateAvailability.mockResolvedValue();
+      stockManagementService.validateStockAvailability.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When
       await useCase.execute(input);
 
       // Then
-      expect(stockValidationService.validateAvailability).toHaveBeenCalledWith(
+      expect(stockManagementService.validateStockAvailability).toHaveBeenCalledWith(
         'product-1',
         'option-1',
         5,
@@ -189,7 +190,7 @@ describe('AddCartItemUseCase', () => {
         productId: 'product-1',
         productName: 'Test Product',
         productOptionId: 'option-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -202,7 +203,7 @@ describe('AddCartItemUseCase', () => {
 
       productRepository.findById.mockResolvedValue(product);
       cartRepository.findByUserId.mockResolvedValue(existingCart);
-      stockValidationService.validateAvailability.mockResolvedValue();
+      stockManagementService.validateStockAvailability.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When

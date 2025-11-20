@@ -1,6 +1,6 @@
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { CartItem, CartItemCreateData } from '@/order/domain/entities/cart-item.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 
 /**
  * 테스트용 Cart 생성 헬퍼
@@ -20,7 +20,7 @@ export const createTestCartItem = (
     productId: 'prod-1',
     productName: '테스트 상품',
     productOptionId: 'opt-1',
-    price: Money.from(10000),
+    price: Price.from(10000),
     quantity: 1,
   };
 
@@ -37,7 +37,7 @@ export const createTestCartWithItems = (userId: string = 'user-1'): Cart => {
     productId: 'prod-1',
     productName: '상품 A',
     productOptionId: 'opt-1',
-    price: Money.from(10000),
+    price: Price.from(10000),
     quantity: 2,
   });
 
@@ -45,7 +45,7 @@ export const createTestCartWithItems = (userId: string = 'user-1'): Cart => {
     productId: 'prod-2',
     productName: '상품 B',
     productOptionId: null,
-    price: Money.from(5000),
+    price: Price.from(5000),
     quantity: 3,
   });
 

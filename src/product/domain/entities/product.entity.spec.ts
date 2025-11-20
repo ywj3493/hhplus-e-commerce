@@ -1,7 +1,7 @@
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { StockStatusType } from '@/product/domain/entities/stock-status.vo';
 
 describe('Product', () => {
@@ -9,7 +9,7 @@ describe('Product', () => {
     return Product.create(
       'product-1',
       'Test Product',
-      Money.from(10000),
+      Price.from(10000),
       'Test Description',
       'https://example.com/image.jpg',
       options,
@@ -38,7 +38,7 @@ describe('Product', () => {
       'product-1',
       type,
       name,
-      Money.from(additionalPrice),
+      Price.from(additionalPrice),
       stock,
     );
   };
@@ -48,7 +48,7 @@ describe('Product', () => {
       // Given
       const id = 'product-1';
       const name = 'Test Product';
-      const price = Money.from(10000);
+      const price = Price.from(10000);
       const description = 'Test Description';
       const imageUrl = 'https://example.com/image.jpg';
       const createdAt = new Date('2024-01-01');
@@ -83,7 +83,7 @@ describe('Product', () => {
         Product.create(
           '',
           'Test',
-          Money.from(10000),
+          Price.from(10000),
           'Desc',
           'https://example.com/image.jpg',
           [],
@@ -99,7 +99,7 @@ describe('Product', () => {
         Product.create(
           'product-1',
           '',
-          Money.from(10000),
+          Price.from(10000),
           'Desc',
           'https://example.com/image.jpg',
           [],
@@ -115,7 +115,7 @@ describe('Product', () => {
         Product.create(
           'product-1',
           'Test',
-          Money.from(10000),
+          Price.from(10000),
           'Desc',
           '',
           [],

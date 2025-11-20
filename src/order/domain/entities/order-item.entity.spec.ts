@@ -1,5 +1,5 @@
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { CartItem } from '@/order/domain/entities/cart-item.entity';
 
 describe('OrderItem Entity', () => {
@@ -11,7 +11,7 @@ describe('OrderItem Entity', () => {
         productId: 'product-1',
         productName: '테스트 상품',
         productOptionId: 'option-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
       const orderId = 'order-1';
@@ -43,7 +43,7 @@ describe('OrderItem Entity', () => {
         productName: '테스트 상품',
         productOptionId: 'option-1',
         productOptionName: '블루',
-        price: Money.from(15000),
+        price: Price.from(15000),
         quantity: 3,
       };
 
@@ -67,7 +67,7 @@ describe('OrderItem Entity', () => {
         productName: '테스트 상품',
         productOptionId: 'option-1',
         productOptionName: '그린',
-        price: Money.from(20000),
+        price: Price.from(20000),
         quantity: 1,
       };
 
@@ -90,7 +90,7 @@ describe('OrderItem Entity', () => {
         productName: '테스트 상품',
         productOptionId: null,
         productOptionName: null,
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 0, // 잘못된 수량
       };
 
@@ -110,7 +110,7 @@ describe('OrderItem Entity', () => {
         productName: '테스트 상품',
         productOptionId: null,
         productOptionName: null,
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 3,
       });
 
@@ -129,7 +129,7 @@ describe('OrderItem Entity', () => {
         productName: '테스트 상품',
         productOptionId: null,
         productOptionName: null,
-        price: Money.from(15000),
+        price: Price.from(15000),
         quantity: 1,
       });
 
@@ -149,7 +149,7 @@ describe('OrderItem Entity', () => {
         productId: 'product-1',
         productName: '원본 상품명',
         productOptionId: 'option-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 1,
       });
 

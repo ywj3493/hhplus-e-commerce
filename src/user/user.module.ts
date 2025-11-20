@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserController } from '@/user/presentation/controllers/user.controller';
 import { GetUserProfileUseCase } from '@/user/application/use-cases/get-user-profile.use-case';
 import { InMemoryUserRepository } from '@/user/infrastructure/repositories/in-memory-user.repository';
+import { USER_REPOSITORY } from '@/user/domain/repositories/user.repository';
 
 /**
  * User Module
@@ -15,14 +16,14 @@ import { InMemoryUserRepository } from '@/user/infrastructure/repositories/in-me
 
     // Repository
     {
-      provide: 'USER_REPOSITORY',
+      provide: USER_REPOSITORY,
       useClass: InMemoryUserRepository,
     },
   ],
   exports: [
     // Export use cases if needed by other modules
     GetUserProfileUseCase,
-    'USER_REPOSITORY',
+    USER_REPOSITORY,
   ],
 })
 export class UserModule {}

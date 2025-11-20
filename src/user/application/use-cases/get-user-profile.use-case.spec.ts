@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GetUserProfileUseCase } from '@/user/application/use-cases/get-user-profile.use-case';
-import { UserRepository } from '@/user/domain/repositories/user.repository';
+import {
+  UserRepository,
+  USER_REPOSITORY,
+} from '@/user/domain/repositories/user.repository';
 import { UserNotFoundException } from '@/user/domain/user.exceptions';
 import { User } from '@/user/domain/entities/user.entity';
 import { GetUserProfileInput } from '@/user/application/dtos/get-user-profile.dto';
@@ -18,14 +21,14 @@ describe('GetUserProfileUseCase', () => {
       providers: [
         GetUserProfileUseCase,
         {
-          provide: 'USER_REPOSITORY',
+          provide: USER_REPOSITORY,
           useValue: mockRepository,
         },
       ],
     }).compile();
 
     useCase = module.get<GetUserProfileUseCase>(GetUserProfileUseCase);
-    userRepository = module.get('USER_REPOSITORY');
+    userRepository = module.get(USER_REPOSITORY);
   });
 
   describe('execute', () => {

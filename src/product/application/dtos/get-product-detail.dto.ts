@@ -1,4 +1,4 @@
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { StockStatus } from '@/product/domain/entities/stock-status.vo';
 
 /**
@@ -8,7 +8,7 @@ export class ProductOptionDetail {
   constructor(
     public readonly id: string,
     public readonly name: string,
-    public readonly additionalPrice: Money,
+    public readonly additionalPrice: Price,
     public readonly stockStatus: StockStatus,
     public readonly isSelectable: boolean,
   ) {}
@@ -49,7 +49,7 @@ export class GetProductDetailOutput {
   constructor(
     public readonly id: string,
     public readonly name: string,
-    public readonly price: Money,
+    public readonly price: Price,
     public readonly description: string,
     public readonly imageUrl: string,
     public readonly optionGroups: ProductOptionGroup[],

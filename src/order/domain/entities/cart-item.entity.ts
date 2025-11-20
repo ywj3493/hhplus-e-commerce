@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { InvalidQuantityException } from '@/order/domain/order.exceptions';
 
 export interface CartItemCreateData {
@@ -7,7 +7,7 @@ export interface CartItemCreateData {
   productId: string;
   productName: string;
   productOptionId: string | null;
-  price: Money;
+  price: Price;
   quantity: number;
 }
 
@@ -17,7 +17,7 @@ export interface CartItemData {
   productId: string;
   productName: string;
   productOptionId: string | null;
-  price: Money;
+  price: Price;
   quantity: number;
 }
 
@@ -27,7 +27,7 @@ export class CartItem {
   private readonly _productId: string;
   private readonly _productName: string;
   private readonly _productOptionId: string | null;
-  private readonly _price: Money;
+  private readonly _price: Price;
   private _quantity: number;
 
   private constructor(
@@ -36,7 +36,7 @@ export class CartItem {
     productId: string,
     productName: string,
     productOptionId: string | null,
-    price: Money,
+    price: Price,
     quantity: number,
   ) {
     this._id = id;
@@ -126,14 +126,14 @@ export class CartItem {
   /**
    * 소계 계산 (가격 × 수량)
    */
-  getSubtotal(): Money {
+  getSubtotal(): Price {
     return this._price.multiply(this._quantity);
   }
 
   /**
-   * 가격 반환 (Money VO)
+   * 가격 반환 (Price VO)
    */
-  getPrice(): Money {
+  getPrice(): Price {
     return this._price;
   }
 

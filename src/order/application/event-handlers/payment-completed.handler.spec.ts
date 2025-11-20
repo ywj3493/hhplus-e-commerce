@@ -1,34 +1,48 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
 import { PaymentCompletedHandler } from '@/order/application/event-handlers/payment-completed.handler';
-import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { PaymentCompletedEvent } from '@/order/domain/events/payment-completed.event';
+import { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { ORDER_REPOSITORY } from '@/order/domain/repositories/tokens';
+import { Order } from '@/order/domain/entities/order.entity';
+import { OrderItem } from '@/order/domain/entities/order-item.entity';
+import { OrderStatus } from '@/order/domain/entities/order-status.enum';
+import { Price } from '@/product/domain/entities/price.vo';
 
 describe('PaymentCompletedHandler', () => {
   let handler: PaymentCompletedHandler;
-  let stockReservationService: jest.Mocked<StockReservationService>;
+  let stockManagementService: jest.Mocked<StockManagementService>;
+  let orderRepository: jest.Mocked<OrderRepository>;
   let loggerSpy: jest.SpyInstance;
   let loggerErrorSpy: jest.SpyInstance;
 
   beforeEach(async () => {
-    const mockStockReservationService = {
-      convertReservedToSold: jest.fn(),
-      reserveStockForCart: jest.fn(),
-      releaseReservedStock: jest.fn(),
-    } as unknown as jest.Mocked<StockReservationService>;
+    const mockStockManagementService = {
+      confirmSale: jest.fn(),
+    } as unknown as jest.Mocked<StockManagementService>;
+
+    const mockOrderRepository = {
+      findById: jest.fn(),
+    } as unknown as jest.Mocked<OrderRepository>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PaymentCompletedHandler,
         {
-          provide: StockReservationService,
-          useValue: mockStockReservationService,
+          provide: ORDER_REPOSITORY,
+          useValue: mockOrderRepository,
+        },
+        {
+          provide: StockManagementService,
+          useValue: mockStockManagementService,
         },
       ],
     }).compile();
 
     handler = module.get<PaymentCompletedHandler>(PaymentCompletedHandler);
-    stockReservationService = module.get(StockReservationService);
+    orderRepository = module.get(ORDER_REPOSITORY);
+    stockManagementService = module.get(StockManagementService);
 
     // Logger spy 설정
     loggerSpy = jest.spyOn(Logger.prototype, 'log').mockImplementation();
@@ -43,25 +57,77 @@ describe('PaymentCompletedHandler', () => {
   describe('handle', () => {
     it('결제 완료 이벤트 수신 시 재고를 확정해야 함', async () => {
       // Given
+      const orderItem = OrderItem.create({
+        orderId: 'order-1',
+        productId: 'product-1',
+        productName: 'Test Product',
+        productOptionId: 'option-1',
+        productOptionName: 'Red',
+        price: Price.from(10000),
+        quantity: 2,
+      });
+      const order = Order.reconstitute({
+        id: 'order-1',
+        userId: 'user-1',
+        status: OrderStatus.COMPLETED,
+        items: [orderItem],
+        totalAmount: 20000,
+        discountAmount: 0,
+        finalAmount: 20000,
+        userCouponId: null,
+        reservationExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        createdAt: new Date(),
+        paidAt: new Date(),
+        updatedAt: new Date(),
+      });
+
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
-      stockReservationService.convertReservedToSold.mockResolvedValue(undefined);
+      orderRepository.findById.mockResolvedValue(order);
+      stockManagementService.confirmSale.mockResolvedValue(undefined);
 
       // When
       await handler.handle(event);
 
       // Then
-      expect(stockReservationService.convertReservedToSold).toHaveBeenCalledWith(
-        'order-1',
+      expect(orderRepository.findById).toHaveBeenCalledWith('order-1');
+      expect(stockManagementService.confirmSale).toHaveBeenCalledWith(
+        'product-1',
+        'option-1',
+        2,
       );
-      expect(stockReservationService.convertReservedToSold).toHaveBeenCalledTimes(
-        1,
-      );
+      expect(stockManagementService.confirmSale).toHaveBeenCalledTimes(1);
     });
 
     it('이벤트 수신 시 로그를 기록해야 함', async () => {
       // Given
+      const orderItem = OrderItem.create({
+        orderId: 'order-1',
+        productId: 'product-1',
+        productName: 'Test Product',
+        productOptionId: 'option-1',
+        productOptionName: 'Red',
+        price: Price.from(10000),
+        quantity: 2,
+      }
+      );
+      const order = Order.reconstitute({
+        id: 'order-1',
+        userId: 'user-1',
+        status: OrderStatus.COMPLETED,
+        items: [orderItem],
+        totalAmount: 20000,
+        discountAmount: 0,
+        finalAmount: 20000,
+        userCouponId: null,
+        reservationExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        createdAt: new Date(),
+        paidAt: new Date(),
+        updatedAt: new Date(),
+      });
+
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
-      stockReservationService.convertReservedToSold.mockResolvedValue(undefined);
+      orderRepository.findById.mockResolvedValue(order);
+      stockManagementService.confirmSale.mockResolvedValue(undefined);
 
       // When
       await handler.handle(event);
@@ -81,7 +147,7 @@ describe('PaymentCompletedHandler', () => {
     it('재고 확정 완료 시 성공 로그를 기록해야 함', async () => {
       // Given
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
-      stockReservationService.convertReservedToSold.mockResolvedValue(undefined);
+      stockManagementService.confirmSale.mockResolvedValue(undefined);
 
       // When
       await handler.handle(event);
@@ -99,7 +165,7 @@ describe('PaymentCompletedHandler', () => {
       // Given
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
       const error = new Error('재고 확정 실패');
-      stockReservationService.convertReservedToSold.mockRejectedValue(error);
+      stockManagementService.confirmSale.mockRejectedValue(error);
 
       // When & Then
       await expect(handler.handle(event)).rejects.toThrow(error);
@@ -114,7 +180,7 @@ describe('PaymentCompletedHandler', () => {
       // Given
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
       const insufficientStockError = new Error('재고가 부족합니다');
-      stockReservationService.convertReservedToSold.mockRejectedValue(
+      stockManagementService.confirmSale.mockRejectedValue(
         insufficientStockError,
       );
 
@@ -123,7 +189,7 @@ describe('PaymentCompletedHandler', () => {
         insufficientStockError,
       );
 
-      expect(stockReservationService.convertReservedToSold).toHaveBeenCalledWith(
+      expect(stockManagementService.confirmSale).toHaveBeenCalledWith(
         'order-1',
       );
     });
@@ -132,7 +198,7 @@ describe('PaymentCompletedHandler', () => {
       // Given
       const event = new PaymentCompletedEvent('payment-1', 'non-existent-order');
       const notFoundError = new Error('주문을 찾을 수 없습니다');
-      stockReservationService.convertReservedToSold.mockRejectedValue(
+      stockManagementService.confirmSale.mockRejectedValue(
         notFoundError,
       );
 
@@ -153,7 +219,7 @@ describe('PaymentCompletedHandler', () => {
       const event2 = new PaymentCompletedEvent('payment-2', 'order-2');
       const event3 = new PaymentCompletedEvent('payment-3', 'order-3');
 
-      stockReservationService.convertReservedToSold.mockResolvedValue(undefined);
+      stockManagementService.confirmSale.mockResolvedValue(undefined);
 
       // When
       await handler.handle(event1);
@@ -161,18 +227,18 @@ describe('PaymentCompletedHandler', () => {
       await handler.handle(event3);
 
       // Then
-      expect(stockReservationService.convertReservedToSold).toHaveBeenCalledTimes(
+      expect(stockManagementService.confirmSale).toHaveBeenCalledTimes(
         3,
       );
-      expect(stockReservationService.convertReservedToSold).toHaveBeenNthCalledWith(
+      expect(stockManagementService.confirmSale).toHaveBeenNthCalledWith(
         1,
         'order-1',
       );
-      expect(stockReservationService.convertReservedToSold).toHaveBeenNthCalledWith(
+      expect(stockManagementService.confirmSale).toHaveBeenNthCalledWith(
         2,
         'order-2',
       );
-      expect(stockReservationService.convertReservedToSold).toHaveBeenNthCalledWith(
+      expect(stockManagementService.confirmSale).toHaveBeenNthCalledWith(
         3,
         'order-3',
       );
@@ -184,7 +250,7 @@ describe('PaymentCompletedHandler', () => {
       const event2 = new PaymentCompletedEvent('payment-2', 'order-2'); // 실패할 이벤트
       const event3 = new PaymentCompletedEvent('payment-3', 'order-3');
 
-      stockReservationService.convertReservedToSold
+      stockManagementService.confirmSale
         .mockResolvedValueOnce(undefined) // event1 성공
         .mockRejectedValueOnce(new Error('재고 확정 실패')) // event2 실패
         .mockResolvedValueOnce(undefined); // event3 성공
@@ -195,7 +261,7 @@ describe('PaymentCompletedHandler', () => {
       await handler.handle(event3); // 성공
 
       // Then
-      expect(stockReservationService.convertReservedToSold).toHaveBeenCalledTimes(
+      expect(stockManagementService.confirmSale).toHaveBeenCalledTimes(
         3,
       );
       expect(loggerSpy).toHaveBeenCalledWith(
@@ -215,13 +281,13 @@ describe('PaymentCompletedHandler', () => {
       const orderId = 'order-67890';
       const event = new PaymentCompletedEvent(paymentId, orderId);
 
-      stockReservationService.convertReservedToSold.mockResolvedValue(undefined);
+      stockManagementService.confirmSale.mockResolvedValue(undefined);
 
       // When
       await handler.handle(event);
 
       // Then
-      expect(stockReservationService.convertReservedToSold).toHaveBeenCalledWith(
+      expect(stockManagementService.confirmSale).toHaveBeenCalledWith(
         orderId,
       );
     });

@@ -4,7 +4,7 @@ import { IProductRepository, PaginationResult } from '@/product/domain/repositor
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { StockStatusType } from '@/product/domain/entities/stock-status.vo';
 
 describe('GetProductsUseCase', () => {
@@ -33,13 +33,13 @@ describe('GetProductsUseCase', () => {
       id,
       'Default',
       'Standard',
-      Money.from(0),
+      Price.from(0),
       Stock.initialize(`stock-${id}`, `opt-${id}`, availableQuantity),
     );
     return Product.create(
       id,
       name,
-      Money.from(price),
+      Price.from(price),
       `Description for ${name}`,
       `https://example.com/${id}.jpg`,
       [option],

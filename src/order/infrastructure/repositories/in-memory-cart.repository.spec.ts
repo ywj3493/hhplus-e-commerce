@@ -1,6 +1,6 @@
 import { InMemoryCartRepository } from '@/order/infrastructure/repositories/in-memory-cart.repository';
 import { Cart } from '@/order/domain/entities/cart.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 
 describe('InMemoryCartRepository', () => {
   let repository: InMemoryCartRepository;
@@ -17,7 +17,7 @@ describe('InMemoryCartRepository', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
       await repository.save(cart);
@@ -48,7 +48,7 @@ describe('InMemoryCartRepository', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -68,7 +68,7 @@ describe('InMemoryCartRepository', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
       const saved = await repository.save(cart);
@@ -78,7 +78,7 @@ describe('InMemoryCartRepository', () => {
         productId: 'prod-2',
         productName: 'Product 2',
         productOptionId: 'opt-2',
-        price: Money.from(20000),
+        price: Price.from(20000),
         quantity: 1,
       });
       const updated = await repository.save(saved);
@@ -95,7 +95,7 @@ describe('InMemoryCartRepository', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -105,7 +105,7 @@ describe('InMemoryCartRepository', () => {
         productId: 'prod-2',
         productName: 'Product 2',
         productOptionId: 'opt-2',
-        price: Money.from(20000),
+        price: Price.from(20000),
         quantity: 1,
       });
 
@@ -123,7 +123,7 @@ describe('InMemoryCartRepository', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
       await repository.save(cart);
@@ -152,7 +152,7 @@ describe('InMemoryCartRepository', () => {
         productId: 'prod-1',
         productName: 'Product 1',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -161,7 +161,7 @@ describe('InMemoryCartRepository', () => {
         productId: 'prod-2',
         productName: 'Product 2',
         productOptionId: 'opt-2',
-        price: Money.from(20000),
+        price: Price.from(20000),
         quantity: 1,
       });
 

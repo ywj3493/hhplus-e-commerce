@@ -9,7 +9,7 @@ import {
   ProductOptionGroup,
   ProductOptionDetail,
 } from '@/product/application/dtos/get-product-detail.dto';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { StockStatus } from '@/product/domain/entities/stock-status.vo';
 import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 
@@ -155,18 +155,18 @@ describe('ProductController', () => {
       const useCaseOutput = new GetProductDetailOutput(
         '550e8400-e29b-41d4-a716-446655440001',
         'Test Product',
-        Money.from(50000),
+        Price.from(50000),
         'Test description',
         'https://example.com/product.jpg',
         [
           new ProductOptionGroup('Color', [
-            new ProductOptionDetail('opt-1', 'Red', Money.from(0), StockStatus.inStock(), true),
-            new ProductOptionDetail('opt-2', 'Blue', Money.from(0), StockStatus.outOfStock(), false),
+            new ProductOptionDetail('opt-1', 'Red', Price.from(0), StockStatus.inStock(), true),
+            new ProductOptionDetail('opt-2', 'Blue', Price.from(0), StockStatus.outOfStock(), false),
           ]),
           new ProductOptionGroup('Size', [
-            new ProductOptionDetail('opt-3', 'S', Money.from(0), StockStatus.outOfStock(), false),
-            new ProductOptionDetail('opt-4', 'M', Money.from(0), StockStatus.inStock(), true),
-            new ProductOptionDetail('opt-5', 'L', Money.from(2000), StockStatus.inStock(), true),
+            new ProductOptionDetail('opt-3', 'S', Price.from(0), StockStatus.outOfStock(), false),
+            new ProductOptionDetail('opt-4', 'M', Price.from(0), StockStatus.inStock(), true),
+            new ProductOptionDetail('opt-5', 'L', Price.from(2000), StockStatus.inStock(), true),
           ]),
         ],
       );
@@ -193,12 +193,12 @@ describe('ProductController', () => {
       const useCaseOutput = new GetProductDetailOutput(
         '550e8400-e29b-41d4-a716-446655440001',
         'Test Product',
-        Money.from(50000),
+        Price.from(50000),
         'Test description',
         'https://example.com/product.jpg',
         [
           new ProductOptionGroup('Color', [
-            new ProductOptionDetail('opt-1', 'Red', Money.from(0), StockStatus.inStock(), true),
+            new ProductOptionDetail('opt-1', 'Red', Price.from(0), StockStatus.inStock(), true),
           ]),
         ],
       );
@@ -238,7 +238,7 @@ describe('ProductController', () => {
       const useCaseOutput = new GetProductDetailOutput(
         '550e8400-e29b-41d4-a716-446655440001',
         'Product without options',
-        Money.from(10000),
+        Price.from(10000),
         'Description',
         'https://example.com/product.jpg',
         [], // 옵션 없음
@@ -252,18 +252,18 @@ describe('ProductController', () => {
       expect(response.optionGroups).toHaveLength(0);
     });
 
-    it('응답에서 Money를 number로 변환해야 함', async () => {
+    it('응답에서 Price를 number로 변환해야 함', async () => {
       // Given
       const param = { id: '550e8400-e29b-41d4-a716-446655440001' };
       const useCaseOutput = new GetProductDetailOutput(
         '550e8400-e29b-41d4-a716-446655440001',
         'Test Product',
-        Money.from(75000),
+        Price.from(75000),
         'Description',
         'https://example.com/product.jpg',
         [
           new ProductOptionGroup('Size', [
-            new ProductOptionDetail('opt-1', 'L', Money.from(3000), StockStatus.inStock(), true),
+            new ProductOptionDetail('opt-1', 'L', Price.from(3000), StockStatus.inStock(), true),
           ]),
         ],
       );
@@ -283,13 +283,13 @@ describe('ProductController', () => {
       const useCaseOutput = new GetProductDetailOutput(
         '550e8400-e29b-41d4-a716-446655440001',
         'Test Product',
-        Money.from(10000),
+        Price.from(10000),
         'Description',
         'https://example.com/product.jpg',
         [
           new ProductOptionGroup('Color', [
-            new ProductOptionDetail('opt-1', 'Red', Money.from(0), StockStatus.inStock(), true),
-            new ProductOptionDetail('opt-2', 'Blue', Money.from(0), StockStatus.outOfStock(), false),
+            new ProductOptionDetail('opt-1', 'Red', Price.from(0), StockStatus.inStock(), true),
+            new ProductOptionDetail('opt-2', 'Blue', Price.from(0), StockStatus.outOfStock(), false),
           ]),
         ],
       );
@@ -309,13 +309,13 @@ describe('ProductController', () => {
       const useCaseOutput = new GetProductDetailOutput(
         '550e8400-e29b-41d4-a716-446655440001',
         'Test Product',
-        Money.from(10000),
+        Price.from(10000),
         'Description',
         'https://example.com/product.jpg',
         [
           new ProductOptionGroup('Size', [
-            new ProductOptionDetail('opt-1', 'S', Money.from(0), StockStatus.outOfStock(), false),
-            new ProductOptionDetail('opt-2', 'M', Money.from(0), StockStatus.inStock(), true),
+            new ProductOptionDetail('opt-1', 'S', Price.from(0), StockStatus.outOfStock(), false),
+            new ProductOptionDetail('opt-2', 'M', Price.from(0), StockStatus.inStock(), true),
           ]),
         ],
       );

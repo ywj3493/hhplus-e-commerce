@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RemoveCartItemUseCase } from '@/order/application/use-cases/remove-cart-item.use-case';
 import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { RemoveCartItemInput } from '@/order/application/dtos/remove-cart-item.dto';
 import { CartNotFoundException } from '@/order/domain/order.exceptions';
 import { createTestCart } from '@/order/infrastructure/fixtures/cart.fixtures';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 
 describe('RemoveCartItemUseCase', () => {
   let useCase: RemoveCartItemUseCase;
@@ -21,14 +22,14 @@ describe('RemoveCartItemUseCase', () => {
       providers: [
         RemoveCartItemUseCase,
         {
-          provide: 'CartRepository',
+          provide: CART_REPOSITORY,
           useValue: mockCartRepository,
         },
       ],
     }).compile();
 
     useCase = module.get<RemoveCartItemUseCase>(RemoveCartItemUseCase);
-    cartRepository = module.get('CartRepository');
+    cartRepository = module.get(CART_REPOSITORY);
   });
 
   describe('실행', () => {
@@ -39,7 +40,7 @@ describe('RemoveCartItemUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -67,14 +68,14 @@ describe('RemoveCartItemUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
       cart.addItem({
         productId: 'prod-2',
         productName: '상품 B',
         productOptionId: 'opt-2',
-        price: Money.from(5000),
+        price: Price.from(5000),
         quantity: 3,
       });
 
@@ -103,7 +104,7 @@ describe('RemoveCartItemUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -143,7 +144,7 @@ describe('RemoveCartItemUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 

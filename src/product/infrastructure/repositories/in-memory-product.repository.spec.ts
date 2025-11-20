@@ -2,7 +2,7 @@ import { InMemoryProductRepository } from '@/product/infrastructure/repositories
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 
 describe('InMemoryProductRepository', () => {
   let repository: InMemoryProductRepository;
@@ -22,13 +22,13 @@ describe('InMemoryProductRepository', () => {
       id,
       'Default',
       'Standard',
-      Money.from(0),
+      Price.from(0),
       Stock.create(`stock-${id}`, `opt-${id}`, 100, 100 - soldQuantity, 0, soldQuantity),
     );
     return Product.create(
       id,
       name,
-      Money.from(10000),
+      Price.from(10000),
       'Test description',
       'https://example.com/image.jpg',
       [option],
@@ -219,7 +219,7 @@ describe('InMemoryProductRepository', () => {
         'prod-multi',
         'Size',
         'S',
-        Money.from(0),
+        Price.from(0),
         Stock.create('stock-1', 'opt-1', 100, 50, 0, 50),
       );
       const option2 = ProductOption.create(
@@ -227,13 +227,13 @@ describe('InMemoryProductRepository', () => {
         'prod-multi',
         'Size',
         'M',
-        Money.from(0),
+        Price.from(0),
         Stock.create('stock-2', 'opt-2', 100, 20, 0, 80),
       );
       const product = Product.create(
         'prod-multi',
         'Multi Option Product',
-        Money.from(10000),
+        Price.from(10000),
         'Test',
         'https://example.com/image.jpg',
         [option1, option2],

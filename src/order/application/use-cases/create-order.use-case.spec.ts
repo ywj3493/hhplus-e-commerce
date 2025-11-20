@@ -1,15 +1,16 @@
 import { CreateOrderUseCase } from '@/order/application/use-cases/create-order.use-case';
 import { OrderRepository } from '@/order/domain/repositories/order.repository';
 import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { IProductRepository } from '@/product/domain/repositories/product.repository';
-import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { CouponApplicationService } from '@/coupon/application/services/coupon-application.service';
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { CartItem } from '@/order/domain/entities/cart-item.entity';
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { CreateOrderInput } from '@/order/application/dtos/create-order.dto';
 import { EmptyCartException } from '@/order/domain/order.exceptions';
 
@@ -18,7 +19,7 @@ describe('CreateOrderUseCase', () => {
   let cartRepository: jest.Mocked<CartRepository>;
   let orderRepository: jest.Mocked<OrderRepository>;
   let productRepository: jest.Mocked<IProductRepository>;
-  let stockReservationService: jest.Mocked<StockReservationService>;
+  let stockManagementService: jest.Mocked<StockManagementService>;
   let couponApplicationService: jest.Mocked<CouponApplicationService>;
 
   beforeEach(() => {
@@ -46,9 +47,9 @@ describe('CreateOrderUseCase', () => {
     } as jest.Mocked<IProductRepository>;
 
     // Mock services
-    stockReservationService = {
-      reserveStockForCart: jest.fn(),
-      releaseReservedStock: jest.fn(),
+    stockManagementService = {
+      reserveStock: jest.fn(),
+      releaseStock: jest.fn(),
       convertReservedToSold: jest.fn(),
     } as any;
 
@@ -61,7 +62,7 @@ describe('CreateOrderUseCase', () => {
       cartRepository,
       orderRepository,
       productRepository,
-      stockReservationService,
+      stockManagementService,
       couponApplicationService,
     );
   });
@@ -73,14 +74,14 @@ describe('CreateOrderUseCase', () => {
       'product-1',
       '색상',
       '레드',
-      Money.from(0),
+      Price.from(0),
       stock,
     );
 
     return Product.create(
       'product-1',
       '테스트 상품',
-      Money.from(10000),
+      Price.from(10000),
       '설명',
       'https://example.com/image.jpg',
       [option],
@@ -95,7 +96,7 @@ describe('CreateOrderUseCase', () => {
       productId: 'product-1',
       productName: '테스트 상품',
       productOptionId: 'option-1',
-      price: Money.from(10000),
+      price: Price.from(10000),
       quantity: 2,
     });
 
@@ -130,8 +131,10 @@ describe('CreateOrderUseCase', () => {
       const result = await useCase.execute(input);
 
       // Then
-      expect(stockReservationService.reserveStockForCart).toHaveBeenCalledWith(
-        cart.getItems(),
+      expect(stockManagementService.reserveStock).toHaveBeenCalledWith(
+        'product-1',
+        'option-1',
+        2,
       );
       expect(orderRepository.save).toHaveBeenCalled();
       expect(cartRepository.clearByUserId).toHaveBeenCalledWith(userId);
@@ -205,13 +208,13 @@ describe('CreateOrderUseCase', () => {
 
       cartRepository.findByUserId.mockResolvedValue(cart);
       productRepository.findById.mockResolvedValue(product);
-      stockReservationService.reserveStockForCart.mockRejectedValue(
+      stockManagementService.reserveStock.mockRejectedValue(
         new Error('재고 부족'),
       );
 
       // When & Then
       await expect(useCase.execute(input)).rejects.toThrow('재고 부족');
-      expect(stockReservationService.releaseReservedStock).not.toHaveBeenCalled();
+      expect(stockManagementService.releaseStock).not.toHaveBeenCalled();
     });
   });
 });

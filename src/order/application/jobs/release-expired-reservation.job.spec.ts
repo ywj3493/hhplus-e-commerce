@@ -1,13 +1,13 @@
 import { ReleaseExpiredReservationJob } from '@/order/application/jobs/release-expired-reservation.job';
 import { OrderRepository } from '@/order/domain/repositories/order.repository';
-import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { OrderFixtures } from '@/order/infrastructure/fixtures/order.fixtures';
 import { OrderStatus } from '@/order/domain/entities/order-status.enum';
 
 describe('ReleaseExpiredReservationJob', () => {
   let job: ReleaseExpiredReservationJob;
   let orderRepository: jest.Mocked<OrderRepository>;
-  let stockReservationService: jest.Mocked<StockReservationService>;
+  let stockManagementService: jest.Mocked<StockManagementService>;
 
   beforeEach(() => {
     // Mock repository
@@ -20,16 +20,16 @@ describe('ReleaseExpiredReservationJob', () => {
     } as jest.Mocked<OrderRepository>;
 
     // Mock service
-    stockReservationService = {
+    stockManagementService = {
       reserveStockForCart: jest.fn(),
-      releaseReservedStock: jest.fn(),
+      releaseStock: jest.fn(),
       convertReservedToSold: jest.fn(),
     } as any;
 
     // Create job
     job = new ReleaseExpiredReservationJob(
       orderRepository,
-      stockReservationService,
+      stockManagementService,
     );
   });
 
@@ -46,8 +46,10 @@ describe('ReleaseExpiredReservationJob', () => {
 
       // Then
       expect(orderRepository.findExpiredPendingOrders).toHaveBeenCalled();
-      expect(stockReservationService.releaseReservedStock).toHaveBeenCalledWith(
-        expiredOrder.items,
+      expect(stockManagementService.releaseStock).toHaveBeenCalledWith(
+        'product-1',
+        'option-1',
+        1,
       );
       expect(orderRepository.save).toHaveBeenCalled();
 
@@ -71,7 +73,7 @@ describe('ReleaseExpiredReservationJob', () => {
       await job.execute();
 
       // Then
-      expect(stockReservationService.releaseReservedStock).toHaveBeenCalledTimes(
+      expect(stockManagementService.releaseStock).toHaveBeenCalledTimes(
         3,
       );
       expect(orderRepository.save).toHaveBeenCalledTimes(3);
@@ -85,7 +87,7 @@ describe('ReleaseExpiredReservationJob', () => {
       await job.execute();
 
       // Then
-      expect(stockReservationService.releaseReservedStock).not.toHaveBeenCalled();
+      expect(stockManagementService.releaseStock).not.toHaveBeenCalled();
       expect(orderRepository.save).not.toHaveBeenCalled();
     });
 
@@ -101,7 +103,7 @@ describe('ReleaseExpiredReservationJob', () => {
       );
 
       // 두 번째 주문 처리 시 오류 발생
-      stockReservationService.releaseReservedStock
+      stockManagementService.releaseStock
         .mockResolvedValueOnce(undefined) // 첫 번째 성공
         .mockRejectedValueOnce(new Error('Stock release failed')) // 두 번째 실패
         .mockResolvedValueOnce(undefined); // 세 번째 성공
@@ -110,7 +112,7 @@ describe('ReleaseExpiredReservationJob', () => {
       await job.execute();
 
       // Then
-      expect(stockReservationService.releaseReservedStock).toHaveBeenCalledTimes(
+      expect(stockManagementService.releaseStock).toHaveBeenCalledTimes(
         3,
       );
       // 실패한 주문 제외하고 2개만 저장

@@ -4,7 +4,7 @@ import { IProductRepository } from '@/product/domain/repositories/product.reposi
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { StockStatusType } from '@/product/domain/entities/stock-status.vo';
 import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 
@@ -30,7 +30,7 @@ describe('GetProductDetailUseCase', () => {
         'product-1',
         'Color',
         'Red',
-        Money.from(0),
+        Price.from(0),
         Stock.initialize('stock-red', 'opt-color-red', 50),
       ),
       ProductOption.create(
@@ -38,7 +38,7 @@ describe('GetProductDetailUseCase', () => {
         'product-1',
         'Color',
         'Blue',
-        Money.from(0),
+        Price.from(0),
         Stock.create('stock-blue', 'opt-color-blue', 50, 0, 30, 20), // 품절
       ),
     ];
@@ -49,7 +49,7 @@ describe('GetProductDetailUseCase', () => {
         'product-1',
         'Size',
         'S',
-        Money.from(0),
+        Price.from(0),
         Stock.create('stock-s', 'opt-size-s', 30, 0, 10, 20), // 품절
       ),
       ProductOption.create(
@@ -57,7 +57,7 @@ describe('GetProductDetailUseCase', () => {
         'product-1',
         'Size',
         'M',
-        Money.from(0),
+        Price.from(0),
         Stock.initialize('stock-m', 'opt-size-m', 40),
       ),
       ProductOption.create(
@@ -65,7 +65,7 @@ describe('GetProductDetailUseCase', () => {
         'product-1',
         'Size',
         'L',
-        Money.from(2000),
+        Price.from(2000),
         Stock.initialize('stock-l', 'opt-size-l', 30),
       ),
     ];
@@ -73,7 +73,7 @@ describe('GetProductDetailUseCase', () => {
     return Product.create(
       'product-1',
       'Test Product',
-      Money.from(50000),
+      Price.from(50000),
       'Test product with multiple options',
       'https://example.com/product-1.jpg',
       [...colorOptions, ...sizeOptions],
@@ -196,7 +196,7 @@ describe('GetProductDetailUseCase', () => {
       const product = Product.create(
         'product-1',
         'Product without options',
-        Money.from(10000),
+        Price.from(10000),
         'Description',
         'https://example.com/product.jpg',
         [], // 옵션 없음
@@ -220,13 +220,13 @@ describe('GetProductDetailUseCase', () => {
         'product-1',
         'Color',
         'Red',
-        Money.from(0),
+        Price.from(0),
         Stock.initialize('stock-1', 'opt-1', 50),
       );
       const product = Product.create(
         'product-1',
         'Single Option Product',
-        Money.from(10000),
+        Price.from(10000),
         'Description',
         'https://example.com/product.jpg',
         [option],

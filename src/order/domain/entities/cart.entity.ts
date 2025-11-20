@@ -1,13 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { CartItem } from '@/order/domain/entities/cart-item.entity';
-import { Money } from '@/product/domain/entities/money.vo';
 import { CartItemNotFoundException } from '@/order/domain/order.exceptions';
+import { Price } from '@/product/domain/entities/price.vo';
 
 export interface AddItemData {
   productId: string;
   productName: string;
   productOptionId: string | null;
-  price: Money;
+  price: Price;
   quantity: number;
 }
 
@@ -145,14 +145,14 @@ export class Cart {
    * 총 금액 계산
    * BR-CART-05: 총 금액 = Σ (아이템 가격 × 수량)
    */
-  getTotalAmount(): Money {
+  getTotalAmount(): Price {
     if (this._items.length === 0) {
-      return Money.from(0);
+      return Price.from(0);
     }
 
     return this._items.reduce(
       (sum, item) => sum.add(item.getSubtotal()),
-      Money.from(0),
+      Price.from(0),
     );
   }
 

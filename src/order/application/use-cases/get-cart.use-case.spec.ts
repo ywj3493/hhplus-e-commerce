@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GetCartUseCase } from '@/order/application/use-cases/get-cart.use-case';
 import { CartRepository } from '@/order/domain/repositories/cart.repository';
+import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { GetCartInput } from '@/order/application/dtos/get-cart.dto';
 import { createTestCart, createTestCartWithItems } from '@/order/infrastructure/fixtures/cart.fixtures';
 
@@ -19,14 +20,14 @@ describe('GetCartUseCase', () => {
       providers: [
         GetCartUseCase,
         {
-          provide: 'CartRepository',
+          provide: CART_REPOSITORY,
           useValue: mockCartRepository,
         },
       ],
     }).compile();
 
     useCase = module.get<GetCartUseCase>(GetCartUseCase);
-    cartRepository = module.get('CartRepository');
+    cartRepository = module.get(CART_REPOSITORY);
   });
 
   describe('실행', () => {

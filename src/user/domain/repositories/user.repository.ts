@@ -1,6 +1,11 @@
 import { User } from '@/user/domain/entities/user.entity';
 
 /**
+ * Injection Token
+ */
+export const USER_REPOSITORY = Symbol('USER_REPOSITORY');
+
+/**
  * UserRepository Interface
  * User 도메인의 저장소 인터페이스
  */

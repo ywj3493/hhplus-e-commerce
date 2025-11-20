@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Money } from '@/product/domain/entities/money.vo';
 import { CartItem } from '@/order/domain/entities/cart-item.entity';
+import { Price } from '@/product/domain/entities/price.vo';
 
 /**
  * OrderItem 생성을 위한 데이터 인터페이스
@@ -11,7 +11,7 @@ export interface OrderItemCreateData {
   productName: string;
   productOptionId: string | null;
   productOptionName: string | null;
-  price: Money;
+  price: Price;
   quantity: number;
 }
 
@@ -25,7 +25,7 @@ export interface OrderItemData {
   productName: string;
   productOptionId: string | null;
   productOptionName: string | null;
-  price: Money;
+  price: Price;
   quantity: number;
 }
 
@@ -41,7 +41,7 @@ export class OrderItem {
   private readonly _productName: string; // Snapshot
   private readonly _productOptionId: string | null;
   private readonly _productOptionName: string | null; // Snapshot
-  private readonly _price: Money; // Snapshot
+  private readonly _price: Price; // Snapshot
   private readonly _quantity: number;
 
   private constructor(
@@ -51,7 +51,7 @@ export class OrderItem {
     productName: string,
     productOptionId: string | null,
     productOptionName: string | null,
-    price: Money,
+    price: Price,
     quantity: number,
   ) {
     this._id = id;
@@ -131,7 +131,7 @@ export class OrderItem {
   /**
    * 소계 계산 (가격 × 수량)
    */
-  getSubtotal(): Money {
+  getSubtotal(): Price {
     return this._price.multiply(this._quantity);
   }
 
@@ -160,7 +160,7 @@ export class OrderItem {
     return this._productOptionName;
   }
 
-  get price(): Money {
+  get price(): Price {
     return this._price;
   }
 

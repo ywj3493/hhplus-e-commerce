@@ -139,7 +139,7 @@ export class Cart {
   removeItem(itemId: string): void
   clearAll(): number  // returns deleted count
 
-  getTotalAmount(): Money  // BR-CART-05 구현
+  getTotalAmount(): Price  // BR-CART-05 구현
   findItem(itemId: string): CartItem | undefined
   getItems(): CartItem[]
   getUserId(): string
@@ -160,7 +160,7 @@ export class CartItem {
   private productId: string
   private productName: string
   private productOptionId: string | null
-  private price: Money
+  private price: Price
   private quantity: number
 
   static create(data: CartItemCreateData): CartItem
@@ -170,7 +170,7 @@ export class CartItem {
   increaseQuantity(amount: number): void
   updateQuantity(quantity: number): void  // BR-CART-03 검증
 
-  getSubtotal(): Money
+  getSubtotal(): Price
   getQuantity(): number
   getId(): string
 }
@@ -835,7 +835,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.of(10000),
+        price: Price.of(10000),
         quantity: 2,
       };
 
@@ -854,7 +854,7 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.of(10000),
+        price: Price.of(10000),
         quantity: 2,
       };
       cart.addItem(itemData);
@@ -876,14 +876,14 @@ describe('Cart', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.of(10000),
+        price: Price.of(10000),
         quantity: 2,
       });
       cart.addItem({
         productId: 'prod-2',
         productName: '상품 B',
         productOptionId: null,
-        price: Money.of(5000),
+        price: Price.of(5000),
         quantity: 3,
       });
 
@@ -1016,7 +1016,7 @@ describe('AddCartItemUseCase', () => {
       const product = Product.reconstitute({
         id: 'prod-1',
         name: '상품 A',
-        price: Money.of(10000),
+        price: Price.of(10000),
       });
 
       mockProductRepository.findById.mockResolvedValue(product);
@@ -1040,14 +1040,14 @@ describe('AddCartItemUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.of(10000),
+        price: Price.of(10000),
         quantity: 2,
       });
 
       const product = Product.reconstitute({
         id: 'prod-1',
         name: '상품 A',
-        price: Money.of(10000),
+        price: Price.of(10000),
       });
 
       mockProductRepository.findById.mockResolvedValue(product);
@@ -1076,7 +1076,7 @@ describe('AddCartItemUseCase', () => {
       const product = Product.reconstitute({
         id: 'prod-1',
         name: '상품 A',
-        price: Money.of(10000),
+        price: Price.of(10000),
       });
 
       mockProductRepository.findById.mockResolvedValue(product);

@@ -1,4 +1,4 @@
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import { StockStatus } from '@/product/domain/entities/stock-status.vo';
 import { Stock } from '@/product/domain/entities/stock.entity';
 
@@ -13,7 +13,7 @@ export class ProductOption {
   private readonly _productId: string;
   private readonly _type: string;
   private readonly _name: string;
-  private readonly _additionalPrice: Money;
+  private readonly _additionalPrice: Price;
   private readonly _stock: Stock;
 
   private constructor(
@@ -21,7 +21,7 @@ export class ProductOption {
     productId: string,
     type: string,
     name: string,
-    additionalPrice: Money,
+    additionalPrice: Price,
     stock: Stock,
   ) {
     this._id = id;
@@ -42,7 +42,7 @@ export class ProductOption {
     productId: string,
     type: string,
     name: string,
-    additionalPrice: Money,
+    additionalPrice: Price,
     stock: Stock,
   ): ProductOption {
     return new ProductOption(id, productId, type, name, additionalPrice, stock);
@@ -67,7 +67,7 @@ export class ProductOption {
    * 총 가격 계산 (기본 가격 + 추가 가격)
    * BR-PROD-07: 총 금액 계산에 사용됨
    */
-  calculatePrice(basePrice: Money): Money {
+  calculatePrice(basePrice: Price): Price {
     return basePrice.add(this._additionalPrice);
   }
 
@@ -104,7 +104,7 @@ export class ProductOption {
     return this._name;
   }
 
-  get additionalPrice(): Money {
+  get additionalPrice(): Price {
     return this._additionalPrice;
   }
 

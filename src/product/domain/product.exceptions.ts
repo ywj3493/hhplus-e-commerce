@@ -27,8 +27,8 @@ export class InvalidProductIdException extends Error {
  * 재고 부족 시 발생하는 예외
  */
 export class InsufficientStockException extends Error {
-  constructor(requestedQuantity: number, availableQuantity: number) {
-    super(`재고 부족: 요청 ${requestedQuantity}, 재고 ${availableQuantity}`);
+  constructor(message: string = '재고가 부족합니다.') {
+    super(message);
     this.name = 'InsufficientStockException';
   }
 }

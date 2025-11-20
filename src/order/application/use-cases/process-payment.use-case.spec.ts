@@ -24,7 +24,7 @@ import {
   PaymentFailedException,
 } from '@/order/domain/order.exceptions';
 import { PaymentCompletedEvent } from '@/order/domain/events/payment-completed.event';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 
 describe('ProcessPaymentUseCase', () => {
   let useCase: ProcessPaymentUseCase;
@@ -97,7 +97,7 @@ describe('ProcessPaymentUseCase', () => {
       productName: '테스트 상품',
       productOptionId: 'option-1',
       productOptionName: '옵션 1',
-      price: Money.from(25000),
+      price: Price.from(25000),
       quantity: 2,
     });
   };

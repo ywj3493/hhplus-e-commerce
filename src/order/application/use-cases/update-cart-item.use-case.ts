@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { CartRepository } from '@/order/domain/repositories/cart.repository';
-import { CartStockValidationService } from '@/order/domain/services/cart-stock-validation.service';
+import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import {
   CartNotFoundException,
   CartItemNotFoundException,
@@ -28,7 +28,7 @@ export class UpdateCartItemUseCase {
   constructor(
     @Inject(CART_REPOSITORY)
     private readonly cartRepository: CartRepository,
-    private readonly cartStockValidationService: CartStockValidationService,
+    private readonly stockManagementService: StockManagementService,
   ) {}
 
   async execute(input: UpdateCartItemInput): Promise<UpdateCartItemOutput> {
@@ -51,9 +51,9 @@ export class UpdateCartItemUseCase {
       return UpdateCartItemOutput.from(cart, input.cartItemId);
     }
 
-    // 4. BR-CART-08: 수량 증가 시만 재고 검증
+    // 4. BR-CART-08: 수량 증가 시만 재고 검증 (Product 도메인 서비스)
     if (input.quantity > item.quantity) {
-      await this.cartStockValidationService.validateAvailability(
+      await this.stockManagementService.validateStockAvailability(
         item.productId,
         item.productOptionId,
         input.quantity,

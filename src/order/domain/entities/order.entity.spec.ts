@@ -1,7 +1,7 @@
 import { Order } from '@/order/domain/entities/order.entity';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
 import { OrderStatus } from '@/order/domain/entities/order-status.enum';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 import {
   MinimumOrderAmountException,
   OrderAlreadyCompletedException,
@@ -21,7 +21,7 @@ describe('Order Entity', () => {
       productName: '테스트 상품',
       productOptionId: 'option-1',
       productOptionName: '레드',
-      price: Money.from(price),
+      price: Price.from(price),
       quantity,
     });
   };

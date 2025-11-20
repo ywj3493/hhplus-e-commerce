@@ -1,7 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { PaymentCompletedEvent } from '@/order/domain/events/payment-completed.event';
-import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
+import { StockManagementService } from '@/product/domain/services/stock-management.service';
+import type { OrderRepository } from '@/order/domain/repositories/order.repository';
+import { ORDER_REPOSITORY } from '@/order/domain/repositories/tokens';
 
 /**
  * PaymentCompletedHandler
@@ -10,15 +12,18 @@ import { StockReservationService } from '@/order/domain/services/stock-reservati
  *
  * 책임:
  * 1. PaymentCompletedEvent 수신
- * 2. StockReservationService.convertReservedToSold 호출
- * 3. 재고 상태 변경 (reserved → sold)
+ * 2. Order 조회
+ * 3. Product 도메인 서비스를 통한 재고 확정
+ * 4. 재고 상태 변경 (reserved → sold)
  */
 @Injectable()
 export class PaymentCompletedHandler {
   private readonly logger = new Logger(PaymentCompletedHandler.name);
 
   constructor(
-    private readonly stockReservationService: StockReservationService,
+    @Inject(ORDER_REPOSITORY)
+    private readonly orderRepository: OrderRepository,
+    private readonly stockManagementService: StockManagementService,
   ) {}
 
   /**
@@ -31,8 +36,20 @@ export class PaymentCompletedHandler {
     );
 
     try {
+      // Order 조회
+      const order = await this.orderRepository.findById(event.orderId);
+      if (!order) {
+        throw new Error(`주문을 찾을 수 없습니다: ${event.orderId}`);
+      }
+
       // 재고 확정 (reserved → sold)
-      await this.stockReservationService.convertReservedToSold(event.orderId);
+      for (const orderItem of order.items) {
+        await this.stockManagementService.confirmSale(
+          orderItem.productId,
+          orderItem.productOptionId,
+          orderItem.quantity,
+        );
+      }
 
       this.logger.log(
         `재고 확정 완료: orderId=${event.orderId}`,

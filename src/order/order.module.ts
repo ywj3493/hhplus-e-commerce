@@ -21,10 +21,6 @@ import { GetOrdersUseCase } from '@/order/application/use-cases/get-orders.use-c
 // Use Cases - Payment
 import { ProcessPaymentUseCase } from '@/order/application/use-cases/process-payment.use-case';
 
-// Domain Services
-import { CartStockValidationService } from '@/order/domain/services/cart-stock-validation.service';
-import { StockReservationService } from '@/order/domain/services/stock-reservation.service';
-
 // Event Handlers
 import { PaymentCompletedHandler } from '@/order/application/event-handlers/payment-completed.handler';
 
@@ -85,10 +81,6 @@ import { ProductModule } from '@/product/product.module';
 
     // Payment Use Cases
     ProcessPaymentUseCase,
-
-    // Domain Services
-    CartStockValidationService,
-    StockReservationService,
 
     // Event Handlers
     PaymentCompletedHandler,

@@ -1054,7 +1054,7 @@ src/
 │   ├── domain/
 │   │   ├── base-entity.ts
 │   │   ├── value-objects/
-│   │   │   ├── money.vo.ts
+│   │   │   ├── price.vo.ts
 │   │   │   └── date-range.vo.ts
 │   │   └── exceptions/
 │   │       └── domain.exception.ts
@@ -2190,7 +2190,7 @@ src/product/domain/entities/
 ├── product.entity.ts
 ├── product-option.entity.ts
 ├── stock.entity.ts
-├── money.vo.ts            # Value Object
+├── price.vo.ts            # Value Object
 └── stock-status.vo.ts     # Value Object
 ```
 
@@ -2202,7 +2202,7 @@ src/product/domain/
 │   ├── product-option.entity.ts
 │   └── stock.entity.ts
 └── value-objects/
-    ├── money.vo.ts
+    ├── price.vo.ts
     └── stock-status.vo.ts
 ```
 

@@ -1,16 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UpdateCartItemUseCase } from '@/order/application/use-cases/update-cart-item.use-case';
 import { CartRepository } from '@/order/domain/repositories/cart.repository';
-import { CartStockValidationService } from '@/order/domain/services/cart-stock-validation.service';
+import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
+import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { UpdateCartItemInput } from '@/order/application/dtos/update-cart-item.dto';
 import { CartNotFoundException, CartItemNotFoundException } from '@/order/domain/order.exceptions';
 import { createTestCart } from '@/order/infrastructure/fixtures/cart.fixtures';
-import { Money } from '@/product/domain/entities/money.vo';
+import { Price } from '@/product/domain/entities/price.vo';
 
 describe('UpdateCartItemUseCase', () => {
   let useCase: UpdateCartItemUseCase;
   let cartRepository: jest.Mocked<CartRepository>;
-  let stockValidationService: jest.Mocked<CartStockValidationService>;
+  let stockManagementService: jest.Mocked<StockManagementService>;
 
   beforeEach(async () => {
     const mockCartRepository: jest.Mocked<CartRepository> = {
@@ -19,27 +20,27 @@ describe('UpdateCartItemUseCase', () => {
       clearByUserId: jest.fn(),
     };
 
-    const mockStockValidationService: Partial<CartStockValidationService> = {
-      validateAvailability: jest.fn(),
+    const mockStockValidationService: Partial<StockManagementService> = {
+      validateStockAvailability: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UpdateCartItemUseCase,
         {
-          provide: 'CartRepository',
+          provide: CART_REPOSITORY,
           useValue: mockCartRepository,
         },
         {
-          provide: CartStockValidationService,
+          provide: StockManagementService,
           useValue: mockStockValidationService,
         },
       ],
     }).compile();
 
     useCase = module.get<UpdateCartItemUseCase>(UpdateCartItemUseCase);
-    cartRepository = module.get('CartRepository');
-    stockValidationService = module.get(CartStockValidationService);
+    cartRepository = module.get(CART_REPOSITORY);
+    stockManagementService = module.get(StockManagementService);
   });
 
   describe('실행', () => {
@@ -50,7 +51,7 @@ describe('UpdateCartItemUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -61,7 +62,7 @@ describe('UpdateCartItemUseCase', () => {
       });
 
       cartRepository.findByUserId.mockResolvedValue(cart);
-      stockValidationService.validateAvailability.mockResolvedValue();
+      stockManagementService.validateStockAvailability.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When
@@ -71,7 +72,7 @@ describe('UpdateCartItemUseCase', () => {
       expect(output.cartItemId).toBe(addedItemId);
       expect(output.quantity).toBe(5);
       expect(output.subtotal).toBe(50000);
-      expect(stockValidationService.validateAvailability).toHaveBeenCalledWith(
+      expect(stockManagementService.validateStockAvailability).toHaveBeenCalledWith(
         'prod-1',
         'opt-1',
         5,
@@ -86,7 +87,7 @@ describe('UpdateCartItemUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 5,
       });
 
@@ -107,7 +108,7 @@ describe('UpdateCartItemUseCase', () => {
       expect(output.quantity).toBe(2);
       expect(output.subtotal).toBe(20000);
       // 수량 감소 시 재고 검증 안 함
-      expect(stockValidationService.validateAvailability).not.toHaveBeenCalled();
+      expect(stockManagementService.validateStockAvailability).not.toHaveBeenCalled();
       expect(cartRepository.save).toHaveBeenCalled();
     });
 
@@ -118,7 +119,7 @@ describe('UpdateCartItemUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 3,
       });
 
@@ -129,14 +130,14 @@ describe('UpdateCartItemUseCase', () => {
       });
 
       cartRepository.findByUserId.mockResolvedValue(cart);
-      stockValidationService.validateAvailability.mockResolvedValue();
+      stockManagementService.validateStockAvailability.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When
       await useCase.execute(input);
 
       // Then
-      expect(stockValidationService.validateAvailability).toHaveBeenCalledWith(
+      expect(stockManagementService.validateStockAvailability).toHaveBeenCalledWith(
         'prod-1',
         'opt-1',
         7,
@@ -150,7 +151,7 @@ describe('UpdateCartItemUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
@@ -172,7 +173,7 @@ describe('UpdateCartItemUseCase', () => {
       expect(cart.getItems()).toHaveLength(0);
       expect(cartRepository.save).toHaveBeenCalled();
       // 삭제 시 재고 검증 안 함
-      expect(stockValidationService.validateAvailability).not.toHaveBeenCalled();
+      expect(stockManagementService.validateStockAvailability).not.toHaveBeenCalled();
     });
 
     it('음수 수량을 입력하면 InvalidQuantityException을 발생시켜야 함', async () => {
@@ -182,7 +183,7 @@ describe('UpdateCartItemUseCase', () => {
         productId: 'prod-1',
         productName: '상품 A',
         productOptionId: 'opt-1',
-        price: Money.from(10000),
+        price: Price.from(10000),
         quantity: 2,
       });
 
