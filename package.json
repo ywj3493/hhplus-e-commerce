@@ -10,6 +10,11 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "test": "jest",
+    "test:unit": "jest --testMatch='**/src/**/*.spec.ts' --testPathIgnorePatterns='integration.spec.ts' --testPathIgnorePatterns='e2e.spec.ts'",
+    "test:unit:watch": "jest --watch --testMatch='**/src/**/*.spec.ts' --testPathIgnorePatterns='integration.spec.ts' --testPathIgnorePatterns='e2e.spec.ts'",
+    "test:integration": "jest --testMatch='**/test/**/*.integration.spec.ts'",
+    "test:e2e": "jest --testMatch='**/test/**/*.e2e.spec.ts'",
+    "test:all": "jest --testMatch='**/*.spec.ts'",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
@@ -36,6 +41,7 @@
   "devDependencies": {
     "@nestjs/cli": "^11.0.10",
     "@nestjs/testing": "^11.1.8",
+    "@testcontainers/mysql": "^11.8.1",
     "@types/express": "^5.0.5",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.9.2",
@@ -44,6 +50,7 @@
     "jest": "^30.2.0",
     "prisma": "^6",
     "supertest": "^7.1.4",
+    "testcontainers": "^11.8.1",
     "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
