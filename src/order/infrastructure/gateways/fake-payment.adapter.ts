@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  IPaymentGateway,
+  PaymentAdapter,
   ProcessPaymentRequest,
   ProcessPaymentResponse,
   RefundPaymentResponse,
@@ -13,7 +13,7 @@ import {
  * 테스트/개발 환경용 결제 Adapter (랜덤 실패 제거, X-Test-Fail 헤더 기반 제어)
  */
 @Injectable()
-export class FakePaymentAdapter implements IPaymentGateway {
+export class FakePaymentAdapter implements PaymentAdapter {
   async processPayment(
     request: ProcessPaymentRequest,
     shouldFail = false,

@@ -8,8 +8,7 @@ import {
 } from '@/order/application/dtos/process-payment.dto';
 import type { OrderRepository } from '@/order/domain/repositories/order.repository';
 import type { PaymentRepository } from '@/order/domain/repositories/payment.repository';
-import { ORDER_REPOSITORY } from '@/order/domain/repositories/tokens';
-import { PAYMENT_REPOSITORY } from '@/order/domain/repositories/payment.repository';
+import { ORDER_REPOSITORY, PAYMENT_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import type { OrderItem } from '@/order/domain/entities/order-item.entity';
 

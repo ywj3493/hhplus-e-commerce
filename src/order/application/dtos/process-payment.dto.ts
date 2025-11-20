@@ -10,6 +10,7 @@ export class ProcessPaymentInput {
     public readonly userId: string,
     public readonly orderId: string,
     public readonly paymentMethod: PaymentMethod,
+    public readonly idempotencyKey: string,
   ) {
     this.validate();
   }
@@ -25,6 +26,10 @@ export class ProcessPaymentInput {
 
     if (!Object.values(PaymentMethod).includes(this.paymentMethod)) {
       throw new Error('유효하지 않은 결제 방법입니다.');
+    }
+
+    if (!this.idempotencyKey || this.idempotencyKey.trim() === '') {
+      throw new Error('멱등성 키는 필수입니다.');
     }
   }
 }

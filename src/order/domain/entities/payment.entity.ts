@@ -11,6 +11,7 @@ export interface PaymentCreateData {
   amount: number;
   paymentMethod: PaymentMethod;
   transactionId: string;
+  idempotencyKey: string;
 }
 
 /**
@@ -35,6 +36,7 @@ export class Payment {
   private readonly _amount: number;
   private readonly _paymentMethod: PaymentMethod;
   private readonly _transactionId: string;
+  private readonly _idempotencyKey: string;
   private _status: PaymentStatus;
   private readonly _createdAt: Date;
   private _refundedAt?: Date;
@@ -46,6 +48,7 @@ export class Payment {
     this._amount = data.amount;
     this._paymentMethod = data.paymentMethod;
     this._transactionId = data.transactionId;
+    this._idempotencyKey = data.idempotencyKey;
     this._status = data.status;
     this._createdAt = data.createdAt;
     this._refundedAt = data.refundedAt;
@@ -99,6 +102,10 @@ export class Payment {
     if (!this._transactionId || this._transactionId.trim() === '') {
       throw new Error('거래 번호는 필수입니다.');
     }
+
+    if (!this._idempotencyKey || this._idempotencyKey.trim() === '') {
+      throw new Error('멱등성 키는 필수입니다.');
+    }
   }
 
   // Getters
@@ -124,6 +131,10 @@ export class Payment {
 
   get transactionId(): string {
     return this._transactionId;
+  }
+
+  get idempotencyKey(): string {
+    return this._idempotencyKey;
   }
 
   get createdAt(): Date {

@@ -12,6 +12,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       };
 
       // When
@@ -36,6 +37,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
         status: PaymentStatus.COMPLETED,
         createdAt: new Date('2025-01-01'),
       };
@@ -64,6 +66,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       });
 
       // When
@@ -83,6 +86,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       });
       payment.refund();
 
@@ -98,6 +102,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       });
 
       // Then
@@ -114,6 +119,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       };
 
       // When & Then
@@ -130,6 +136,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       };
 
       // When & Then
@@ -146,6 +153,7 @@ describe('Payment Entity', () => {
         amount: 0,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       };
 
       // When & Then
@@ -162,6 +170,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: '',
+        idempotencyKey: 'test-idempotency-key',
       };
 
       // When & Then

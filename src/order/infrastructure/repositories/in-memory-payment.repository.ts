@@ -30,6 +30,16 @@ export class InMemoryPaymentRepository implements PaymentRepository {
   }
 
   /**
+   * 멱등성 키로 Payment 조회
+   */
+  async findByIdempotencyKey(idempotencyKey: string): Promise<Payment | null> {
+    const payment = Array.from(this.payments.values()).find(
+      (p) => p.idempotencyKey === idempotencyKey,
+    );
+    return payment ? this.deepCopy(payment) : null;
+  }
+
+  /**
    * Payment 저장
    */
   async save(payment: Payment): Promise<Payment> {
@@ -62,6 +72,7 @@ export class InMemoryPaymentRepository implements PaymentRepository {
       amount: payment.amount,
       paymentMethod: payment.paymentMethod,
       transactionId: payment.transactionId,
+      idempotencyKey: payment.idempotencyKey,
       status: payment.status,
       createdAt: new Date(payment.createdAt.getTime()),
       refundedAt: payment.refundedAt ? new Date(payment.refundedAt.getTime()) : undefined,

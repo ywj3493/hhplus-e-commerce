@@ -22,6 +22,14 @@ export interface PaymentRepository {
   findByOrderId(orderId: string): Promise<Payment | null>;
 
   /**
+   * 멱등성 키로 Payment 조회
+   *
+   * @param idempotencyKey 멱등성 키
+   * @returns 해당 키로 생성된 Payment, 없으면 null
+   */
+  findByIdempotencyKey(idempotencyKey: string): Promise<Payment | null>;
+
+  /**
    * Payment 저장
    */
   save(payment: Payment): Promise<Payment>;

@@ -1,15 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Payment } from '@/order/domain/entities/payment.entity';
 import {
-  AlreadyPaidException,
   InvalidOrderStatusException,
   OrderExpiredException,
   PaymentFailedException,
 } from '@/order/domain/order.exceptions';
 import type { PaymentRepository } from '@/order/domain/repositories/payment.repository';
 import {
-  IPaymentGateway,
-  PAYMENT_GATEWAY,
+  PaymentAdapter,
+  PAYMENT_ADAPTER,
 } from '@/order/domain/ports/payment.port';
 import {
   ProcessPaymentInput,
@@ -42,47 +41,49 @@ export class ProcessPaymentUseCase {
     private readonly orderRepository: OrderRepository,
     @Inject(PAYMENT_REPOSITORY)
     private readonly paymentRepository: PaymentRepository,
-    @Inject(PAYMENT_GATEWAY)
-    private readonly paymentGateway: IPaymentGateway,
+    @Inject(PAYMENT_ADAPTER)
+    private readonly paymentAdapter: PaymentAdapter,
   ) {}
 
   async execute(
     input: ProcessPaymentInput,
     testFail = false, // 테스트용 강제 실패 플래그
   ): Promise<ProcessPaymentOutput> {
-    // 1. 주문 조회
+    // 1. 멱등성 체크: 기존 결제 조회 (idempotencyKey 기반)
+    const existingPayment = await this.paymentRepository.findByIdempotencyKey(
+      input.idempotencyKey,
+    );
+
+    if (existingPayment) {
+      // 이미 처리된 요청 → 기존 결과 반환 (멱등성 보장)
+      return ProcessPaymentOutput.from(existingPayment);
+    }
+
+    // 2. 주문 조회
     const order = await this.orderRepository.findById(input.orderId);
     if (!order) {
       throw new Error('주문을 찾을 수 없습니다.');
     }
 
-    // 2. 소유권 검증 (BR-PAYMENT-01)
+    // 3. 소유권 검증 (BR-PAYMENT-01)
     if (order.userId !== input.userId) {
       throw new Error('권한이 없습니다.');
     }
 
-    // 3. 주문 상태 검증 (BR-PAYMENT-02)
+    // 4. 주문 상태 검증 (BR-PAYMENT-02)
     if (order.status !== OrderStatus.PENDING) {
       throw new InvalidOrderStatusException(
         '대기 중인 주문만 결제할 수 있습니다.',
       );
     }
 
-    // 4. 예약 만료 검증 (BR-PAYMENT-03)
+    // 5. 예약 만료 검증 (BR-PAYMENT-03)
     if (order.isExpired()) {
       throw new OrderExpiredException('주문 예약 시간이 만료되었습니다.');
     }
 
-    // 5. 기존 결제 여부 확인
-    const existingPayment = await this.paymentRepository.findByOrderId(
-      input.orderId,
-    );
-    if (existingPayment) {
-      throw new AlreadyPaidException('이미 결제 완료된 주문입니다.');
-    }
-
-    // 6. 결제 Gateway 호출
-    const paymentResponse = await this.paymentGateway.processPayment(
+    // 6. 결제 Adapter 호출
+    const paymentResponse = await this.paymentAdapter.processPayment(
       {
         orderId: order.id,
         userId: order.userId,
@@ -105,6 +106,7 @@ export class ProcessPaymentUseCase {
       amount: order.finalAmount,
       paymentMethod: input.paymentMethod,
       transactionId: paymentResponse.transactionId!,
+      idempotencyKey: input.idempotencyKey,
     });
 
     // 8. Payment 저장

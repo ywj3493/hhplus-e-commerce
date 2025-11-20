@@ -18,6 +18,7 @@ describe('InMemoryPaymentRepository', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+      idempotencyKey: 'test-idempotency-key',
       });
 
       // When
@@ -38,6 +39,7 @@ describe('InMemoryPaymentRepository', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+      idempotencyKey: 'test-idempotency-key',
       });
 
       // When
@@ -60,6 +62,7 @@ describe('InMemoryPaymentRepository', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+      idempotencyKey: 'test-idempotency-key',
       });
       await repository.save(payment);
 
@@ -90,6 +93,7 @@ describe('InMemoryPaymentRepository', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+      idempotencyKey: 'test-idempotency-key',
       });
       await repository.save(payment);
 
@@ -120,6 +124,7 @@ describe('InMemoryPaymentRepository', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+      idempotencyKey: 'test-idempotency-key',
       });
       await repository.save(payment);
 
@@ -142,6 +147,7 @@ describe('InMemoryPaymentRepository', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-1',
+      idempotencyKey: 'test-idempotency-key',
       });
       const payment2 = Payment.create({
         orderId: 'order-002',
@@ -149,6 +155,7 @@ describe('InMemoryPaymentRepository', () => {
         amount: 20000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-2',
+      idempotencyKey: 'test-idempotency-key',
       });
       await repository.save(payment1);
       await repository.save(payment2);
@@ -170,6 +177,7 @@ describe('InMemoryPaymentRepository', () => {
           amount: 10000,
           paymentMethod: PaymentMethod.CREDIT_CARD,
           transactionId: 'txn-1',
+      idempotencyKey: 'test-idempotency-key',
         }),
         Payment.create({
           orderId: 'order-002',
@@ -177,6 +185,7 @@ describe('InMemoryPaymentRepository', () => {
           amount: 20000,
           paymentMethod: PaymentMethod.CREDIT_CARD,
           transactionId: 'txn-2',
+      idempotencyKey: 'test-idempotency-key',
         }),
       ];
 

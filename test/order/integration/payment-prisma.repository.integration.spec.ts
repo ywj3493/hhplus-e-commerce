@@ -142,6 +142,7 @@ describe('PaymentPrismaRepository 통합 테스트', () => {
           amount: 10000,
           method: 'CREDIT_CARD',
           transactionId: 'txn-123456',
+          idempotencyKey: 'test-idempotency-key-1',
         },
       });
 
@@ -233,6 +234,7 @@ describe('PaymentPrismaRepository 통합 테스트', () => {
           amount: 10000,
           method: 'CREDIT_CARD',
           transactionId: 'txn-123456',
+          idempotencyKey: 'test-idempotency-key-2',
         },
       });
 
@@ -318,6 +320,7 @@ describe('PaymentPrismaRepository 통합 테스트', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-new-123456',
+        idempotencyKey: 'test-idempotency-key-123',
       });
 
       // When: 결제 저장
@@ -398,6 +401,7 @@ describe('PaymentPrismaRepository 통합 테스트', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-first',
+        idempotencyKey: 'test-idempotency-key-123',
       });
       await repository.save(payment1);
 
@@ -408,6 +412,7 @@ describe('PaymentPrismaRepository 통합 테스트', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-second',
+        idempotencyKey: 'test-idempotency-key-123',
       });
 
       // When & Then: unique 제약조건 위반으로 에러 발생

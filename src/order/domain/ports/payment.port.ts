@@ -1,6 +1,6 @@
 import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
 
-export const PAYMENT_GATEWAY = Symbol('PAYMENT_GATEWAY');
+export const PAYMENT_ADAPTER = Symbol('PAYMENT_ADAPTER');
 
 export interface ProcessPaymentRequest {
   orderId: string;
@@ -26,7 +26,7 @@ export interface RefundPaymentResponse {
  * 결제 처리를 위한 Domain Port
  * Infrastructure Adapter가 이 인터페이스를 구현
  */
-export interface IPaymentGateway {
+export interface PaymentAdapter {
   processPayment(
     request: ProcessPaymentRequest,
     shouldFail?: boolean,

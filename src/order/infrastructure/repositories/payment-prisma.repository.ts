@@ -55,6 +55,23 @@ export class PaymentPrismaRepository implements PaymentRepository {
   }
 
   /**
+   * 멱등성 키로 결제 조회
+   * @param idempotencyKey - 멱등성 키
+   * @returns Payment 엔티티 또는 null
+   */
+  async findByIdempotencyKey(idempotencyKey: string): Promise<Payment | null> {
+    const paymentModel = await this.prisma.payment.findUnique({
+      where: { idempotencyKey },
+    });
+
+    if (!paymentModel) {
+      return null;
+    }
+
+    return this.toDomain(paymentModel);
+  }
+
+  /**
    * 결제 저장 (생성 또는 업데이트)
    * @param payment - Payment 도메인 엔티티
    * @returns 저장된 결제
@@ -66,6 +83,7 @@ export class PaymentPrismaRepository implements PaymentRepository {
       amount: payment.amount,
       method: payment.paymentMethod,
       transactionId: payment.transactionId,
+      idempotencyKey: payment.idempotencyKey,
       status: payment.status,
       refundedAt: payment.refundedAt,
     };
@@ -116,6 +134,7 @@ export class PaymentPrismaRepository implements PaymentRepository {
       amount: Number(prismaPayment.amount),
       paymentMethod: prismaPayment.method as PaymentMethod,
       transactionId: prismaPayment.transactionId,
+      idempotencyKey: prismaPayment.idempotencyKey,
       status: prismaPayment.status as PaymentStatus,
       createdAt: prismaPayment.createdAt,
       refundedAt: prismaPayment.refundedAt,
