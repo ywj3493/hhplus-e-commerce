@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
-import { ProductModule } from '../../../src/product/product.module';
+import { ProductModule } from '@/product/product.module';
 
 /**
  * E2E Test: Product API Endpoints

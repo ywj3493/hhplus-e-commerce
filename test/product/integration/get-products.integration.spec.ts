@@ -1,7 +1,7 @@
-import { GetProductsUseCase } from '../../../src/product/application/use-cases/get-products.use-case';
-import { GetProductsInput } from '../../../src/product/application/dtos/get-products.dto';
-import { InMemoryProductRepository } from '../../../src/product/infrastructure/repositories/in-memory-product.repository';
-import { StockStatusType } from '../../../src/product/domain/entities/stock-status.vo';
+import { GetProductsUseCase } from '@/product/application/use-cases/get-products.use-case';
+import { GetProductsInput } from '@/product/application/dtos/get-products.dto';
+import { InMemoryProductRepository } from '@/product/infrastructure/repositories/in-memory-product.repository';
+import { StockStatusType } from '@/product/domain/entities/stock-status.vo';
 
 /**
  * Integration Test: GetProductsUseCase + InMemoryProductRepository
