@@ -128,6 +128,7 @@ erDiagram
     User {
         string id PK "사용자 ID (UUID)"
         string name "사용자 이름"
+        string email UK "이메일 (NULL 허용)"
         timestamp createdAt "생성일시"
         timestamp updatedAt "수정일시"
     }
@@ -419,6 +420,7 @@ erDiagram
 |--------|------------|---------|------|
 | `id` | VARCHAR(36) | PRIMARY KEY | 사용자 ID (UUID) |
 | `name` | VARCHAR(100) | NOT NULL | 사용자 이름 |
+| `email` | VARCHAR(255) | UNIQUE, NULL | 이메일 (향후 인증용) |
 | `createdAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 생성일시 |
 | `updatedAt` | TIMESTAMP | NOT NULL, DEFAULT NOW() | 수정일시 |
 
@@ -427,6 +429,9 @@ erDiagram
 ```sql
 -- 기본 키 (자동 생성)
 PRIMARY KEY (id)
+
+-- 이메일 UNIQUE 인덱스
+UNIQUE INDEX idx_user_email (email)
 ```
 
 #### 관계
@@ -434,6 +439,22 @@ PRIMARY KEY (id)
 - **1:1** → Cart (한 사용자는 하나의 장바구니를 가짐)
 - **1:N** → Order (한 사용자는 여러 주문을 생성)
 - **1:N** → UserCoupon (한 사용자는 여러 쿠폰을 보유)
+
+#### 테스트 데이터
+
+```sql
+INSERT INTO "User" (id, name, email, createdAt, updatedAt) VALUES
+  ('user-uuid-1', '홍길동', 'hong@example.com', NOW(), NOW()),
+  ('user-uuid-2', '김철수', 'kim@example.com', NOW(), NOW()),
+  ('user-uuid-3', '이영희', 'lee@example.com', NOW(), NOW());
+```
+
+#### 비즈니스 로직
+
+- **Dashboard 제품 범위**: 사용자 정보 조회만 제공 (GET /api/users/me)
+- **Admin 제품 범위** (향후): 사용자 목록 조회, 생성, 수정, 삭제
+- **인증**: 현재는 Master Token 방식, 향후 JWT 기반 인증으로 전환 예정
+- `email` 필드는 NULL 허용 (향후 확장을 위한 예약 필드)
 
 ---
 
