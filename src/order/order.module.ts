@@ -27,10 +27,14 @@ import { PaymentCompletedHandler } from '@/order/application/event-handlers/paym
 // Batch Jobs
 import { ReleaseExpiredReservationJob } from '@/order/application/jobs/release-expired-reservation.job';
 
-// Repositories
+// Repositories - InMemory
 import { InMemoryCartRepository } from '@/order/infrastructure/repositories/in-memory-cart.repository';
 import { InMemoryOrderRepository } from '@/order/infrastructure/repositories/in-memory-order.repository';
 import { InMemoryPaymentRepository } from '@/order/infrastructure/repositories/in-memory-payment.repository';
+
+// Repositories - Prisma
+import { OrderPrismaRepository } from '@/order/infrastructure/repositories/order-prisma.repository';
+import { PaymentPrismaRepository } from '@/order/infrastructure/repositories/payment-prisma.repository';
 
 // External Clients
 import { MockPaymentApiClient } from '@/order/infrastructure/clients/mock-payment-api.client';
@@ -95,11 +99,17 @@ import { ProductModule } from '@/product/product.module';
     },
     {
       provide: ORDER_REPOSITORY,
-      useClass: InMemoryOrderRepository,
+      useClass:
+        process.env.NODE_ENV === 'test'
+          ? InMemoryOrderRepository
+          : OrderPrismaRepository,
     },
     {
       provide: PAYMENT_REPOSITORY,
-      useClass: InMemoryPaymentRepository,
+      useClass:
+        process.env.NODE_ENV === 'test'
+          ? InMemoryPaymentRepository
+          : PaymentPrismaRepository,
     },
 
     // External Clients
