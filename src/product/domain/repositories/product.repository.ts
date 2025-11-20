@@ -16,7 +16,7 @@ export interface PaginationResult<T> {
  * Defines data access operations for Product aggregate
  * Infrastructure layer implements this interface
  */
-export interface IProductRepository {
+export interface ProductRepository {
   /**
    * Find product by ID
    * @param id - Product ID (UUID)
@@ -51,8 +51,3 @@ export interface IProductRepository {
    */
   exists(id: string): Promise<boolean>;
 }
-
-/**
- * Repository token for dependency injection
- */
-export const PRODUCT_REPOSITORY = Symbol('PRODUCT_REPOSITORY');

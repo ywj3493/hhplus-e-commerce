@@ -20,21 +20,29 @@ import { GetOrdersUseCase } from '@/order/application/use-cases/get-orders.use-c
 
 // Use Cases - Payment
 import { ProcessPaymentUseCase } from '@/order/application/use-cases/process-payment.use-case';
+import { ConfirmStockUseCase } from '@/order/application/use-cases/confirm-stock.use-case';
+import { CompleteOrderUseCase } from '@/order/application/use-cases/complete-order.use-case';
 
-// Event Handlers
-import { PaymentCompletedHandler } from '@/order/application/event-handlers/payment-completed.handler';
+// Facades
+import { OrderFacade } from '@/order/application/facades/order.facade';
 
 // Batch Jobs
 import { ReleaseExpiredReservationJob } from '@/order/application/jobs/release-expired-reservation.job';
 
-// Repositories
+// Repositories - InMemory
 import { InMemoryCartRepository } from '@/order/infrastructure/repositories/in-memory-cart.repository';
 import { InMemoryOrderRepository } from '@/order/infrastructure/repositories/in-memory-order.repository';
 import { InMemoryPaymentRepository } from '@/order/infrastructure/repositories/in-memory-payment.repository';
 
-// External Clients
-import { MockPaymentApiClient } from '@/order/infrastructure/clients/mock-payment-api.client';
-import { PAYMENT_API_CLIENT } from '@/order/infrastructure/clients/payment-api.interface';
+// Repositories - Prisma
+import { CartPrismaRepository } from '@/order/infrastructure/repositories/cart-prisma.repository';
+import { OrderPrismaRepository } from '@/order/infrastructure/repositories/order-prisma.repository';
+import { PaymentPrismaRepository } from '@/order/infrastructure/repositories/payment-prisma.repository';
+
+// Payment Gateway
+import { FakePaymentAdapter } from '@/order/infrastructure/gateways/fake-payment.adapter';
+import { FakePaymentApiAdapter } from '@/__fake__/payment/fake-payment-api.adapter';
+import { PAYMENT_GATEWAY } from '@/order/domain/ports/payment.port';
 
 // Symbols
 import { ORDER_REPOSITORY, CART_REPOSITORY, PAYMENT_REPOSITORY } from '@/order/domain/repositories/tokens';
@@ -81,9 +89,11 @@ import { ProductModule } from '@/product/product.module';
 
     // Payment Use Cases
     ProcessPaymentUseCase,
+    ConfirmStockUseCase,
+    CompleteOrderUseCase,
 
-    // Event Handlers
-    PaymentCompletedHandler,
+    // Facades
+    OrderFacade,
 
     // Batch Jobs
     ReleaseExpiredReservationJob,
@@ -91,21 +101,35 @@ import { ProductModule } from '@/product/product.module';
     // Repositories
     {
       provide: CART_REPOSITORY,
-      useClass: InMemoryCartRepository,
+      useClass:
+        process.env.NODE_ENV === 'test'
+          ? InMemoryCartRepository
+          : CartPrismaRepository,
     },
     {
       provide: ORDER_REPOSITORY,
-      useClass: InMemoryOrderRepository,
+      useClass:
+        process.env.NODE_ENV === 'test'
+          ? InMemoryOrderRepository
+          : OrderPrismaRepository,
     },
     {
       provide: PAYMENT_REPOSITORY,
-      useClass: InMemoryPaymentRepository,
+      useClass:
+        process.env.NODE_ENV === 'test'
+          ? InMemoryPaymentRepository
+          : PaymentPrismaRepository,
     },
 
-    // External Clients
+    // Payment Gateway
     {
-      provide: PAYMENT_API_CLIENT,
-      useClass: MockPaymentApiClient,
+      provide: PAYMENT_GATEWAY,
+      useClass:
+        process.env.NODE_ENV === 'test'
+          ? FakePaymentAdapter
+          : process.env.NODE_ENV === 'production'
+          ? FakePaymentApiAdapter
+          : FakePaymentAdapter,
     },
   ],
   exports: [

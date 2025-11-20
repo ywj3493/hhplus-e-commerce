@@ -23,7 +23,7 @@ describe('InMemoryProductRepository', () => {
       'Default',
       'Standard',
       Price.from(0),
-      Stock.create(`stock-${id}`, `opt-${id}`, 100, 100 - soldQuantity, 0, soldQuantity),
+      Stock.create(`stock-${id}`, id, `opt-${id}`, 100, 100 - soldQuantity, 0, soldQuantity),
     );
     return Product.create(
       id,
@@ -31,6 +31,7 @@ describe('InMemoryProductRepository', () => {
       Price.from(10000),
       'Test description',
       'https://example.com/image.jpg',
+      'category-test', // categoryId
       [option],
       createdAt,
       createdAt,
@@ -220,7 +221,7 @@ describe('InMemoryProductRepository', () => {
         'Size',
         'S',
         Price.from(0),
-        Stock.create('stock-1', 'opt-1', 100, 50, 0, 50),
+        Stock.create('stock-1', 'prod-multi', 'opt-1', 100, 50, 0, 50),
       );
       const option2 = ProductOption.create(
         'opt-2',
@@ -228,7 +229,7 @@ describe('InMemoryProductRepository', () => {
         'Size',
         'M',
         Price.from(0),
-        Stock.create('stock-2', 'opt-2', 100, 20, 0, 80),
+        Stock.create('stock-2', 'prod-multi', 'opt-2', 100, 20, 0, 80),
       );
       const product = Product.create(
         'prod-multi',
@@ -236,6 +237,7 @@ describe('InMemoryProductRepository', () => {
         Price.from(10000),
         'Test',
         'https://example.com/image.jpg',
+        'category-test', // categoryId
         [option1, option2],
         new Date(),
         new Date(),

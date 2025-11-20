@@ -69,6 +69,7 @@ describe('OrderItem Entity', () => {
         productOptionName: '그린',
         price: Price.from(20000),
         quantity: 1,
+        createdAt: new Date(),
       };
 
       // When
@@ -80,6 +81,7 @@ describe('OrderItem Entity', () => {
       expect(orderItem.productName).toBe('테스트 상품');
       expect(orderItem.productOptionName).toBe('그린');
       expect(orderItem.quantity).toBe(1);
+      expect(orderItem.createdAt).toBeInstanceOf(Date);
     });
 
     it('수량이 1 미만이면 예외를 던져야 함', () => {

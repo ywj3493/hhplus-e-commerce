@@ -12,7 +12,7 @@ describe('ProductOption', () => {
       const type = 'Color';
       const name = 'Red';
       const additionalPrice = Price.from(0);
-      const stock = Stock.initialize('stock-1', 'option-1', 100);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 100);
 
       // When
       const option = ProductOption.create(id, productId, type, name, additionalPrice, stock);
@@ -28,7 +28,7 @@ describe('ProductOption', () => {
 
     it('옵션 ID가 비어있을 때 에러를 발생시켜야 함', () => {
       // Given
-      const stock = Stock.initialize('stock-1', 'option-1', 100);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 100);
       const additionalPrice = Price.from(0);
 
       // When & Then
@@ -39,7 +39,7 @@ describe('ProductOption', () => {
 
     it('상품 ID가 비어있을 때 에러를 발생시켜야 함', () => {
       // Given
-      const stock = Stock.initialize('stock-1', 'option-1', 100);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 100);
       const additionalPrice = Price.from(0);
 
       // When & Then
@@ -50,7 +50,7 @@ describe('ProductOption', () => {
 
     it('옵션 타입이 비어있을 때 에러를 발생시켜야 함', () => {
       // Given
-      const stock = Stock.initialize('stock-1', 'option-1', 100);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 100);
       const additionalPrice = Price.from(0);
 
       // When & Then
@@ -61,7 +61,7 @@ describe('ProductOption', () => {
 
     it('옵션명이 비어있을 때 에러를 발생시켜야 함', () => {
       // Given
-      const stock = Stock.initialize('stock-1', 'option-1', 100);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 100);
       const additionalPrice = Price.from(0);
 
       // When & Then
@@ -76,7 +76,7 @@ describe('ProductOption', () => {
       // Given
       const basePrice = Price.from(10000);
       const additionalPrice = Price.from(0);
-      const stock = Stock.initialize('stock-1', 'option-1', 100);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 100);
       const option = ProductOption.create(
         'option-1',
         'product-1',
@@ -97,7 +97,7 @@ describe('ProductOption', () => {
       // Given
       const basePrice = Price.from(10000);
       const additionalPrice = Price.from(1000);
-      const stock = Stock.initialize('stock-1', 'option-1', 100);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 100);
       const option = ProductOption.create(
         'option-1',
         'product-1',
@@ -119,7 +119,7 @@ describe('ProductOption', () => {
     it('재고가 있을 때 재고 있음 상태를 반환해야 함', () => {
       // Given
       const additionalPrice = Price.from(0);
-      const stock = Stock.initialize('stock-1', 'option-1', 100);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 100);
       const option = ProductOption.create(
         'option-1',
         'product-1',
@@ -139,7 +139,7 @@ describe('ProductOption', () => {
     it('재고가 없을 때 품절 상태를 반환해야 함', () => {
       // Given
       const additionalPrice = Price.from(0);
-      const stock = Stock.create('stock-1', 'option-1', 100, 0, 50, 50);
+      const stock = Stock.create('stock-1', 'product-1', 'option-1', 100, 0, 50, 50);
       const option = ProductOption.create(
         'option-1',
         'product-1',
@@ -161,7 +161,7 @@ describe('ProductOption', () => {
     it('재고가 있을 때 true를 반환해야 함 (BR-PROD-08)', () => {
       // Given
       const additionalPrice = Price.from(0);
-      const stock = Stock.initialize('stock-1', 'option-1', 100);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 100);
       const option = ProductOption.create(
         'option-1',
         'product-1',
@@ -181,7 +181,7 @@ describe('ProductOption', () => {
     it('재고가 없을 때 false를 반환해야 함 (BR-PROD-08)', () => {
       // Given
       const additionalPrice = Price.from(0);
-      const stock = Stock.create('stock-1', 'option-1', 100, 0, 50, 50);
+      const stock = Stock.create('stock-1', 'product-1', 'option-1', 100, 0, 50, 50);
       const option = ProductOption.create(
         'option-1',
         'product-1',
@@ -203,7 +203,7 @@ describe('ProductOption', () => {
     it('추가 금액 없이 색상 옵션을 생성해야 함', () => {
       // Given
       const additionalPrice = Price.from(0);
-      const stock = Stock.initialize('stock-1', 'option-1', 50);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 50);
 
       // When
       const option = ProductOption.create(
@@ -224,7 +224,7 @@ describe('ProductOption', () => {
     it('추가 금액과 함께 사이즈 옵션을 생성해야 함', () => {
       // Given
       const additionalPrice = Price.from(1000);
-      const stock = Stock.initialize('stock-1', 'option-1', 30);
+      const stock = Stock.initialize('stock-1', 'product-1', 'option-1', 30);
 
       // When
       const option = ProductOption.create(

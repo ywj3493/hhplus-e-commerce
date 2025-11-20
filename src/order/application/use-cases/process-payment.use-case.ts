@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Payment } from '@/order/domain/entities/payment.entity';
 import {
   AlreadyPaidException,
@@ -8,16 +7,14 @@ import {
   PaymentFailedException,
 } from '@/order/domain/order.exceptions';
 import type { PaymentRepository } from '@/order/domain/repositories/payment.repository';
-import { PaymentCompletedEvent } from '@/order/domain/events/payment-completed.event';
 import {
-  IPaymentApiClient,
-  PAYMENT_API_CLIENT,
-} from '@/order/infrastructure/clients/payment-api.interface';
+  IPaymentGateway,
+  PAYMENT_GATEWAY,
+} from '@/order/domain/ports/payment.port';
 import {
   ProcessPaymentInput,
   ProcessPaymentOutput,
 } from '@/order/application/dtos/process-payment.dto';
-import { Order } from '@/order/domain/entities/order.entity';
 import { OrderStatus } from '@/order/domain/entities/order-status.enum';
 import type { OrderRepository } from '@/order/domain/repositories/order.repository';
 import { ORDER_REPOSITORY, PAYMENT_REPOSITORY } from '@/order/domain/repositories/tokens';
@@ -32,8 +29,11 @@ import { ORDER_REPOSITORY, PAYMENT_REPOSITORY } from '@/order/domain/repositorie
  * 2. 기존 결제 여부 확인
  * 3. 외부 결제 API 호출
  * 4. Payment 엔티티 생성 및 저장
- * 5. Order 상태 COMPLETED로 변경
- * 6. PaymentCompletedEvent 발행
+ *
+ * Note: Facade Pattern
+ * - 결제 처리만 담당 (단일 책임)
+ * - 재고 확정 및 주문 완료는 PaymentFacadeService에서 처리
+ * - 보상 트랜잭션 구현 대비 UseCase 분리
  */
 @Injectable()
 export class ProcessPaymentUseCase {
@@ -42,9 +42,8 @@ export class ProcessPaymentUseCase {
     private readonly orderRepository: OrderRepository,
     @Inject(PAYMENT_REPOSITORY)
     private readonly paymentRepository: PaymentRepository,
-    @Inject(PAYMENT_API_CLIENT)
-    private readonly paymentApiClient: IPaymentApiClient,
-    private readonly eventEmitter: EventEmitter2,
+    @Inject(PAYMENT_GATEWAY)
+    private readonly paymentGateway: IPaymentGateway,
   ) {}
 
   async execute(
@@ -82,20 +81,20 @@ export class ProcessPaymentUseCase {
       throw new AlreadyPaidException('이미 결제 완료된 주문입니다.');
     }
 
-    // 6. 외부 결제 API 호출
-    const paymentResponse = await this.paymentApiClient.requestPayment(
+    // 6. 결제 Gateway 호출
+    const paymentResponse = await this.paymentGateway.processPayment(
       {
         orderId: order.id,
         userId: order.userId,
         amount: order.finalAmount,
         paymentMethod: input.paymentMethod,
       },
-      testFail, // 테스트 플래그 전달
+      testFail,
     );
 
     if (!paymentResponse.success) {
       throw new PaymentFailedException(
-        paymentResponse.message || '결제 처리에 실패했습니다.',
+        paymentResponse.errorMessage || '결제 처리에 실패했습니다.',
       );
     }
 
@@ -111,17 +110,8 @@ export class ProcessPaymentUseCase {
     // 8. Payment 저장
     const savedPayment = await this.paymentRepository.save(payment);
 
-    // 9. Order 상태 변경 (COMPLETED)
-    order.complete();
-    await this.orderRepository.save(order);
-
-    // 10. PaymentCompletedEvent 발행 (재고 확정용)
-    this.eventEmitter.emit(
-      'payment.completed',
-      new PaymentCompletedEvent(savedPayment.id, order.id),
-    );
-
-    // 11. Output DTO 반환
+    // 9. Output DTO 반환
+    // Note: 재고 확정 및 주문 완료는 PaymentFacadeService에서 처리
     return ProcessPaymentOutput.from(savedPayment);
   }
 }

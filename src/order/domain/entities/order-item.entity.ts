@@ -27,6 +27,7 @@ export interface OrderItemData {
   productOptionName: string | null;
   price: Price;
   quantity: number;
+  createdAt: Date;
 }
 
 /**
@@ -43,6 +44,7 @@ export class OrderItem {
   private readonly _productOptionName: string | null; // Snapshot
   private readonly _price: Price; // Snapshot
   private readonly _quantity: number;
+  private readonly _createdAt: Date;
 
   private constructor(
     id: string,
@@ -53,6 +55,7 @@ export class OrderItem {
     productOptionName: string | null,
     price: Price,
     quantity: number,
+    createdAt: Date,
   ) {
     this._id = id;
     this._orderId = orderId;
@@ -62,6 +65,7 @@ export class OrderItem {
     this._productOptionName = productOptionName;
     this._price = price;
     this._quantity = quantity;
+    this._createdAt = createdAt;
 
     this.validate();
   }
@@ -84,6 +88,7 @@ export class OrderItem {
       productOptionName, // Snapshot
       cartItem.getPrice(), // Snapshot
       cartItem.quantity,
+      new Date(),
     );
   }
 
@@ -100,6 +105,7 @@ export class OrderItem {
       data.productOptionName,
       data.price,
       data.quantity,
+      data.createdAt,
     );
   }
 
@@ -116,6 +122,7 @@ export class OrderItem {
       data.productOptionName,
       data.price,
       data.quantity,
+      new Date(),
     );
   }
 
@@ -166,5 +173,9 @@ export class OrderItem {
 
   get quantity(): number {
     return this._quantity;
+  }
+
+  get createdAt(): Date {
+    return this._createdAt;
   }
 }

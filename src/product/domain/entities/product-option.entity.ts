@@ -15,6 +15,8 @@ export class ProductOption {
   private readonly _name: string;
   private readonly _additionalPrice: Price;
   private readonly _stock: Stock;
+  private readonly _createdAt: Date;
+  private readonly _updatedAt: Date;
 
   private constructor(
     id: string,
@@ -23,6 +25,8 @@ export class ProductOption {
     name: string,
     additionalPrice: Price,
     stock: Stock,
+    createdAt: Date,
+    updatedAt: Date,
   ) {
     this._id = id;
     this._productId = productId;
@@ -30,6 +34,8 @@ export class ProductOption {
     this._name = name;
     this._additionalPrice = additionalPrice;
     this._stock = stock;
+    this._createdAt = createdAt;
+    this._updatedAt = updatedAt;
 
     this.validate();
   }
@@ -44,8 +50,10 @@ export class ProductOption {
     name: string,
     additionalPrice: Price,
     stock: Stock,
+    createdAt: Date = new Date(),
+    updatedAt: Date = new Date(),
   ): ProductOption {
-    return new ProductOption(id, productId, type, name, additionalPrice, stock);
+    return new ProductOption(id, productId, type, name, additionalPrice, stock, createdAt, updatedAt);
   }
 
   private validate(): void {
@@ -110,5 +118,13 @@ export class ProductOption {
 
   get stock(): Stock {
     return this._stock;
+  }
+
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this._updatedAt;
   }
 }

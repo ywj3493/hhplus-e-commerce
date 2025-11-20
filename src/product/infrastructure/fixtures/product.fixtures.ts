@@ -19,6 +19,7 @@ export class ProductFixtures {
         Price.from(29000),
         'Comfortable cotton t-shirt for everyday wear',
         'https://example.com/images/basic-tshirt.jpg',
+        'category-fashion', // categoryId
         [
           ProductOption.create(
             'opt-001-color-white',
@@ -26,7 +27,7 @@ export class ProductFixtures {
             'Color',
             'White',
             Price.from(0),
-            Stock.initialize('stock-001-white', 'opt-001-color-white', 100),
+            Stock.initialize('stock-001-white', '550e8400-e29b-41d4-a716-446655440001', 'opt-001-color-white', 100),
           ),
           ProductOption.create(
             'opt-001-color-black',
@@ -34,7 +35,7 @@ export class ProductFixtures {
             'Color',
             'Black',
             Price.from(0),
-            Stock.initialize('stock-001-black', 'opt-001-color-black', 80),
+            Stock.initialize('stock-001-black', '550e8400-e29b-41d4-a716-446655440001', 'opt-001-color-black', 80),
           ),
           ProductOption.create(
             'opt-001-color-navy',
@@ -42,7 +43,7 @@ export class ProductFixtures {
             'Color',
             'Navy',
             Price.from(0),
-            Stock.create('stock-001-navy', 'opt-001-color-navy', 50, 0, 30, 20),
+            Stock.create('stock-001-navy', '550e8400-e29b-41d4-a716-446655440001', 'opt-001-color-navy', 50, 0, 30, 20),
           ),
         ],
         new Date('2024-01-01T00:00:00Z'),
@@ -56,6 +57,7 @@ export class ProductFixtures {
         Price.from(79000),
         'High-quality hoodie with soft interior lining',
         'https://example.com/images/premium-hoodie.jpg',
+        'category-fashion', // categoryId
         [
           ProductOption.create(
             'opt-002-size-s',
@@ -63,7 +65,7 @@ export class ProductFixtures {
             'Size',
             'S',
             Price.from(0),
-            Stock.create('stock-002-s', 'opt-002-size-s', 50, 0, 20, 30),
+            Stock.create('stock-002-s', '550e8400-e29b-41d4-a716-446655440002', 'opt-002-size-s', 50, 0, 20, 30),
           ),
           ProductOption.create(
             'opt-002-size-m',
@@ -71,7 +73,7 @@ export class ProductFixtures {
             'Size',
             'M',
             Price.from(0),
-            Stock.initialize('stock-002-m', 'opt-002-size-m', 60),
+            Stock.initialize('stock-002-m', '550e8400-e29b-41d4-a716-446655440002', 'opt-002-size-m', 60),
           ),
           ProductOption.create(
             'opt-002-size-l',
@@ -79,7 +81,7 @@ export class ProductFixtures {
             'Size',
             'L',
             Price.from(2000),
-            Stock.initialize('stock-002-l', 'opt-002-size-l', 40),
+            Stock.initialize('stock-002-l', '550e8400-e29b-41d4-a716-446655440002', 'opt-002-size-l', 40),
           ),
           ProductOption.create(
             'opt-002-size-xl',
@@ -87,7 +89,7 @@ export class ProductFixtures {
             'Size',
             'XL',
             Price.from(2000),
-            Stock.initialize('stock-002-xl', 'opt-002-size-xl', 30),
+            Stock.initialize('stock-002-xl', '550e8400-e29b-41d4-a716-446655440002', 'opt-002-size-xl', 30),
           ),
         ],
         new Date('2024-01-02T00:00:00Z'),
@@ -101,6 +103,7 @@ export class ProductFixtures {
         Price.from(59000),
         'Durable denim jeans with classic fit',
         'https://example.com/images/denim-jeans.jpg',
+        'category-fashion', // categoryId
         [
           ProductOption.create(
             'opt-003-size-28',
@@ -108,7 +111,7 @@ export class ProductFixtures {
             'Size',
             '28',
             Price.from(0),
-            Stock.initialize('stock-003-28', 'opt-003-size-28', 25),
+            Stock.initialize('stock-003-28', '550e8400-e29b-41d4-a716-446655440003', 'opt-003-size-28', 25),
           ),
           ProductOption.create(
             'opt-003-size-30',
@@ -116,7 +119,7 @@ export class ProductFixtures {
             'Size',
             '30',
             Price.from(0),
-            Stock.initialize('stock-003-30', 'opt-003-size-30', 35),
+            Stock.initialize('stock-003-30', '550e8400-e29b-41d4-a716-446655440003', 'opt-003-size-30', 35),
           ),
           ProductOption.create(
             'opt-003-size-32',
@@ -124,7 +127,7 @@ export class ProductFixtures {
             'Size',
             '32',
             Price.from(0),
-            Stock.initialize('stock-003-32', 'opt-003-size-32', 40),
+            Stock.initialize('stock-003-32', '550e8400-e29b-41d4-a716-446655440003', 'opt-003-size-32', 40),
           ),
         ],
         new Date('2024-01-03T00:00:00Z'),
@@ -138,6 +141,7 @@ export class ProductFixtures {
         Price.from(89000),
         'Comfortable sneakers for casual wear',
         'https://example.com/images/sneakers.jpg',
+        'category-fashion', // categoryId
         [
           ProductOption.create(
             'opt-004-size-250',
@@ -145,7 +149,7 @@ export class ProductFixtures {
             'Size',
             '250mm',
             Price.from(0),
-            Stock.initialize('stock-004-250', 'opt-004-size-250', 20),
+            Stock.initialize('stock-004-250', '550e8400-e29b-41d4-a716-446655440004', 'opt-004-size-250', 20),
           ),
           ProductOption.create(
             'opt-004-size-260',
@@ -153,7 +157,7 @@ export class ProductFixtures {
             'Size',
             '260mm',
             Price.from(0),
-            Stock.initialize('stock-004-260', 'opt-004-size-260', 30),
+            Stock.initialize('stock-004-260', '550e8400-e29b-41d4-a716-446655440004', 'opt-004-size-260', 30),
           ),
           ProductOption.create(
             'opt-004-size-270',
@@ -161,7 +165,7 @@ export class ProductFixtures {
             'Size',
             '270mm',
             Price.from(0),
-            Stock.initialize('stock-004-270', 'opt-004-size-270', 25),
+            Stock.initialize('stock-004-270', '550e8400-e29b-41d4-a716-446655440004', 'opt-004-size-270', 25),
           ),
         ],
         new Date('2024-01-04T00:00:00Z'),
@@ -175,6 +179,7 @@ export class ProductFixtures {
         Price.from(25000),
         'Stylish baseball cap with adjustable strap',
         'https://example.com/images/baseball-cap.jpg',
+        'category-fashion', // categoryId
         [
           ProductOption.create(
             'opt-005-color-black',
@@ -182,7 +187,7 @@ export class ProductFixtures {
             'Color',
             'Black',
             Price.from(0),
-            Stock.initialize('stock-005-black', 'opt-005-color-black', 50),
+            Stock.initialize('stock-005-black', '550e8400-e29b-41d4-a716-446655440005', 'opt-005-color-black', 50),
           ),
           ProductOption.create(
             'opt-005-color-beige',
@@ -190,7 +195,7 @@ export class ProductFixtures {
             'Color',
             'Beige',
             Price.from(0),
-            Stock.initialize('stock-005-beige', 'opt-005-color-beige', 45),
+            Stock.initialize('stock-005-beige', '550e8400-e29b-41d4-a716-446655440005', 'opt-005-color-beige', 45),
           ),
         ],
         new Date('2024-01-05T00:00:00Z'),
@@ -207,6 +212,7 @@ export class ProductFixtures {
           Price.from(10000 + idx * 1000),
           `Description for product ${idx}`,
           `https://example.com/images/product-${idx}.jpg`,
+          'category-general', // categoryId
           [
             ProductOption.create(
               `opt-${idx}-default`,
@@ -214,7 +220,7 @@ export class ProductFixtures {
               'Default',
               'Standard',
               Price.from(0),
-              Stock.initialize(`stock-${idx}-default`, `opt-${idx}-default`, 50),
+              Stock.initialize(`stock-${idx}-default`, productId, `opt-${idx}-default`, 50),
             ),
           ],
           new Date(`2024-01-${idx.toString().padStart(2, '0')}T00:00:00Z`),

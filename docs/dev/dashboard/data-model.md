@@ -1,7 +1,7 @@
 # 데이터 모델 (Data Model)
 
-**버전**: 1.0.0
-**최종 수정**: 2025-10-31
+**버전**: 1.2.0
+**최종 수정**: 2025-11-20
 **상태**: Active
 
 ---
@@ -175,7 +175,7 @@ erDiagram
     Stock {
         string id PK
         string productId FK
-        string optionId FK
+        string productOptionId FK "NULL 가능"
         int totalQuantity
         int availableQuantity
         int reservedQuantity
@@ -193,7 +193,7 @@ erDiagram
 
 - `Stock.totalQuantity = availableQuantity + reservedQuantity + soldQuantity` (CHECK)
 - `Stock.availableQuantity >= 0, reservedQuantity >= 0, soldQuantity >= 0` (CHECK)
-- `Stock (productId, optionId)` UNIQUE
+- `Stock (productId, productOptionId)` UNIQUE (productOptionId는 nullable)
 - `Category.name` UNIQUE
 - 동시성 제어: `SELECT FOR UPDATE` on Stock
 
@@ -584,8 +584,8 @@ INDEX idx_option_product_type (productId, type)  -- 타입별 옵션 조회 최�
 | 컬럼명 | 데이터 타입 | 제약조건 | 설명 |
 |--------|------------|---------|------|
 | `id` | VARCHAR(36) | PRIMARY KEY | 재고 ID (UUID) |
-| `productId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 상품 ID |
-| `optionId` | VARCHAR(36) | NULL, FOREIGN KEY | 옵션 ID (NULL 가능) |
+| `productId` | VARCHAR(36) | NOT NULL, FOREIGN KEY | 상품 ID (필수) |
+| `productOptionId` | VARCHAR(36) | NULL, FOREIGN KEY | 상품 옵션 ID (NULL 허용) |
 | `totalQuantity` | INT | NOT NULL, CHECK (totalQuantity >= 0) | 전체 재고 수량 |
 | `availableQuantity` | INT | NOT NULL, CHECK (availableQuantity >= 0) | 가용 재고 (판매 가능) |
 | `reservedQuantity` | INT | NOT NULL, DEFAULT 0, CHECK (reservedQuantity >= 0) | 예약된 재고 (주문 생성, 미결제) |
@@ -597,8 +597,8 @@ INDEX idx_option_product_type (productId, type)  -- 타입별 옵션 조회 최�
 ```sql
 PRIMARY KEY (id)
 -- NULL 안전 UNIQUE 제약 (PostgreSQL)
-UNIQUE INDEX idx_stock_product_option (productId, COALESCE(optionId, ''))
--- MySQL의 경우: UNIQUE INDEX idx_stock_product_option (productId, IFNULL(optionId, ''))
+UNIQUE INDEX idx_stock_product_option (productId, COALESCE(productOptionId, ''))
+-- MySQL의 경우: UNIQUE INDEX idx_stock_product_option (productId, IFNULL(productOptionId, ''))
 INDEX idx_stock_product (productId)
 ```
 
@@ -621,11 +621,15 @@ ALTER TABLE Stock ADD CONSTRAINT chk_stock_non_negative CHECK (
 
 #### NULL 처리
 
-**중요**: `optionId`가 NULL일 수 있으므로, UNIQUE 제약에서 NULL을 빈 문자열로 변환하여 처리합니다.
-- PostgreSQL: `COALESCE(optionId, '')`
-- MySQL: `IFNULL(optionId, '')`
+**중요**: `productOptionId`가 NULL일 수 있으므로, UNIQUE 제약에서 NULL을 빈 문자열로 변환하여 처리합니다.
+- PostgreSQL: `COALESCE(productOptionId, '')`
+- MySQL: `IFNULL(productOptionId, '')`
 
 이를 통해 옵션이 없는 상품의 재고가 중복 생성되는 것을 방지합니다.
+
+**구조**:
+- **단일 옵션 상품**: `productId` 필드만 사용, `productOptionId`는 NULL
+- **다중 옵션 상품**: `productId`와 `productOptionId` 모두 사용
 
 #### 관계
 
@@ -678,11 +682,11 @@ COMMIT;
    - `reservedQuantity -= orderQuantity`
    - `availableQuantity += orderQuantity`
 
-**UNIQUE 제약**: (productId, optionId) 조합은 유일해야 함
+**UNIQUE 제약**: (productId, productOptionId) 조합은 유일해야 함
 
 **옵션 처리**:
-- `optionId = NULL`: 옵션이 없는 상품의 재고
-- `optionId != NULL`: 특정 옵션의 재고
+- `productOptionId = NULL`: 옵션이 없는 상품의 재고
+- `productOptionId != NULL`: 특정 옵션의 재고
 
 #### 애플리케이션 레벨 검증
 
@@ -1278,8 +1282,8 @@ LIMIT 5;
 
 #### 재고 관리
 ```sql
--- 상품+옵션 조합 UNIQUE
-UNIQUE INDEX idx_stock_product_option (productId, optionId)
+-- 상품+옵션 조합 UNIQUE (productOptionId nullable)
+UNIQUE INDEX idx_stock_product_option (productId, COALESCE(productOptionId, ''))
 ```
 
 #### 쿠폰 발급
@@ -1706,6 +1710,14 @@ const prisma = new PrismaClient({
 ---
 
 **버전 이력**:
+- 1.2.0 (2025-11-20): Issue #018 - 데이터 모델 일관성 개선
+  - ProductOption, OrderItem, CartItem에 타임스탬프 필드 추가 (createdAt, updatedAt)
+  - Coupon에 minAmount 필드 추가 및 검증 로직 구현
+  - Category 엔티티 추가 및 Product와 관계 설정
+  - Stock 구조 변경: optionId → (productId + productOptionId nullable)
+    - 단일 옵션 상품: productOptionId = NULL
+    - 다중 옵션 상품: productOptionId 사용
+    - UNIQUE 제약 조건: (productId, COALESCE(productOptionId, ''))
 - 1.1.0 (2025-11-02): 피드백 반영 - 데이터 모델 간소화
   - ProductOptionGroup 제거 → ProductOption에 `type` 필드 추가
   - StockReservation 제거 → OrderItem에서 예약 관리

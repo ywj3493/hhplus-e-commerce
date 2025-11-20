@@ -7,6 +7,13 @@ import { CouponApplicationService } from '@/coupon/application/services/coupon-a
 import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon-query.service';
 import { InMemoryCouponRepository } from '@/coupon/infrastructure/repositories/in-memory-coupon.repository';
 import { InMemoryUserCouponRepository } from '@/coupon/infrastructure/repositories/in-memory-user-coupon.repository';
+import { CouponPrismaRepository } from '@/coupon/infrastructure/repositories/coupon-prisma.repository';
+import { UserCouponPrismaRepository } from '@/coupon/infrastructure/repositories/user-coupon-prisma.repository';
+import { PrismaModule } from '@/common/infrastructure/prisma/prisma.module';
+import {
+  COUPON_REPOSITORY,
+  USER_COUPON_REPOSITORY,
+} from '@/coupon/domain/repositories/tokens';
 
 /**
  * 쿠폰 모듈
@@ -21,7 +28,7 @@ import { InMemoryUserCouponRepository } from '@/coupon/infrastructure/repositori
  * - CouponService: Order 도메인에서 쿠폰 사용 및 할인 계산 시 사용
  */
 @Module({
-  imports: [], // No dependencies
+  imports: [PrismaModule],
   controllers: [CouponController],
   providers: [
     // Domain Services
@@ -35,19 +42,25 @@ import { InMemoryUserCouponRepository } from '@/coupon/infrastructure/repositori
     IssueCouponUseCase,
     GetUserCouponsUseCase,
 
-    // Repositories
+    // Repositories (환경별 분기)
     {
-      provide: 'CouponRepository',
-      useClass: InMemoryCouponRepository,
+      provide: COUPON_REPOSITORY,
+      useClass:
+        process.env.NODE_ENV === 'test'
+          ? InMemoryCouponRepository
+          : CouponPrismaRepository,
     },
     {
-      provide: 'UserCouponRepository',
-      useClass: InMemoryUserCouponRepository,
+      provide: USER_COUPON_REPOSITORY,
+      useClass:
+        process.env.NODE_ENV === 'test'
+          ? InMemoryUserCouponRepository
+          : UserCouponPrismaRepository,
     },
   ],
   exports: [
-    'CouponRepository',
-    'UserCouponRepository',
+    COUPON_REPOSITORY,
+    USER_COUPON_REPOSITORY,
     CouponService,
     CouponApplicationService, // Export for Order module
   ],

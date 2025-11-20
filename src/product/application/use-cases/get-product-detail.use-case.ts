@@ -1,8 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  IProductRepository,
-  PRODUCT_REPOSITORY,
-} from '@/product/domain/repositories/product.repository';
+import { ProductRepository } from '@/product/domain/repositories/product.repository';
+import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
 import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 import { GetProductDetailInput } from '@/product/application/dtos/get-product-detail.dto';
 import {
@@ -20,7 +18,7 @@ import {
 export class GetProductDetailUseCase {
   constructor(
     @Inject(PRODUCT_REPOSITORY)
-    private readonly productRepository: IProductRepository,
+    private readonly productRepository: ProductRepository,
   ) {}
 
   /**

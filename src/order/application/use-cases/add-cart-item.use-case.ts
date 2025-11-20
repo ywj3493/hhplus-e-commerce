@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { CartRepository } from '@/order/domain/repositories/cart.repository';
-import { IProductRepository, PRODUCT_REPOSITORY } from '@/product/domain/repositories/product.repository';
+import type { ProductRepository } from '@/product/domain/repositories/product.repository';
+import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
 import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { ProductNotFoundException } from '@/product/domain/product.exceptions';
@@ -24,7 +25,7 @@ export class AddCartItemUseCase {
     @Inject(CART_REPOSITORY)
     private readonly cartRepository: CartRepository,
     @Inject(PRODUCT_REPOSITORY)
-    private readonly productRepository: IProductRepository,
+    private readonly productRepository: ProductRepository,
     private readonly stockManagementService: StockManagementService,
   ) {}
 

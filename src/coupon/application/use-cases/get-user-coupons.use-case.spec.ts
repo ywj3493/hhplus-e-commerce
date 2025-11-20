@@ -53,6 +53,7 @@ describe('GetUserCouponsUseCase', () => {
       '테스트 쿠폰',
       CouponType.PERCENTAGE,
       10,
+      null, // minAmount
       100,
       0,
       overrides?.validFrom || new Date('2025-01-01'),

@@ -20,6 +20,7 @@ export enum CouponType {
  * 비즈니스 규칙:
  * - BR-COUPON-02: 선착순 발급 (issuedQuantity >= totalQuantity 검증)
  * - BR-COUPON-03: 발급 기간 검증 (validFrom ~ validUntil)
+ * - BR-COUPON-04: 최소 주문 금액 검증 (minAmount)
  */
 export class Coupon {
   private readonly _id: string;
@@ -27,6 +28,7 @@ export class Coupon {
   private readonly _description: string;
   private readonly _discountType: CouponType;
   private readonly _discountValue: number;
+  private readonly _minAmount: number | null;
   private readonly _totalQuantity: number;
   private _issuedQuantity: number;
   private readonly _validFrom: Date;
@@ -40,6 +42,7 @@ export class Coupon {
     description: string,
     discountType: CouponType,
     discountValue: number,
+    minAmount: number | null,
     totalQuantity: number,
     issuedQuantity: number,
     validFrom: Date,
@@ -52,6 +55,7 @@ export class Coupon {
     this._description = description;
     this._discountType = discountType;
     this._discountValue = discountValue;
+    this._minAmount = minAmount;
     this._totalQuantity = totalQuantity;
     this._issuedQuantity = issuedQuantity;
     this._validFrom = validFrom;
@@ -70,6 +74,7 @@ export class Coupon {
     description: string,
     discountType: CouponType,
     discountValue: number,
+    minAmount: number | null,
     totalQuantity: number,
     issuedQuantity: number,
     validFrom: Date,
@@ -82,6 +87,7 @@ export class Coupon {
       description,
       discountType,
       discountValue,
+      minAmount,
       totalQuantity,
       issuedQuantity,
       validFrom,
@@ -100,6 +106,7 @@ export class Coupon {
     description: string,
     discountType: CouponType,
     discountValue: number,
+    minAmount: number | null,
     totalQuantity: number,
     issuedQuantity: number,
     validFrom: Date,
@@ -113,6 +120,7 @@ export class Coupon {
       description,
       discountType,
       discountValue,
+      minAmount,
       totalQuantity,
       issuedQuantity,
       validFrom,
@@ -137,6 +145,9 @@ export class Coupon {
     }
     if (this._discountValue <= 0) {
       throw new Error('할인 값은 0보다 커야 합니다');
+    }
+    if (this._minAmount !== null && this._minAmount < 0) {
+      throw new Error('최소 주문 금액은 0 이상이어야 합니다');
     }
   }
 
@@ -172,6 +183,20 @@ export class Coupon {
     return now >= this._validFrom && now <= this._validUntil;
   }
 
+  /**
+   * 주문 금액이 쿠폰 사용 가능 최소 금액을 만족하는지 확인
+   * BR-COUPON-04: 최소 주문 금액 검증
+   *
+   * @param orderAmount 주문 금액
+   * @returns 사용 가능 여부
+   */
+  canBeAppliedTo(orderAmount: number): boolean {
+    if (this._minAmount === null) {
+      return true; // 최소 금액 제한 없음
+    }
+    return orderAmount >= this._minAmount;
+  }
+
   // Getters
   get id(): string {
     return this._id;
@@ -198,6 +223,10 @@ export class Coupon {
 
   get discountValue(): number {
     return this._discountValue;
+  }
+
+  get minAmount(): number | null {
+    return this._minAmount;
   }
 
   get totalQuantity(): number {

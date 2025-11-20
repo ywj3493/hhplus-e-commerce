@@ -2,12 +2,17 @@ import { StockStatus } from '@/product/domain/entities/stock-status.vo';
 
 /**
  * Stock Entity
- * 상품 옵션의 재고를 관리
+ * 상품 및 상품 옵션의 재고를 관리
  * BR-PROD-04: availableQuantity를 기반으로 재고 상태 계산
+ *
+ * 구조:
+ * - productId: 필수 (상품 ID)
+ * - productOptionId: 선택 (옵션이 없는 상품은 null)
  */
 export class Stock {
   private readonly _id: string;
-  private readonly _productOptionId: string;
+  private readonly _productId: string;
+  private readonly _productOptionId: string | null;
   private _totalQuantity: number;
   private _availableQuantity: number;
   private _reservedQuantity: number;
@@ -15,13 +20,15 @@ export class Stock {
 
   private constructor(
     id: string,
-    productOptionId: string,
+    productId: string,
+    productOptionId: string | null,
     totalQuantity: number,
     availableQuantity: number,
     reservedQuantity: number,
     soldQuantity: number,
   ) {
     this._id = id;
+    this._productId = productId;
     this._productOptionId = productOptionId;
     this._totalQuantity = totalQuantity;
     this._availableQuantity = availableQuantity;
@@ -36,7 +43,8 @@ export class Stock {
    */
   static create(
     id: string,
-    productOptionId: string,
+    productId: string,
+    productOptionId: string | null,
     totalQuantity: number,
     availableQuantity: number,
     reservedQuantity: number,
@@ -44,6 +52,7 @@ export class Stock {
   ): Stock {
     return new Stock(
       id,
+      productId,
       productOptionId,
       totalQuantity,
       availableQuantity,
@@ -55,11 +64,14 @@ export class Stock {
   /**
    * 초기 재고를 생성하는 팩토리 메서드
    */
-  static initialize(id: string, productOptionId: string, totalQuantity: number): Stock {
-    return new Stock(id, productOptionId, totalQuantity, totalQuantity, 0, 0);
+  static initialize(id: string, productId: string, productOptionId: string | null, totalQuantity: number): Stock {
+    return new Stock(id, productId, productOptionId, totalQuantity, totalQuantity, 0, 0);
   }
 
   private validate(): void {
+    if (!this._productId || this._productId.trim() === '') {
+      throw new Error('상품 ID는 필수입니다');
+    }
     if (this._totalQuantity < 0) {
       throw new Error('총 재고 수량은 음수일 수 없습니다');
     }
@@ -139,7 +151,11 @@ export class Stock {
     return this._id;
   }
 
-  get productOptionId(): string {
+  get productId(): string {
+    return this._productId;
+  }
+
+  get productOptionId(): string | null {
     return this._productOptionId;
   }
 

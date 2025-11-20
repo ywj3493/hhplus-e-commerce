@@ -10,6 +10,7 @@ export const createTestCoupon = (
     description: string;
     discountType: CouponType;
     discountValue: number;
+    minAmount: number | null;
     totalQuantity: number;
     issuedQuantity: number;
     validFrom: Date;
@@ -21,6 +22,7 @@ export const createTestCoupon = (
     overrides?.description || '전체 상품 10% 할인',
     overrides?.discountType || CouponType.PERCENTAGE,
     overrides?.discountValue ?? 10,
+    overrides?.minAmount ?? null, // 기본값: 최소 금액 제한 없음
     overrides?.totalQuantity ?? 100,
     overrides?.issuedQuantity ?? 0,
     overrides?.validFrom || new Date('2025-01-01'),

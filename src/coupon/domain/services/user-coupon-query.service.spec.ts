@@ -15,6 +15,7 @@ describe('UserCouponQueryService', () => {
       '테스트용',
       CouponType.PERCENTAGE,
       10,
+        null, // minAmount
       100,
       0,
       new Date('2025-01-01'),

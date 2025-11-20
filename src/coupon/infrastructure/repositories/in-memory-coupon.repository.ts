@@ -11,6 +11,7 @@ interface CouponData {
   description: string;
   discountType: string;
   discountValue: number;
+  minAmount: number | null;
   totalQuantity: number;
   issuedQuantity: number;
   validFrom: Date;
@@ -88,6 +89,7 @@ export class InMemoryCouponRepository implements CouponRepository {
       data.description,
       data.discountType as any,
       data.discountValue,
+      data.minAmount,
       data.totalQuantity,
       data.issuedQuantity,
       data.validFrom,
@@ -107,6 +109,7 @@ export class InMemoryCouponRepository implements CouponRepository {
       description: coupon.description,
       discountType: coupon.discountType,
       discountValue: coupon.discountValue,
+      minAmount: coupon.minAmount,
       totalQuantity: coupon.totalQuantity,
       issuedQuantity: coupon.issuedQuantity,
       validFrom: coupon.validFrom,

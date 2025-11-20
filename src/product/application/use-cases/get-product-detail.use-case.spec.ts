@@ -1,6 +1,6 @@
 import { GetProductDetailUseCase } from '@/product/application/use-cases/get-product-detail.use-case';
 import { GetProductDetailInput } from '@/product/application/dtos/get-product-detail.dto';
-import { IProductRepository } from '@/product/domain/repositories/product.repository';
+import { ProductRepository } from '@/product/domain/repositories/product.repository';
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
@@ -10,7 +10,7 @@ import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 
 describe('GetProductDetailUseCase', () => {
   let useCase: GetProductDetailUseCase;
-  let mockRepository: jest.Mocked<IProductRepository>;
+  let mockRepository: jest.Mocked<ProductRepository>;
 
   beforeEach(() => {
     mockRepository = {
@@ -31,7 +31,7 @@ describe('GetProductDetailUseCase', () => {
         'Color',
         'Red',
         Price.from(0),
-        Stock.initialize('stock-red', 'opt-color-red', 50),
+        Stock.initialize('stock-red', 'product-1', 'opt-color-red', 50),
       ),
       ProductOption.create(
         'opt-color-blue',
@@ -39,7 +39,7 @@ describe('GetProductDetailUseCase', () => {
         'Color',
         'Blue',
         Price.from(0),
-        Stock.create('stock-blue', 'opt-color-blue', 50, 0, 30, 20), // 품절
+        Stock.create('stock-blue', 'product-1', 'opt-color-blue', 50, 0, 30, 20), // 품절
       ),
     ];
 
@@ -50,7 +50,7 @@ describe('GetProductDetailUseCase', () => {
         'Size',
         'S',
         Price.from(0),
-        Stock.create('stock-s', 'opt-size-s', 30, 0, 10, 20), // 품절
+        Stock.create('stock-s', 'product-1', 'opt-size-s', 30, 0, 10, 20), // 품절
       ),
       ProductOption.create(
         'opt-size-m',
@@ -58,7 +58,7 @@ describe('GetProductDetailUseCase', () => {
         'Size',
         'M',
         Price.from(0),
-        Stock.initialize('stock-m', 'opt-size-m', 40),
+        Stock.initialize('stock-m', 'product-1', 'opt-size-m', 40),
       ),
       ProductOption.create(
         'opt-size-l',
@@ -66,7 +66,7 @@ describe('GetProductDetailUseCase', () => {
         'Size',
         'L',
         Price.from(2000),
-        Stock.initialize('stock-l', 'opt-size-l', 30),
+        Stock.initialize('stock-l', 'product-1', 'opt-size-l', 30),
       ),
     ];
 
@@ -76,6 +76,7 @@ describe('GetProductDetailUseCase', () => {
       Price.from(50000),
       'Test product with multiple options',
       'https://example.com/product-1.jpg',
+      'category-test', // categoryId
       [...colorOptions, ...sizeOptions],
       new Date('2024-01-01'),
       new Date('2024-01-01'),
@@ -199,6 +200,7 @@ describe('GetProductDetailUseCase', () => {
         Price.from(10000),
         'Description',
         'https://example.com/product.jpg',
+        'category-test', // categoryId
         [], // 옵션 없음
         new Date(),
         new Date(),
@@ -221,7 +223,7 @@ describe('GetProductDetailUseCase', () => {
         'Color',
         'Red',
         Price.from(0),
-        Stock.initialize('stock-1', 'opt-1', 50),
+        Stock.initialize('stock-1', 'product-1', 'opt-1', 50),
       );
       const product = Product.create(
         'product-1',
@@ -229,6 +231,7 @@ describe('GetProductDetailUseCase', () => {
         Price.from(10000),
         'Description',
         'https://example.com/product.jpg',
+        'category-test', // categoryId
         [option],
         new Date(),
         new Date(),

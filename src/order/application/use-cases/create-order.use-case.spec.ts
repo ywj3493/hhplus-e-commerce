@@ -2,7 +2,7 @@ import { CreateOrderUseCase } from '@/order/application/use-cases/create-order.u
 import { OrderRepository } from '@/order/domain/repositories/order.repository';
 import { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
-import { IProductRepository } from '@/product/domain/repositories/product.repository';
+import { ProductRepository } from '@/product/domain/repositories/product.repository';
 import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { CouponApplicationService } from '@/coupon/application/services/coupon-application.service';
 import { Cart } from '@/order/domain/entities/cart.entity';
@@ -18,7 +18,7 @@ describe('CreateOrderUseCase', () => {
   let useCase: CreateOrderUseCase;
   let cartRepository: jest.Mocked<CartRepository>;
   let orderRepository: jest.Mocked<OrderRepository>;
-  let productRepository: jest.Mocked<IProductRepository>;
+  let productRepository: jest.Mocked<ProductRepository>;
   let stockManagementService: jest.Mocked<StockManagementService>;
   let couponApplicationService: jest.Mocked<CouponApplicationService>;
 
@@ -44,7 +44,7 @@ describe('CreateOrderUseCase', () => {
       findPopular: jest.fn(),
       save: jest.fn(),
       exists: jest.fn(),
-    } as jest.Mocked<IProductRepository>;
+    } as jest.Mocked<ProductRepository>;
 
     // Mock services
     stockManagementService = {
@@ -68,7 +68,7 @@ describe('CreateOrderUseCase', () => {
   });
 
   const createTestProduct = (): Product => {
-    const stock = Stock.create('stock-1', 'option-1', 100, 50, 0, 0);
+    const stock = Stock.create('stock-1', 'product-1', 'option-1', 100, 50, 0, 0);
     const option = ProductOption.create(
       'option-1',
       'product-1',
@@ -84,6 +84,7 @@ describe('CreateOrderUseCase', () => {
       Price.from(10000),
       '설명',
       'https://example.com/image.jpg',
+      'category-test', // categoryId
       [option],
       new Date(),
       new Date(),
