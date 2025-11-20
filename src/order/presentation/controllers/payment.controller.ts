@@ -5,8 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiHeader, ApiBearerAuth } from '@nestjs/swagger';
+import { FakeJwtAuthGuard } from '@/__fake__/auth/fake-jwt-auth.guard';
 import { ProcessPaymentUseCase } from '@/order/application/use-cases/process-payment.use-case';
 import { ProcessPaymentInput } from '@/order/application/dtos/process-payment.dto';
 import { ProcessPaymentRequestDto } from '@/order/presentation/dtos/process-payment-request.dto';
@@ -16,9 +19,13 @@ import { PaymentResponseDto } from '@/order/presentation/dtos/payment-response.d
  * PaymentController
  *
  * POST /payments - 결제 처리
+ *
+ * 인증: JWT 토큰 필요 (Bearer token)
  */
 @ApiTags('payments')
 @Controller('payments')
+@UseGuards(FakeJwtAuthGuard)
+@ApiBearerAuth('access-token')
 export class PaymentController {
   constructor(
     private readonly processPaymentUseCase: ProcessPaymentUseCase,
@@ -41,10 +48,10 @@ export class PaymentController {
   @ApiResponse({ status: 402, description: '결제 실패' })
   async processPayment(
     @Body() body: ProcessPaymentRequestDto,
-    @Headers('x-test-fail') testFail?: string,
+    @Headers('x-test-fail') testFail: string | undefined,
+    @Request() req,
   ): Promise<PaymentResponseDto> {
-    // TODO: 실제 환경에서는 @CurrentUser() 데코레이터로 인증된 사용자 정보 가져오기
-    const userId = 'user-1'; // 임시 하드코딩
+    const userId = req.user.userId;
 
     // Input DTO 생성
     const input = new ProcessPaymentInput(

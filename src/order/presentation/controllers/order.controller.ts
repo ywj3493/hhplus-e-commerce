@@ -6,8 +6,11 @@ import {
   Body,
   Query,
   HttpCode,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { FakeJwtAuthGuard } from '@/__fake__/auth/fake-jwt-auth.guard';
 import { CreateOrderUseCase } from '@/order/application/use-cases/create-order.use-case';
 import { GetOrderUseCase } from '@/order/application/use-cases/get-order.use-case';
 import { GetOrdersUseCase } from '@/order/application/use-cases/get-orders.use-case';
@@ -29,9 +32,13 @@ import { OrderListResponseDto } from '@/order/presentation/dtos/order-list-respo
  * - POST /orders - 주문 생성
  * - GET /orders/:id - 주문 조회
  * - GET /orders - 주문 목록 조회
+ *
+ * 인증: JWT 토큰 필요 (Bearer token)
  */
 @ApiTags('orders')
 @Controller('orders')
+@UseGuards(FakeJwtAuthGuard)
+@ApiBearerAuth('access-token')
 export class OrderController {
   constructor(
     private readonly createOrderUseCase: CreateOrderUseCase,
@@ -56,10 +63,9 @@ export class OrderController {
   @ApiResponse({ status: 409, description: '재고 부족' })
   async createOrder(
     @Body() body: CreateOrderRequestDto,
-    // TODO: @CurrentUser() user: User 구현 후 적용
+    @Request() req,
   ): Promise<CreateOrderResponseDto> {
-    // TODO: user.id로 변경
-    const userId = 'user-1'; // 임시 하드코딩
+    const userId = req.user.userId;
 
     const input = new CreateOrderInput(userId, body.couponId);
     const output = await this.createOrderUseCase.execute(input);
@@ -83,10 +89,9 @@ export class OrderController {
   @ApiResponse({ status: 404, description: '주문을 찾을 수 없음' })
   async getOrder(
     @Param('id') id: string,
-    // TODO: @CurrentUser() user: User 구현 후 적용
+    @Request() req,
   ): Promise<OrderResponseDto> {
-    // TODO: user.id로 변경
-    const userId = 'user-1'; // 임시 하드코딩
+    const userId = req.user.userId;
 
     const input = new GetOrderInput(id, userId);
     const output = await this.getOrderUseCase.execute(input);
@@ -111,10 +116,9 @@ export class OrderController {
   @ApiResponse({ status: 200, description: '주문 목록 조회 성공', type: OrderListResponseDto })
   async getOrders(
     @Query() query: PaginationQueryDto,
-    // TODO: @CurrentUser() user: User 구현 후 적용
+    @Request() req,
   ): Promise<OrderListResponseDto> {
-    // TODO: user.id로 변경
-    const userId = 'user-1'; // 임시 하드코딩
+    const userId = req.user.userId;
 
     const input = new GetOrdersInput(
       userId,

@@ -17,7 +17,7 @@ async function bootstrap() {
         '- __fake__: 실제 동작하는 간단한 구현체 (JWT 인증)\n' +
         '- __stub__: 미리 준비된 응답 데이터 (JSON)\n\n' +
         '**인증 방법:**\n' +
-        '1. POST /api/v1/fake-auth/login 으로 로그인\n' +
+        '1. POST /api/v1/auth/login 으로 로그인\n' +
         '2. 응답으로 받은 accessToken 복사\n' +
         '3. 우측 상단 "Authorize" 버튼 클릭\n' +
         '4. 토큰 입력 후 "Authorize" 클릭\n\n' +
@@ -37,7 +37,7 @@ async function bootstrap() {
       },
       'access-token',
     )
-    .addTag('Fake Auth', '테스트용 인증 엔드포인트 (Fake Implementation)')
+    .addTag('auth', '인증 엔드포인트 (Fake Implementation)')
     .addTag('products', 'EPIC-1: Product browsing endpoints')
     .addTag('carts', 'EPIC-2: Cart management endpoints (인증 필요)')
     .addTag('orders', 'EPIC-3: Order management endpoints (인증 필요)')

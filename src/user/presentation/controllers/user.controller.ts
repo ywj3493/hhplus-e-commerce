@@ -1,6 +1,6 @@
 import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { FakeAuthGuard } from '@/__fake__/auth/fake-auth.guard';
+import { FakeJwtAuthGuard } from '@/__fake__/auth/fake-jwt-auth.guard';
 import { GetUserProfileUseCase } from '@/user/application/use-cases/get-user-profile.use-case';
 import { GetUserProfileInput } from '@/user/application/dtos/get-user-profile.dto';
 import { UserResponseDto } from '@/user/presentation/dtos/user.response.dto';
@@ -22,7 +22,7 @@ export class UserController {
    * UC-USER-01: 사용자 정보 조회
    */
   @Get('me')
-  @UseGuards(FakeAuthGuard)
+  @UseGuards(FakeJwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: '내 프로필 조회', description: '인증된 사용자의 프로필 정보를 조회합니다.' })
   @ApiResponse({ status: 200, description: '프로필 조회 성공', type: UserResponseDto })

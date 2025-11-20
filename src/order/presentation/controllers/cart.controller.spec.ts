@@ -19,6 +19,14 @@ describe('CartController', () => {
   let removeCartItemUseCase: jest.Mocked<RemoveCartItemUseCase>;
   let clearCartUseCase: jest.Mocked<ClearCartUseCase>;
 
+  // Mock request object with authenticated user
+  const mockRequest = {
+    user: {
+      userId: 'user-001',
+      name: '테스트 유저 1',
+    },
+  };
+
   beforeEach(async () => {
     const mockAddCartItemUseCase = {
       execute: jest.fn(),
@@ -86,12 +94,12 @@ describe('CartController', () => {
       addCartItemUseCase.execute.mockResolvedValue(useCaseOutput);
 
       // When
-      const response = await controller.addItem(request);
+      const response = await controller.addItem(request, mockRequest);
 
       // Then
       expect(addCartItemUseCase.execute).toHaveBeenCalledWith(
         expect.objectContaining({
-          userId: 'user-1',
+          userId: 'user-001',
           productId: 'prod-1',
           productOptionId: 'opt-1',
           quantity: 2,
@@ -114,12 +122,12 @@ describe('CartController', () => {
       getCartUseCase.execute.mockResolvedValue(useCaseOutput);
 
       // When
-      const response = await controller.getCart();
+      const response = await controller.getCart(mockRequest);
 
       // Then
       expect(getCartUseCase.execute).toHaveBeenCalledWith(
         expect.objectContaining({
-          userId: 'user-1',
+          userId: 'user-001',
         }),
       );
       expect(response.items).toHaveLength(2);
@@ -141,7 +149,7 @@ describe('CartController', () => {
       getCartUseCase.execute.mockResolvedValue(useCaseOutput);
 
       // When
-      const response = await controller.getCart();
+      const response = await controller.getCart(mockRequest);
 
       // Then
       expect(response.items).toHaveLength(0);
@@ -158,12 +166,12 @@ describe('CartController', () => {
       updateCartItemUseCase.execute.mockResolvedValue(useCaseOutput);
 
       // When
-      const response = await controller.updateItem(param, request);
+      const response = await controller.updateItem(param, request, mockRequest);
 
       // Then
       expect(updateCartItemUseCase.execute).toHaveBeenCalledWith(
         expect.objectContaining({
-          userId: 'user-1',
+          userId: 'user-001',
           cartItemId: 'item-1',
           quantity: 5,
         }),
@@ -181,7 +189,7 @@ describe('CartController', () => {
       updateCartItemUseCase.execute.mockResolvedValue(useCaseOutput);
 
       // When
-      const response = await controller.updateItem(param, request);
+      const response = await controller.updateItem(param, request, mockRequest);
 
       // Then
       expect(response.cartItemId).toBe('item-1');
@@ -198,12 +206,12 @@ describe('CartController', () => {
       removeCartItemUseCase.execute.mockResolvedValue(useCaseOutput);
 
       // When
-      const response = await controller.removeItem(param);
+      const response = await controller.removeItem(param, mockRequest);
 
       // Then
       expect(removeCartItemUseCase.execute).toHaveBeenCalledWith(
         expect.objectContaining({
-          userId: 'user-1',
+          userId: 'user-001',
           cartItemId: 'item-1',
         }),
       );
@@ -218,12 +226,12 @@ describe('CartController', () => {
       clearCartUseCase.execute.mockResolvedValue(useCaseOutput);
 
       // When
-      const response = await controller.clearCart();
+      const response = await controller.clearCart(mockRequest);
 
       // Then
       expect(clearCartUseCase.execute).toHaveBeenCalledWith(
         expect.objectContaining({
-          userId: 'user-1',
+          userId: 'user-001',
         }),
       );
       expect(response).toBeUndefined(); // clearCart returns void
@@ -235,7 +243,7 @@ describe('CartController', () => {
       clearCartUseCase.execute.mockResolvedValue(useCaseOutput);
 
       // When
-      const response = await controller.clearCart();
+      const response = await controller.clearCart(mockRequest);
 
       // Then
       expect(response).toBeUndefined(); // clearCart returns void

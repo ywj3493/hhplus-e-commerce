@@ -5,8 +5,11 @@ import {
   Param,
   Query,
   HttpCode,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { FakeJwtAuthGuard } from '@/__fake__/auth/fake-jwt-auth.guard';
 import { IssueCouponUseCase } from '@/coupon/application/use-cases/issue-coupon.use-case';
 import { GetUserCouponsUseCase } from '@/coupon/application/use-cases/get-user-coupons.use-case';
 import { IssueCouponInput } from '@/coupon/application/dtos/issue-coupon.dto';
@@ -21,9 +24,13 @@ import { CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
  * API Endpoints:
  * - POST /coupons/:id/issue - 쿠폰 발급
  * - GET /coupons/my - 사용자 쿠폰 목록 조회
+ *
+ * 인증: JWT 토큰 필요 (Bearer token)
  */
 @ApiTags('coupons')
 @Controller('coupons')
+@UseGuards(FakeJwtAuthGuard)
+@ApiBearerAuth('access-token')
 export class CouponController {
   constructor(
     private readonly issueCouponUseCase: IssueCouponUseCase,
@@ -48,11 +55,9 @@ export class CouponController {
   @ApiResponse({ status: 409, description: '수량 부족으로 발급 실패' })
   async issueCoupon(
     @Param('id') couponId: string,
-    // TODO: @CurrentUser() user: User 구현 후 적용
-    // 현재는 임시로 하드코딩된 userId 사용
+    @Request() req,
   ): Promise<UserCouponResponseDto> {
-    // TODO: user.id로 변경
-    const userId = 'user-1'; // 임시 하드코딩
+    const userId = req.user.userId;
 
     const input = new IssueCouponInput({
       userId,
@@ -78,11 +83,10 @@ export class CouponController {
   @ApiQuery({ name: 'status', required: false, enum: CouponStatus, description: '쿠폰 상태 필터 (AVAILABLE, USED, EXPIRED)' })
   @ApiResponse({ status: 200, description: '쿠폰 목록 조회 성공', type: UserCouponsResponseDto })
   async getUserCoupons(
-    @Query('status') status?: CouponStatus,
-    // TODO: @CurrentUser() user: User 구현 후 적용
+    @Query('status') status: CouponStatus | undefined,
+    @Request() req,
   ): Promise<UserCouponsResponseDto> {
-    // TODO: user.id로 변경
-    const userId = 'user-1'; // 임시 하드코딩
+    const userId = req.user.userId;
 
     const input = new GetUserCouponsInput({
       userId,

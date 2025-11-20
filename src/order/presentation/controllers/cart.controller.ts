@@ -8,8 +8,11 @@ import {
   Param,
   HttpCode,
   HttpStatus,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { FakeJwtAuthGuard } from '@/__fake__/auth/fake-jwt-auth.guard';
 import { AddCartItemUseCase } from '@/order/application/use-cases/add-cart-item.use-case';
 import { GetCartUseCase } from '@/order/application/use-cases/get-cart.use-case';
 import { UpdateCartItemUseCase } from '@/order/application/use-cases/update-cart-item.use-case';
@@ -37,11 +40,12 @@ import { CartResponseDto } from '@/order/presentation/dtos/cart-response.dto';
  * - DELETE /carts/items/:id: 아이템 삭제
  * - DELETE /carts: 장바구니 전체 비우기
  *
- * 참고: 현재는 Mock User('user-1')를 사용하며,
- *      추후 인증 구현 시 @CurrentUser() 데코레이터로 변경 예정
+ * 인증: JWT 토큰 필요 (Bearer token)
  */
 @ApiTags('carts')
 @Controller('carts')
+@UseGuards(FakeJwtAuthGuard)
+@ApiBearerAuth('access-token')
 export class CartController {
   constructor(
     private readonly addCartItemUseCase: AddCartItemUseCase,
@@ -80,9 +84,9 @@ export class CartController {
   })
   async addItem(
     @Body() dto: AddCartItemRequestDto,
+    @Request() req,
   ): Promise<CartItemResponseDto> {
-    // TODO: 추후 @CurrentUser() 데코레이터로 변경
-    const userId = 'user-1';
+    const userId = req.user.userId;
 
     const input = new AddCartItemInput({
       userId,
@@ -110,9 +114,8 @@ export class CartController {
     description: 'Cart retrieved successfully',
     type: CartResponseDto,
   })
-  async getCart(): Promise<CartResponseDto> {
-    // TODO: 추후 @CurrentUser() 데코레이터로 변경
-    const userId = 'user-1';
+  async getCart(@Request() req): Promise<CartResponseDto> {
+    const userId = req.user.userId;
 
     const input = new GetCartInput(userId);
     const output = await this.getCartUseCase.execute(input);
@@ -149,9 +152,9 @@ export class CartController {
   async updateItem(
     @Param() param: GetCartItemParamDto,
     @Body() dto: UpdateCartItemRequestDto,
+    @Request() req,
   ): Promise<CartItemResponseDto> {
-    // TODO: 추후 @CurrentUser() 데코레이터로 변경
-    const userId = 'user-1';
+    const userId = req.user.userId;
 
     const input = new UpdateCartItemInput({
       userId,
@@ -181,9 +184,11 @@ export class CartController {
     status: 404,
     description: 'Cart or cart item not found',
   })
-  async removeItem(@Param() param: GetCartItemParamDto): Promise<void> {
-    // TODO: 추후 @CurrentUser() 데코레이터로 변경
-    const userId = 'user-1';
+  async removeItem(
+    @Param() param: GetCartItemParamDto,
+    @Request() req,
+  ): Promise<void> {
+    const userId = req.user.userId;
 
     const input = new RemoveCartItemInput({
       userId,
@@ -207,9 +212,8 @@ export class CartController {
     status: 204,
     description: 'Cart cleared successfully',
   })
-  async clearCart(): Promise<void> {
-    // TODO: 추후 @CurrentUser() 데코레이터로 변경
-    const userId = 'user-1';
+  async clearCart(@Request() req): Promise<void> {
+    const userId = req.user.userId;
 
     const input = new ClearCartInput(userId);
     await this.clearCartUseCase.execute(input);

@@ -3,15 +3,15 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtService } from '@nestjs/jwt';
 import { FAKE_USERS } from '@/__fake__/auth/fake-users';
 
-@ApiTags('Fake Auth')
-@Controller('fake-auth')
+@ApiTags('auth')
+@Controller('auth')
 export class FakeAuthController {
   constructor(private jwtService: JwtService) {}
 
   @Post('login')
   @ApiOperation({
-    summary: 'Mock 로그인 (JWT 토큰 발급)',
-    description: `테스트용 로그인 엔드포인트입니다. 두 명의 사용자로 테스트 가능합니다:
+    summary: '로그인 (JWT 토큰 발급)',
+    description: `로그인 엔드포인트입니다 (Fake 구현). 두 명의 사용자로 테스트 가능합니다:
 
 **User 1:**
 - id: user1

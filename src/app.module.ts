@@ -19,6 +19,7 @@ import { UserModule } from '@/user/user.module';
 @Module({
   imports: [
     JwtModule.register({
+      global: true,
       secret: 'fake-secret-key-for-testing',
       signOptions: { expiresIn: '1d' },
     }),

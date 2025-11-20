@@ -16,11 +16,19 @@ describe('PaymentController', () => {
   let controller: PaymentController;
   let processPaymentUseCase: jest.Mocked<ProcessPaymentUseCase>;
 
-  const TEST_USER_ID = 'user-1';
+  const TEST_USER_ID = 'user-001';
   const TEST_ORDER_ID = 'order-1';
   const TEST_PAYMENT_ID = 'payment-1';
   const TEST_TRANSACTION_ID = 'TXN-12345';
   const TEST_AMOUNT = 45000;
+
+  // Mock request object with authenticated user
+  const mockRequest = {
+    user: {
+      userId: 'user-001',
+      name: '테스트 유저 1',
+    },
+  };
 
   beforeEach(async () => {
     const mockProcessPaymentUseCase = {
@@ -59,7 +67,7 @@ describe('PaymentController', () => {
       processPaymentUseCase.execute.mockResolvedValue(output);
 
       // When
-      const response = await controller.processPayment(requestDto);
+      const response = await controller.processPayment(requestDto, undefined, mockRequest);
 
       // Then
       expect(response).toBeInstanceOf(PaymentResponseDto);
@@ -95,7 +103,7 @@ describe('PaymentController', () => {
       processPaymentUseCase.execute.mockResolvedValue(output);
 
       // When
-      await controller.processPayment(requestDto, 'true');
+      await controller.processPayment(requestDto, 'true', mockRequest);
 
       // Then
       expect(processPaymentUseCase.execute).toHaveBeenCalledWith(
@@ -121,7 +129,7 @@ describe('PaymentController', () => {
       processPaymentUseCase.execute.mockResolvedValue(output);
 
       // When
-      await controller.processPayment(requestDto, 'false');
+      await controller.processPayment(requestDto, 'false', mockRequest);
 
       // Then
       expect(processPaymentUseCase.execute).toHaveBeenCalledWith(
@@ -147,7 +155,7 @@ describe('PaymentController', () => {
       processPaymentUseCase.execute.mockResolvedValue(output);
 
       // When
-      await controller.processPayment(requestDto, undefined);
+      await controller.processPayment(requestDto, undefined, mockRequest);
 
       // Then
       expect(processPaymentUseCase.execute).toHaveBeenCalledWith(
@@ -169,7 +177,7 @@ describe('PaymentController', () => {
       );
 
       // When & Then
-      await expect(controller.processPayment(requestDto)).rejects.toThrow(
+      await expect(controller.processPayment(requestDto, undefined, mockRequest)).rejects.toThrow(
         AlreadyPaidException,
       );
     });
@@ -185,7 +193,7 @@ describe('PaymentController', () => {
       );
 
       // When & Then
-      await expect(controller.processPayment(requestDto)).rejects.toThrow(
+      await expect(controller.processPayment(requestDto, undefined, mockRequest)).rejects.toThrow(
         OrderExpiredException,
       );
     });
@@ -201,7 +209,7 @@ describe('PaymentController', () => {
       );
 
       // When & Then
-      await expect(controller.processPayment(requestDto)).rejects.toThrow(
+      await expect(controller.processPayment(requestDto, undefined, mockRequest)).rejects.toThrow(
         InvalidOrderStatusException,
       );
     });
@@ -217,7 +225,7 @@ describe('PaymentController', () => {
       );
 
       // When & Then
-      await expect(controller.processPayment(requestDto)).rejects.toThrow(
+      await expect(controller.processPayment(requestDto, undefined, mockRequest)).rejects.toThrow(
         PaymentFailedException,
       );
     });
@@ -232,7 +240,7 @@ describe('PaymentController', () => {
       processPaymentUseCase.execute.mockRejectedValue(genericError);
 
       // When & Then
-      await expect(controller.processPayment(requestDto)).rejects.toThrow(
+      await expect(controller.processPayment(requestDto, undefined, mockRequest)).rejects.toThrow(
         genericError,
       );
     });
@@ -257,7 +265,7 @@ describe('PaymentController', () => {
       processPaymentUseCase.execute.mockResolvedValue(output);
 
       // When
-      const response = await controller.processPayment(requestDto);
+      const response = await controller.processPayment(requestDto, undefined, mockRequest);
 
       // Then
       expect(response.paymentId).toBe(TEST_PAYMENT_ID);
