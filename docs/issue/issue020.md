@@ -17,7 +17,7 @@
 | CategoryPrismaRepository | ✅ Completed | `103e433` feat: CategoryPrismaRepository 구현 |
 | ProductPrismaRepository | ✅ Completed | `3481321` feat: ProductPrismaRepository 구현 (재고 동시성 제어) |
 | Stock Concurrency Control | ✅ Completed | (included in ProductPrismaRepository commit) |
-| Testcontainers Integration Tests | ✅ Completed | Pending commit |
+| Testcontainers Integration Tests | ✅ Completed | `e14cf62` test: Product/Category 도메인 Testcontainers 통합 테스트 |
 
 ### Final Session Summary (2025-11-20)
 
@@ -378,25 +378,25 @@ test: Product/Category 도메인 Testcontainers 통합 테스트
 ## Verification Checklist
 
 ### Functional Requirements
-- [ ] Category CRUD operations work correctly
-- [ ] Product CRUD with JOIN (category, options, stocks)
-- [ ] Stock reservation prevents overselling
-- [ ] Stock release restores availability
-- [ ] Stock confirmation moves reserved → sold
-- [ ] Concurrent stock operations handled safely
+- [x] Category CRUD operations work correctly
+- [x] Product CRUD with JOIN (category, options, stocks)
+- [x] Stock reservation prevents overselling
+- [x] Stock release restores availability
+- [x] Stock confirmation moves reserved → sold
+- [x] Concurrent stock operations handled safely
 
 ### Non-Functional Requirements
-- [ ] Stock reservation <100ms (single operation)
-- [ ] Pessimistic locking prevents race conditions
-- [ ] Transactions rollback on failure
-- [ ] All integration tests pass
-- [ ] No deadlocks in concurrent scenarios
+- [x] Stock reservation <100ms (single operation)
+- [x] Pessimistic locking prevents race conditions
+- [x] Transactions rollback on failure
+- [x] All integration tests pass
+- [x] No deadlocks in concurrent scenarios
 
 ### Code Quality
-- [ ] Repository pattern followed
-- [ ] Domain entity validation preserved
-- [ ] Error handling comprehensive
-- [ ] Korean comments for readability
+- [x] Repository pattern followed
+- [x] Domain entity validation preserved
+- [x] Error handling comprehensive
+- [x] Korean comments for readability
 
 ## Testing Strategy
 
