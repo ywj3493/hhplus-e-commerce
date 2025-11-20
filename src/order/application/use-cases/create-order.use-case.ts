@@ -6,10 +6,8 @@ import { Order } from '@/order/domain/entities/order.entity';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
 import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { CouponApplicationService } from '@/coupon/application/services/coupon-application.service';
-import {
-  IProductRepository,
-  PRODUCT_REPOSITORY,
-} from '@/product/domain/repositories/product.repository';
+import type { ProductRepository } from '@/product/domain/repositories/product.repository';
+import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
 import { CreateOrderInput, CreateOrderOutput } from '@/order/application/dtos/create-order.dto';
 import { EmptyCartException } from '@/order/domain/order.exceptions';
 
@@ -32,7 +30,7 @@ export class CreateOrderUseCase {
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: OrderRepository,
     @Inject(PRODUCT_REPOSITORY)
-    private readonly productRepository: IProductRepository,
+    private readonly productRepository: ProductRepository,
     private readonly stockManagementService: StockManagementService,
     private readonly couponApplicationService: CouponApplicationService,
   ) {}

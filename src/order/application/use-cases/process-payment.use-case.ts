@@ -111,17 +111,15 @@ export class ProcessPaymentUseCase {
     // 8. Payment 저장
     const savedPayment = await this.paymentRepository.save(payment);
 
-    // 9. Order 상태 변경 (COMPLETED)
-    order.complete();
-    await this.orderRepository.save(order);
-
-    // 10. PaymentCompletedEvent 발행 (재고 확정용)
+    // 9. PaymentCompletedEvent 발행 (재고 확정 및 주문 완료 처리)
+    // Note: Order 상태는 event handler에서 재고 확정 후 COMPLETED로 변경
+    // 이를 통해 재고 확정과 주문 완료가 원자적으로 처리됨 (Option A: Event-driven)
     this.eventEmitter.emit(
       'payment.completed',
       new PaymentCompletedEvent(savedPayment.id, order.id),
     );
 
-    // 11. Output DTO 반환
+    // 10. Output DTO 반환
     return ProcessPaymentOutput.from(savedPayment);
   }
 }

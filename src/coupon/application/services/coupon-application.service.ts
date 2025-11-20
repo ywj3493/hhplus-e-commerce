@@ -1,6 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.repository';
 import { CouponRepository } from '@/coupon/domain/repositories/coupon.repository';
+import {
+  COUPON_REPOSITORY,
+  USER_COUPON_REPOSITORY,
+} from '@/coupon/domain/repositories/tokens';
 import { CouponService } from '@/coupon/domain/services/coupon.service';
 
 /**
@@ -24,9 +28,9 @@ export interface CouponApplicationResult {
 @Injectable()
 export class CouponApplicationService {
   constructor(
-    @Inject('UserCouponRepository')
+    @Inject(USER_COUPON_REPOSITORY)
     private readonly userCouponRepository: UserCouponRepository,
-    @Inject('CouponRepository')
+    @Inject(COUPON_REPOSITORY)
     private readonly couponRepository: CouponRepository,
     private readonly couponService: CouponService,
   ) {}

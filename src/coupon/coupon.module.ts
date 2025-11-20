@@ -7,6 +7,10 @@ import { CouponApplicationService } from '@/coupon/application/services/coupon-a
 import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon-query.service';
 import { InMemoryCouponRepository } from '@/coupon/infrastructure/repositories/in-memory-coupon.repository';
 import { InMemoryUserCouponRepository } from '@/coupon/infrastructure/repositories/in-memory-user-coupon.repository';
+import {
+  COUPON_REPOSITORY,
+  USER_COUPON_REPOSITORY,
+} from '@/coupon/domain/repositories/tokens';
 
 /**
  * 쿠폰 모듈
@@ -37,17 +41,17 @@ import { InMemoryUserCouponRepository } from '@/coupon/infrastructure/repositori
 
     // Repositories
     {
-      provide: 'CouponRepository',
+      provide: COUPON_REPOSITORY,
       useClass: InMemoryCouponRepository,
     },
     {
-      provide: 'UserCouponRepository',
+      provide: USER_COUPON_REPOSITORY,
       useClass: InMemoryUserCouponRepository,
     },
   ],
   exports: [
-    'CouponRepository',
-    'UserCouponRepository',
+    COUPON_REPOSITORY,
+    USER_COUPON_REPOSITORY,
     CouponService,
     CouponApplicationService, // Export for Order module
   ],

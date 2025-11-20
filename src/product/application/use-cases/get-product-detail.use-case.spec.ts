@@ -1,6 +1,6 @@
 import { GetProductDetailUseCase } from '@/product/application/use-cases/get-product-detail.use-case';
 import { GetProductDetailInput } from '@/product/application/dtos/get-product-detail.dto';
-import { IProductRepository } from '@/product/domain/repositories/product.repository';
+import { ProductRepository } from '@/product/domain/repositories/product.repository';
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
@@ -10,7 +10,7 @@ import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 
 describe('GetProductDetailUseCase', () => {
   let useCase: GetProductDetailUseCase;
-  let mockRepository: jest.Mocked<IProductRepository>;
+  let mockRepository: jest.Mocked<ProductRepository>;
 
   beforeEach(() => {
     mockRepository = {

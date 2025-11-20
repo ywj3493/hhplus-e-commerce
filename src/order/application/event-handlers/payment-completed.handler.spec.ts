@@ -24,6 +24,7 @@ describe('PaymentCompletedHandler', () => {
 
     const mockOrderRepository = {
       findById: jest.fn(),
+      save: jest.fn(), // Issue #017: event handler에서 order 저장 필요
     } as unknown as jest.Mocked<OrderRepository>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -55,6 +56,7 @@ describe('PaymentCompletedHandler', () => {
   });
 
   // 테스트 헬퍼 함수: Order 엔티티 생성
+  // Note: Issue #017 변경사항 - event handler에서 order.complete()를 호출하므로 PENDING 상태로 생성
   const createTestOrder = (
     orderId: string,
     productId: string,
@@ -74,7 +76,7 @@ describe('PaymentCompletedHandler', () => {
     return Order.reconstitute({
       id: orderId,
       userId: 'user-1',
-      status: OrderStatus.COMPLETED,
+      status: OrderStatus.PENDING, // event handler에서 COMPLETED로 변경
       items: [orderItem],
       totalAmount: 10000 * quantity,
       discountAmount: 0,
@@ -82,13 +84,13 @@ describe('PaymentCompletedHandler', () => {
       userCouponId: null,
       reservationExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
       createdAt: new Date(),
-      paidAt: new Date(),
+      paidAt: null, // event handler에서 paidAt이 설정됨
       updatedAt: new Date(),
     });
   };
 
   describe('handle', () => {
-    it('결제 완료 이벤트 수신 시 재고를 확정해야 함', async () => {
+    it('결제 완료 이벤트 수신 시 재고를 확정하고 주문을 완료해야 함 (Issue #017)', async () => {
       // Given
       const order = createTestOrder('order-1', 'product-1', 'option-1', 2);
       const event = new PaymentCompletedEvent('payment-1', 'order-1');
@@ -98,7 +100,7 @@ describe('PaymentCompletedHandler', () => {
       // When
       await handler.handle(event);
 
-      // Then
+      // Then: 재고가 확정되어야 함
       expect(orderRepository.findById).toHaveBeenCalledWith('order-1');
       expect(stockManagementService.confirmSale).toHaveBeenCalledWith(
         'product-1',
@@ -106,6 +108,10 @@ describe('PaymentCompletedHandler', () => {
         2,
       );
       expect(stockManagementService.confirmSale).toHaveBeenCalledTimes(1);
+
+      // Then: 주문이 완료되어야 함 (Issue #017 변경사항)
+      expect(order.status).toBe(OrderStatus.COMPLETED);
+      expect(orderRepository.save).toHaveBeenCalledWith(order);
     });
 
     it('이벤트 수신 시 로그를 기록해야 함', async () => {
@@ -160,8 +166,9 @@ describe('PaymentCompletedHandler', () => {
       // When & Then
       await expect(handler.handle(event)).rejects.toThrow(error);
 
+      // Issue #017: 에러 메시지가 "결제 완료 처리 실패"로 변경됨
       expect(loggerErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('재고 확정 실패'),
+        expect.stringContaining('결제 완료 처리 실패'),
         error,
       );
     });
@@ -200,7 +207,7 @@ describe('PaymentCompletedHandler', () => {
 
       expect(stockManagementService.confirmSale).not.toHaveBeenCalled();
       expect(loggerErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('재고 확정 실패'),
+        expect.stringContaining('결제 완료 처리 실패'), // Issue #017: 에러 메시지 변경
         expect.any(Error),
       );
     });
@@ -286,7 +293,7 @@ describe('PaymentCompletedHandler', () => {
         expect.stringContaining('재고 확정 완료'),
       );
       expect(loggerErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('재고 확정 실패'),
+        expect.stringContaining('결제 완료 처리 실패'), // Issue #017: 에러 메시지 변경
         expect.any(Error),
       );
     });

@@ -2,7 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AddCartItemUseCase } from '@/order/application/use-cases/add-cart-item.use-case';
 import { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
-import { IProductRepository, PRODUCT_REPOSITORY } from '@/product/domain/repositories/product.repository';
+import { ProductRepository } from '@/product/domain/repositories/product.repository';
+import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
 import { StockManagementService } from '@/product/domain/services/stock-management.service';
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { Product } from '@/product/domain/entities/product.entity';
@@ -15,7 +16,7 @@ import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 describe('AddCartItemUseCase', () => {
   let useCase: AddCartItemUseCase;
   let cartRepository: jest.Mocked<CartRepository>;
-  let productRepository: jest.Mocked<IProductRepository>;
+  let productRepository: jest.Mocked<ProductRepository>;
   let stockManagementService: jest.Mocked<StockManagementService>;
 
   beforeEach(async () => {
@@ -25,7 +26,7 @@ describe('AddCartItemUseCase', () => {
       clearByUserId: jest.fn(),
     };
 
-    const mockProductRepository: jest.Mocked<IProductRepository> = {
+    const mockProductRepository: jest.Mocked<ProductRepository> = {
       findById: jest.fn(),
       findAll: jest.fn(),
       findPopular: jest.fn(),

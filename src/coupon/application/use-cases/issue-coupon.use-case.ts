@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CouponRepository } from '@/coupon/domain/repositories/coupon.repository';
 import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.repository';
+import {
+  COUPON_REPOSITORY,
+  USER_COUPON_REPOSITORY,
+} from '@/coupon/domain/repositories/tokens';
 import { CouponService } from '@/coupon/domain/services/coupon.service';
 import {
   CouponAlreadyIssuedException,
@@ -33,9 +37,9 @@ import {
 @Injectable()
 export class IssueCouponUseCase {
   constructor(
-    @Inject('CouponRepository')
+    @Inject(COUPON_REPOSITORY)
     private readonly couponRepository: CouponRepository,
-    @Inject('UserCouponRepository')
+    @Inject(USER_COUPON_REPOSITORY)
     private readonly userCouponRepository: UserCouponRepository,
     private readonly couponService: CouponService,
   ) {}

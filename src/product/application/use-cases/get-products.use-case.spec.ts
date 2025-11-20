@@ -1,6 +1,6 @@
 import { GetProductsUseCase } from '@/product/application/use-cases/get-products.use-case';
 import { GetProductsInput } from '@/product/application/dtos/get-products.dto';
-import { IProductRepository, PaginationResult } from '@/product/domain/repositories/product.repository';
+import { ProductRepository, PaginationResult } from '@/product/domain/repositories/product.repository';
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
@@ -9,7 +9,7 @@ import { StockStatusType } from '@/product/domain/entities/stock-status.vo';
 
 describe('GetProductsUseCase', () => {
   let useCase: GetProductsUseCase;
-  let mockRepository: jest.Mocked<IProductRepository>;
+  let mockRepository: jest.Mocked<ProductRepository>;
 
   beforeEach(() => {
     mockRepository = {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from '@/product/domain/entities/product.entity';
 import {
-  IProductRepository,
+  ProductRepository,
   PaginationResult,
 } from '@/product/domain/repositories/product.repository';
 import { ProductFixtures } from '@/product/infrastructure/fixtures/product.fixtures';
@@ -12,7 +12,7 @@ import { ProductFixtures } from '@/product/infrastructure/fixtures/product.fixtu
  * BR-PROD-01: Default sorting - newest first (createdAt DESC)
  */
 @Injectable()
-export class InMemoryProductRepository implements IProductRepository {
+export class InMemoryProductRepository implements ProductRepository {
   private readonly products: Map<string, Product>;
 
   constructor() {

@@ -168,7 +168,8 @@ describe('ProcessPaymentUseCase', () => {
       expect(output.transactionId).toBe(transactionId);
 
       expect(paymentRepository.save).toHaveBeenCalled();
-      expect(orderRepository.save).toHaveBeenCalled();
+      // Note: orderRepository.save는 event handler에서 호출됨 (Issue #017 변경사항)
+      expect(orderRepository.save).not.toHaveBeenCalled();
       expect(eventEmitter.emit).toHaveBeenCalledWith(
         'payment.completed',
         expect.any(PaymentCompletedEvent),
@@ -429,7 +430,7 @@ describe('ProcessPaymentUseCase', () => {
   });
 
   describe('주문 상태 업데이트', () => {
-    it('결제 성공 시 주문 상태를 COMPLETED로 변경해야 함', async () => {
+    it('결제 성공 시 주문 상태는 event handler에서 COMPLETED로 변경됨 (Issue #017)', async () => {
       // Given
       const input = new ProcessPaymentInput(
         TEST_USER_ID,
@@ -455,22 +456,20 @@ describe('ProcessPaymentUseCase', () => {
       });
       paymentRepository.save.mockResolvedValue(savedPayment);
 
-      let savedOrder: Order | null = null;
-      orderRepository.save.mockImplementation(async (o: Order) => {
-        savedOrder = o;
-        return o;
-      });
-
       // When
       await useCase.execute(input);
 
-      // Then
-      expect(savedOrder).not.toBeNull();
-      expect(savedOrder!.status).toBe(OrderStatus.COMPLETED);
-      expect(orderRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({
-          status: OrderStatus.COMPLETED,
-        }),
+      // Then: Order 상태는 event handler에서 변경되므로 use case에서는 변경되지 않음
+      expect(order.status).toBe(OrderStatus.PENDING);
+      expect(orderRepository.save).not.toHaveBeenCalled();
+
+      // Payment는 저장됨
+      expect(paymentRepository.save).toHaveBeenCalled();
+
+      // Event는 발행됨 (event handler에서 order.complete() 호출)
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        'payment.completed',
+        expect.any(PaymentCompletedEvent),
       );
     });
   });

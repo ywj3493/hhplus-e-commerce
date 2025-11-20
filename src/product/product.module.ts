@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ProductController } from '@/product/presentation/controllers/product.controller';
 import { GetProductsUseCase } from '@/product/application/use-cases/get-products.use-case';
 import { GetProductDetailUseCase } from '@/product/application/use-cases/get-product-detail.use-case';
-import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/product.repository';
+import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
 import { InMemoryProductRepository } from '@/product/infrastructure/repositories/in-memory-product.repository';
 import { StockManagementService } from '@/product/domain/services/stock-management.service';
 

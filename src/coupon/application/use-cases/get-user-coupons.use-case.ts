@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CouponRepository } from '@/coupon/domain/repositories/coupon.repository';
 import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.repository';
+import {
+  COUPON_REPOSITORY,
+  USER_COUPON_REPOSITORY,
+} from '@/coupon/domain/repositories/tokens';
 import { CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
 import {
   GetUserCouponsInput,
@@ -27,9 +31,9 @@ import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon-que
 @Injectable()
 export class GetUserCouponsUseCase {
   constructor(
-    @Inject('UserCouponRepository')
+    @Inject(USER_COUPON_REPOSITORY)
     private readonly userCouponRepository: UserCouponRepository,
-    @Inject('CouponRepository')
+    @Inject(COUPON_REPOSITORY)
     private readonly couponRepository: CouponRepository,
     private readonly userCouponQueryService: UserCouponQueryService,
   ) {}
