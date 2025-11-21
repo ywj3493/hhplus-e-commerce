@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString } from 'class-validator';
+import { IsEnum, IsString, IsUUID } from 'class-validator';
 import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
 
 /**
@@ -15,4 +15,12 @@ export class ProcessPaymentRequestDto {
   @ApiProperty({ description: '결제 수단', enum: PaymentMethod, example: PaymentMethod.CREDIT_CARD })
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod;
+
+  @ApiProperty({
+    description: '멱등성 키 (중복 결제 방지용, UUID v4 형식)',
+    example: '550e8400-e29b-41d4-a716-446655440000'
+  })
+  @IsString()
+  @IsUUID('4')
+  idempotencyKey: string;
 }

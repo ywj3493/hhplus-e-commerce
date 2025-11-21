@@ -5,6 +5,7 @@ import {
   PaymentData,
 } from '@/order/domain/entities/payment.entity';
 import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
+import { PaymentStatus } from '@/order/domain/entities/payment-status.enum';
 import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
 
 /**
@@ -54,6 +55,23 @@ export class PaymentPrismaRepository implements PaymentRepository {
   }
 
   /**
+   * 멱등성 키로 결제 조회
+   * @param idempotencyKey - 멱등성 키
+   * @returns Payment 엔티티 또는 null
+   */
+  async findByIdempotencyKey(idempotencyKey: string): Promise<Payment | null> {
+    const paymentModel = await this.prisma.payment.findUnique({
+      where: { idempotencyKey },
+    });
+
+    if (!paymentModel) {
+      return null;
+    }
+
+    return this.toDomain(paymentModel);
+  }
+
+  /**
    * 결제 저장 (생성 또는 업데이트)
    * @param payment - Payment 도메인 엔티티
    * @returns 저장된 결제
@@ -65,6 +83,9 @@ export class PaymentPrismaRepository implements PaymentRepository {
       amount: payment.amount,
       method: payment.paymentMethod,
       transactionId: payment.transactionId,
+      idempotencyKey: payment.idempotencyKey,
+      status: payment.status,
+      refundedAt: payment.refundedAt,
     };
 
     const savedPayment = await this.prisma.payment.upsert({
@@ -81,6 +102,26 @@ export class PaymentPrismaRepository implements PaymentRepository {
   }
 
   /**
+   * 결제 환불 처리
+   * @param paymentId - 환불할 결제 ID
+   * @throws {Error} 결제를 찾을 수 없거나 이미 환불된 경우
+   */
+  async refund(paymentId: string): Promise<void> {
+    // 결제 조회
+    const payment = await this.findById(paymentId);
+
+    if (!payment) {
+      throw new Error('결제를 찾을 수 없습니다.');
+    }
+
+    // 환불 처리 (도메인 로직 활용)
+    payment.refund();
+
+    // 변경사항 저장
+    await this.save(payment);
+  }
+
+  /**
    * Prisma Payment 모델을 Domain Payment 엔티티로 변환
    * @param prismaPayment - Prisma Payment 모델
    * @returns Payment 도메인 엔티티
@@ -93,7 +134,10 @@ export class PaymentPrismaRepository implements PaymentRepository {
       amount: Number(prismaPayment.amount),
       paymentMethod: prismaPayment.method as PaymentMethod,
       transactionId: prismaPayment.transactionId,
+      idempotencyKey: prismaPayment.idempotencyKey,
+      status: prismaPayment.status as PaymentStatus,
       createdAt: prismaPayment.createdAt,
+      refundedAt: prismaPayment.refundedAt,
     };
 
     return Payment.reconstitute(paymentData);

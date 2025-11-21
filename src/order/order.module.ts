@@ -39,10 +39,10 @@ import { CartPrismaRepository } from '@/order/infrastructure/repositories/cart-p
 import { OrderPrismaRepository } from '@/order/infrastructure/repositories/order-prisma.repository';
 import { PaymentPrismaRepository } from '@/order/infrastructure/repositories/payment-prisma.repository';
 
-// Payment Gateway
+// Payment Adapter
 import { FakePaymentAdapter } from '@/order/infrastructure/gateways/fake-payment.adapter';
 import { FakePaymentApiAdapter } from '@/__fake__/payment/fake-payment-api.adapter';
-import { PAYMENT_GATEWAY } from '@/order/domain/ports/payment.port';
+import { PAYMENT_ADAPTER } from '@/order/domain/ports/payment.port';
 
 // Symbols
 import { ORDER_REPOSITORY, CART_REPOSITORY, PAYMENT_REPOSITORY } from '@/order/domain/repositories/tokens';
@@ -121,9 +121,9 @@ import { ProductModule } from '@/product/product.module';
           : PaymentPrismaRepository,
     },
 
-    // Payment Gateway
+    // Payment Adapter
     {
-      provide: PAYMENT_GATEWAY,
+      provide: PAYMENT_ADAPTER,
       useClass:
         process.env.NODE_ENV === 'test'
           ? FakePaymentAdapter

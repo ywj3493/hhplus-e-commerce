@@ -17,6 +17,7 @@ export class Stock {
   private _availableQuantity: number;
   private _reservedQuantity: number;
   private _soldQuantity: number;
+  private _version: number;
 
   private constructor(
     id: string,
@@ -26,6 +27,7 @@ export class Stock {
     availableQuantity: number,
     reservedQuantity: number,
     soldQuantity: number,
+    version: number = 0,
   ) {
     this._id = id;
     this._productId = productId;
@@ -34,6 +36,7 @@ export class Stock {
     this._availableQuantity = availableQuantity;
     this._reservedQuantity = reservedQuantity;
     this._soldQuantity = soldQuantity;
+    this._version = version;
 
     this.validate();
   }
@@ -49,6 +52,7 @@ export class Stock {
     availableQuantity: number,
     reservedQuantity: number,
     soldQuantity: number,
+    version: number = 0,
   ): Stock {
     return new Stock(
       id,
@@ -58,6 +62,7 @@ export class Stock {
       availableQuantity,
       reservedQuantity,
       soldQuantity,
+      version,
     );
   }
 
@@ -116,6 +121,7 @@ export class Stock {
     }
     this._availableQuantity -= quantity;
     this._reservedQuantity += quantity;
+    this._version += 1; // 버전 증가
   }
 
   /**
@@ -130,6 +136,7 @@ export class Stock {
     }
     this._reservedQuantity -= quantity;
     this._availableQuantity += quantity;
+    this._version += 1; // 버전 증가
   }
 
   /**
@@ -144,6 +151,7 @@ export class Stock {
     }
     this._reservedQuantity -= quantity;
     this._soldQuantity += quantity;
+    this._version += 1; // 버전 증가
   }
 
   // Getters
@@ -173,5 +181,9 @@ export class Stock {
 
   get soldQuantity(): number {
     return this._soldQuantity;
+  }
+
+  get version(): number {
+    return this._version;
   }
 }

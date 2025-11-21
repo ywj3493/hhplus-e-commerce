@@ -58,6 +58,7 @@ export class PaymentController {
       userId,
       body.orderId,
       body.paymentMethod,
+      body.idempotencyKey,
     );
 
     // Facade를 통한 주문 완료 처리 (결제 → 재고 확정 → 주문 완료)

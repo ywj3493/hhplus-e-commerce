@@ -1,5 +1,6 @@
 import { Payment, PaymentCreateData } from '@/order/domain/entities/payment.entity';
 import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
+import { PaymentStatus } from '@/order/domain/entities/payment-status.enum';
 
 describe('Payment Entity', () => {
   describe('생성', () => {
@@ -11,6 +12,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       };
 
       // When
@@ -35,6 +37,8 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
+        status: PaymentStatus.COMPLETED,
         createdAt: new Date('2025-01-01'),
       };
 
@@ -48,7 +52,61 @@ describe('Payment Entity', () => {
       expect(payment.amount).toBe(10000);
       expect(payment.paymentMethod).toBe(PaymentMethod.CREDIT_CARD);
       expect(payment.transactionId).toBe('txn-12345');
+      expect(payment.status).toBe(PaymentStatus.COMPLETED);
       expect(payment.createdAt).toEqual(new Date('2025-01-01'));
+    });
+  });
+
+  describe('환불', () => {
+    it('완료된 결제를 환불할 수 있어야 함', () => {
+      // Given
+      const payment = Payment.create({
+        orderId: 'order-001',
+        userId: 'user-001',
+        amount: 10000,
+        paymentMethod: PaymentMethod.CREDIT_CARD,
+        transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
+      });
+
+      // When
+      payment.refund();
+
+      // Then
+      expect(payment.status).toBe(PaymentStatus.REFUNDED);
+      expect(payment.refundedAt).toBeInstanceOf(Date);
+      expect(payment.canRefund()).toBe(false);
+    });
+
+    it('이미 환불된 결제는 다시 환불할 수 없어야 함', () => {
+      // Given
+      const payment = Payment.create({
+        orderId: 'order-001',
+        userId: 'user-001',
+        amount: 10000,
+        paymentMethod: PaymentMethod.CREDIT_CARD,
+        transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
+      });
+      payment.refund();
+
+      // When & Then
+      expect(() => payment.refund()).toThrow('이미 환불된 결제입니다.');
+    });
+
+    it('생성된 결제는 환불 가능 상태여야 함', () => {
+      // Given
+      const payment = Payment.create({
+        orderId: 'order-001',
+        userId: 'user-001',
+        amount: 10000,
+        paymentMethod: PaymentMethod.CREDIT_CARD,
+        transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
+      });
+
+      // Then
+      expect(payment.canRefund()).toBe(true);
     });
   });
 
@@ -61,6 +119,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       };
 
       // When & Then
@@ -77,6 +136,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       };
 
       // When & Then
@@ -93,6 +153,7 @@ describe('Payment Entity', () => {
         amount: 0,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: 'txn-12345',
+        idempotencyKey: 'test-idempotency-key',
       };
 
       // When & Then
@@ -109,6 +170,7 @@ describe('Payment Entity', () => {
         amount: 10000,
         paymentMethod: PaymentMethod.CREDIT_CARD,
         transactionId: '',
+        idempotencyKey: 'test-idempotency-key',
       };
 
       // When & Then

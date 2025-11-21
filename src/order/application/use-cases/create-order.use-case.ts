@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import type { OrderRepository } from '@/order/domain/repositories/order.repository';
 import type { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { ORDER_REPOSITORY, CART_REPOSITORY } from '@/order/domain/repositories/tokens';
@@ -10,6 +10,7 @@ import type { ProductRepository } from '@/product/domain/repositories/product.re
 import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
 import { CreateOrderInput, CreateOrderOutput } from '@/order/application/dtos/create-order.dto';
 import { EmptyCartException } from '@/order/domain/order.exceptions';
+import { OptimisticLockException } from '@/product/domain/exceptions/optimistic-lock.exception';
 
 /**
  * CreateOrderUseCase
@@ -17,13 +18,22 @@ import { EmptyCartException } from '@/order/domain/order.exceptions';
  *
  * 플로우:
  * 1. 장바구니 조회 및 검증 (CartRepository)
- * 2. 재고 예약 (Product 도메인 서비스)
+ * 2. 재고 예약 (Product 도메인 서비스) - 낙관적 락 + 재시도
  * 3. 쿠폰 적용 (CouponApplicationService)
  * 4. Order.create() 호출
  * 5. 장바구니 비우기 (CartRepository)
+ *
+ * 재시도 정책:
+ * - 최대 3회 재시도
+ * - Exponential Backoff (50ms → 100ms → 200ms)
+ * - OptimisticLockException 발생 시에만 재시도
  */
 @Injectable()
 export class CreateOrderUseCase {
+  private readonly logger = new Logger(CreateOrderUseCase.name);
+  private readonly MAX_RETRIES = 3;
+  private readonly BASE_DELAY_MS = 50;
+
   constructor(
     @Inject(CART_REPOSITORY)
     private readonly cartRepository: CartRepository,
@@ -36,6 +46,39 @@ export class CreateOrderUseCase {
   ) {}
 
   async execute(input: CreateOrderInput): Promise<CreateOrderOutput> {
+    // 재시도 루프
+    for (let attempt = 0; attempt < this.MAX_RETRIES; attempt++) {
+      try {
+        return await this.executeWithRetry(input, attempt);
+      } catch (error) {
+        // OptimisticLockException이고 마지막 시도가 아니면 재시도
+        if (
+          error instanceof OptimisticLockException &&
+          attempt < this.MAX_RETRIES - 1
+        ) {
+          const delayMs = this.BASE_DELAY_MS * Math.pow(2, attempt);
+          this.logger.warn(
+            `재고 예약 충돌 발생. ${delayMs}ms 후 재시도합니다. (시도 ${attempt + 1}/${this.MAX_RETRIES})`,
+          );
+          await this.sleep(delayMs);
+          continue;
+        }
+        // 다른 에러거나 마지막 시도면 그대로 throw
+        throw error;
+      }
+    }
+
+    // 이 코드에는 도달하지 않지만 TypeScript를 위한 fallback
+    throw new Error('주문 생성에 실패했습니다.');
+  }
+
+  /**
+   * 재시도 가능한 주문 생성 로직
+   */
+  private async executeWithRetry(
+    input: CreateOrderInput,
+    attempt: number,
+  ): Promise<CreateOrderOutput> {
     // 1. 장바구니 조회 및 검증
     const cart = await this.cartRepository.findByUserId(input.userId);
     if (!cart || cart.getItems().length === 0) {
@@ -44,7 +87,7 @@ export class CreateOrderUseCase {
 
     const cartItems = cart.getItems();
 
-    // 2. 재고 예약 (Product 도메인 서비스)
+    // 2. 재고 예약 (Product 도메인 서비스) - OptimisticLockException 발생 가능
     for (const cartItem of cartItems) {
       await this.stockManagementService.reserveStock(
         cartItem.productId,
@@ -183,5 +226,12 @@ export class CreateOrderUseCase {
     }
 
     return orderItems;
+  }
+
+  /**
+   * 지정된 시간(ms) 동안 대기
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

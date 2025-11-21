@@ -22,7 +22,23 @@ export interface PaymentRepository {
   findByOrderId(orderId: string): Promise<Payment | null>;
 
   /**
+   * 멱등성 키로 Payment 조회
+   *
+   * @param idempotencyKey 멱등성 키
+   * @returns 해당 키로 생성된 Payment, 없으면 null
+   */
+  findByIdempotencyKey(idempotencyKey: string): Promise<Payment | null>;
+
+  /**
    * Payment 저장
    */
   save(payment: Payment): Promise<Payment>;
+
+  /**
+   * Payment 환불 처리
+   *
+   * @param paymentId 환불할 결제 ID
+   * @throws {Error} 결제를 찾을 수 없거나 이미 환불된 경우
+   */
+  refund(paymentId: string): Promise<void>;
 }

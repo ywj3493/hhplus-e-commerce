@@ -30,11 +30,35 @@ export class InMemoryPaymentRepository implements PaymentRepository {
   }
 
   /**
+   * 멱등성 키로 Payment 조회
+   */
+  async findByIdempotencyKey(idempotencyKey: string): Promise<Payment | null> {
+    const payment = Array.from(this.payments.values()).find(
+      (p) => p.idempotencyKey === idempotencyKey,
+    );
+    return payment ? this.deepCopy(payment) : null;
+  }
+
+  /**
    * Payment 저장
    */
   async save(payment: Payment): Promise<Payment> {
     this.payments.set(payment.id, this.deepCopy(payment));
     return this.deepCopy(payment);
+  }
+
+  /**
+   * Payment 환불 처리
+   */
+  async refund(paymentId: string): Promise<void> {
+    const payment = await this.findById(paymentId);
+
+    if (!payment) {
+      throw new Error('결제를 찾을 수 없습니다.');
+    }
+
+    payment.refund();
+    await this.save(payment);
   }
 
   /**
@@ -48,7 +72,10 @@ export class InMemoryPaymentRepository implements PaymentRepository {
       amount: payment.amount,
       paymentMethod: payment.paymentMethod,
       transactionId: payment.transactionId,
+      idempotencyKey: payment.idempotencyKey,
+      status: payment.status,
       createdAt: new Date(payment.createdAt.getTime()),
+      refundedAt: payment.refundedAt ? new Date(payment.refundedAt.getTime()) : undefined,
     });
   }
 

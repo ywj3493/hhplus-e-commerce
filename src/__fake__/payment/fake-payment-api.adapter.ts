@@ -1,9 +1,10 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  IPaymentGateway,
+  PaymentAdapter,
   ProcessPaymentRequest,
   ProcessPaymentResponse,
+  RefundPaymentResponse,
 } from '@/order/domain/ports/payment.port';
 
 /**
@@ -13,7 +14,7 @@ import {
  * 프로덕션 환경에서 실제 PG API로 교체 예정
  */
 @Injectable()
-export class FakePaymentApiAdapter implements IPaymentGateway {
+export class FakePaymentApiAdapter implements PaymentAdapter {
   async processPayment(
     request: ProcessPaymentRequest,
     shouldFail = false,
@@ -40,6 +41,33 @@ export class FakePaymentApiAdapter implements IPaymentGateway {
       return {
         success: false,
         errorMessage: error instanceof Error ? error.message : '결제 처리 중 오류가 발생했습니다.',
+      };
+    }
+  }
+
+  /**
+   * 결제 환불 처리
+   * @param transactionId 환불할 거래 ID
+   * @returns 환불 처리 결과
+   */
+  async refund(transactionId: string): Promise<RefundPaymentResponse> {
+    // 실제 API 호출 시뮬레이션 (200ms 지연)
+    await this.simulateApiCall(200);
+
+    try {
+      // TODO: 실제 PG API 환불 호출
+      // const response = await this.callPgRefundApi(transactionId);
+
+      // 현재는 Mock 응답
+      console.log(`[FakePaymentApiAdapter] 환불 처리: ${transactionId}`);
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        errorMessage: error instanceof Error ? error.message : '환불 처리 중 오류가 발생했습니다.',
       };
     }
   }

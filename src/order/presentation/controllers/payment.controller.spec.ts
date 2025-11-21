@@ -63,6 +63,7 @@ describe('PaymentController', () => {
       const requestDto = new ProcessPaymentRequestDto();
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
+      requestDto.idempotencyKey = 'test-idempotency-key-123';
 
       const output = new ProcessPaymentOutput(
         TEST_PAYMENT_ID,
@@ -99,6 +100,7 @@ describe('PaymentController', () => {
       const requestDto = new ProcessPaymentRequestDto();
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
+      requestDto.idempotencyKey = 'test-idempotency-key-123';
 
       const output = new ProcessPaymentOutput(
         TEST_PAYMENT_ID,
@@ -125,6 +127,7 @@ describe('PaymentController', () => {
       const requestDto = new ProcessPaymentRequestDto();
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
+      requestDto.idempotencyKey = 'test-idempotency-key-123';
 
       const output = new ProcessPaymentOutput(
         TEST_PAYMENT_ID,
@@ -151,6 +154,7 @@ describe('PaymentController', () => {
       const requestDto = new ProcessPaymentRequestDto();
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
+      requestDto.idempotencyKey = 'test-idempotency-key-123';
 
       const output = new ProcessPaymentOutput(
         TEST_PAYMENT_ID,
@@ -179,6 +183,7 @@ describe('PaymentController', () => {
       const requestDto = new ProcessPaymentRequestDto();
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
+      requestDto.idempotencyKey = 'test-idempotency-key-123';
 
       orderFacade.completeOrder.mockRejectedValue(
         new AlreadyPaidException(),
@@ -195,6 +200,7 @@ describe('PaymentController', () => {
       const requestDto = new ProcessPaymentRequestDto();
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
+      requestDto.idempotencyKey = 'test-idempotency-key-123';
 
       orderFacade.completeOrder.mockRejectedValue(
         new OrderExpiredException(),
@@ -211,6 +217,7 @@ describe('PaymentController', () => {
       const requestDto = new ProcessPaymentRequestDto();
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
+      requestDto.idempotencyKey = 'test-idempotency-key-123';
 
       orderFacade.completeOrder.mockRejectedValue(
         new InvalidOrderStatusException(),
@@ -227,6 +234,7 @@ describe('PaymentController', () => {
       const requestDto = new ProcessPaymentRequestDto();
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
+      requestDto.idempotencyKey = 'test-idempotency-key-123';
 
       orderFacade.completeOrder.mockRejectedValue(
         new PaymentFailedException('결제 실패'),
@@ -243,6 +251,7 @@ describe('PaymentController', () => {
       const requestDto = new ProcessPaymentRequestDto();
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
+      requestDto.idempotencyKey = 'test-idempotency-key-123';
 
       const genericError = new Error('예상치 못한 오류');
       orderFacade.completeOrder.mockRejectedValue(genericError);
@@ -260,6 +269,7 @@ describe('PaymentController', () => {
       const requestDto = new ProcessPaymentRequestDto();
       requestDto.orderId = TEST_ORDER_ID;
       requestDto.paymentMethod = PaymentMethod.CREDIT_CARD;
+      requestDto.idempotencyKey = 'test-idempotency-key-123';
 
       const createdAt = new Date('2025-11-18T12:00:00Z');
       const output = new ProcessPaymentOutput(

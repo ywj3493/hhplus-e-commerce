@@ -100,7 +100,7 @@ model ProductOption {
 /// 재고 엔티티 (동시성 제어 대상)
 /// - 상품별 또는 옵션별 재고 관리
 /// - productOptionId가 null이면 옵션이 없는 상품의 재고
-/// - 비관적 락(SELECT FOR UPDATE)을 통한 동시성 제어
+/// - 낙관적 락(Optimistic Locking)을 통한 동시성 제어
 model Stock {
   id                String   @id @default(uuid()) // 재고 고유 ID (UUID)
   productId         String // 상품 ID (FK)
@@ -109,6 +109,7 @@ model Stock {
   availableQuantity Int // 구매 가능 수량
   reservedQuantity  Int      @default(0) // 예약된 수량 (주문 중)
   soldQuantity      Int      @default(0) // 판매 완료 수량
+  version           Int      @default(0) // 낙관적 락 버전
   updatedAt         DateTime @updatedAt // 수정 일시
 
   product       Product        @relation(fields: [productId], references: [id]) // 상품
@@ -223,20 +224,27 @@ model OrderItem {
 /// - 주문에 대한 결제 정보
 /// - 주문과 1:1 관계
 /// - 결제 수단: CREDIT_CARD (현재 1가지)
+/// - 결제 상태: COMPLETED (완료), REFUNDED (환불)
+/// - 멱등성: idempotencyKey를 통한 중복 결제 방지
 model Payment {
-  id            String   @id @default(uuid()) // 결제 고유 ID (UUID)
-  orderId       String   @unique // 주문 ID (FK, unique - 1:1 관계)
-  userId        String // 사용자 ID (FK)
-  amount        Decimal  @db.Decimal(10, 2) // 결제 금액
-  method        String // 결제 수단 (CREDIT_CARD)
-  transactionId String // 외부 결제 거래 번호
-  createdAt     DateTime @default(now()) // 생성 일시
+  id             String    @id @default(uuid()) // 결제 고유 ID (UUID)
+  orderId        String    @unique // 주문 ID (FK, unique - 1:1 관계)
+  userId         String // 사용자 ID (FK)
+  amount         Decimal   @db.Decimal(10, 2) // 결제 금액
+  method         String // 결제 수단 (CREDIT_CARD)
+  transactionId  String // 외부 결제 거래 번호
+  status         String    @default("COMPLETED") // 결제 상태 (COMPLETED, REFUNDED)
+  idempotencyKey String    @unique // 멱등성 키 (중복 결제 방지)
+  createdAt      DateTime  @default(now()) // 생성 일시
+  refundedAt     DateTime? // 환불 일시 (nullable)
 
   order Order @relation(fields: [orderId], references: [id]) // 주문
   user  User  @relation(fields: [userId], references: [id]) // 사용자
 
   @@index([userId]) // 사용자별 조회 최적화
   @@index([transactionId]) // 거래 번호 조회 최적화
+  @@index([status]) // 상태별 조회 최적화
+  @@index([idempotencyKey]) // 멱등성 키 조회 최적화
   @@map("payments") // 테이블명: payments
 }
 

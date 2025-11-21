@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
+import { PaymentStatus } from '@/order/domain/entities/payment-status.enum';
 
 /**
  * Payment 엔티티 생성 데이터
@@ -10,6 +11,7 @@ export interface PaymentCreateData {
   amount: number;
   paymentMethod: PaymentMethod;
   transactionId: string;
+  idempotencyKey: string;
 }
 
 /**
@@ -17,7 +19,9 @@ export interface PaymentCreateData {
  */
 export interface PaymentData extends PaymentCreateData {
   id: string;
+  status: PaymentStatus;
   createdAt: Date;
+  refundedAt?: Date;
 }
 
 /**
@@ -32,7 +36,10 @@ export class Payment {
   private readonly _amount: number;
   private readonly _paymentMethod: PaymentMethod;
   private readonly _transactionId: string;
+  private readonly _idempotencyKey: string;
+  private _status: PaymentStatus;
   private readonly _createdAt: Date;
+  private _refundedAt?: Date;
 
   private constructor(data: PaymentData) {
     this._id = data.id;
@@ -41,7 +48,10 @@ export class Payment {
     this._amount = data.amount;
     this._paymentMethod = data.paymentMethod;
     this._transactionId = data.transactionId;
+    this._idempotencyKey = data.idempotencyKey;
+    this._status = data.status;
     this._createdAt = data.createdAt;
+    this._refundedAt = data.refundedAt;
 
     this.validate();
   }
@@ -53,6 +63,7 @@ export class Payment {
     return new Payment({
       id: uuidv4(),
       ...data,
+      status: PaymentStatus.COMPLETED,
       createdAt: new Date(),
     });
   }
@@ -91,6 +102,10 @@ export class Payment {
     if (!this._transactionId || this._transactionId.trim() === '') {
       throw new Error('거래 번호는 필수입니다.');
     }
+
+    if (!this._idempotencyKey || this._idempotencyKey.trim() === '') {
+      throw new Error('멱등성 키는 필수입니다.');
+    }
   }
 
   // Getters
@@ -118,7 +133,40 @@ export class Payment {
     return this._transactionId;
   }
 
+  get idempotencyKey(): string {
+    return this._idempotencyKey;
+  }
+
   get createdAt(): Date {
     return this._createdAt;
+  }
+
+  get status(): PaymentStatus {
+    return this._status;
+  }
+
+  get refundedAt(): Date | undefined {
+    return this._refundedAt;
+  }
+
+  /**
+   * 결제 환불 처리
+   *
+   * @throws {Error} 이미 환불된 결제인 경우
+   */
+  refund(): void {
+    if (this._status === PaymentStatus.REFUNDED) {
+      throw new Error('이미 환불된 결제입니다.');
+    }
+
+    this._status = PaymentStatus.REFUNDED;
+    this._refundedAt = new Date();
+  }
+
+  /**
+   * 환불 가능 여부 확인
+   */
+  canRefund(): boolean {
+    return this._status === PaymentStatus.COMPLETED;
   }
 }
