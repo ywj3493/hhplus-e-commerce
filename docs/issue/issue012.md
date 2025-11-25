@@ -341,7 +341,7 @@ constructor(
   @Inject(PRODUCT_REPOSITORY) private productRepository: ProductRepository,
   private stockReservationService: StockReservationService,
   private cartCheckoutService: CartCheckoutService,  // ❌ Application Service
-  private couponApplicationService: CouponApplicationService,
+  private couponApplicationService: CouponApplyService,
 ) {}
 
 async execute(input: CreateOrderInput): Promise<CreateOrderOutput> {
@@ -362,7 +362,7 @@ constructor(
   @Inject(ORDER_REPOSITORY) private orderRepository: OrderRepository,
   @Inject(PRODUCT_REPOSITORY) private productRepository: ProductRepository,
   private stockReservationService: StockReservationService,
-  private couponApplicationService: CouponApplicationService,
+  private couponApplicationService: CouponApplyService,
 ) {}
 
 async execute(input: CreateOrderInput): Promise<CreateOrderOutput> {
@@ -653,7 +653,7 @@ providers: [
   { provide: PRODUCT_REPOSITORY, useValue: mockProductRepository },
   { provide: StockReservationService, useValue: mockStockReservationService },
   { provide: CartCheckoutService, useValue: mockCartCheckoutService },  // ❌
-  { provide: CouponApplicationService, useValue: mockCouponApplicationService },
+  { provide: CouponApplyService, useValue: mockCouponApplyService },
 ]
 ```
 
@@ -665,7 +665,7 @@ providers: [
   { provide: ORDER_REPOSITORY, useValue: mockOrderRepository },
   { provide: PRODUCT_REPOSITORY, useValue: mockProductRepository },
   { provide: StockReservationService, useValue: mockStockReservationService },
-  { provide: CouponApplicationService, useValue: mockCouponApplicationService },
+  { provide: CouponApplyService, useValue: mockCouponApplyService },
 ]
 ```
 

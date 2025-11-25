@@ -5,7 +5,7 @@ import { ORDER_REPOSITORY, CART_REPOSITORY } from '@/order/domain/repositories/t
 import { Order } from '@/order/domain/entities/order.entity';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
 import { StockManagementService } from '@/product/domain/services/stock-management.service';
-import { CouponApplicationService } from '@/coupon/application/services/coupon-application.service';
+import { CouponApplyService } from '@/coupon/application/services/coupon-apply.service';
 import type { ProductRepository } from '@/product/domain/repositories/product.repository';
 import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
 import { CreateOrderInput, CreateOrderOutput } from '@/order/application/dtos/create-order.dto';
@@ -19,7 +19,7 @@ import { OptimisticLockException } from '@/product/domain/exceptions/optimistic-
  * 플로우:
  * 1. 장바구니 조회 및 검증 (CartRepository)
  * 2. 재고 예약 (Product 도메인 서비스) - 낙관적 락 + 재시도
- * 3. 쿠폰 적용 (CouponApplicationService)
+ * 3. 쿠폰 적용 (CouponApplyService)
  * 4. Order.create() 호출
  * 5. 장바구니 비우기 (CartRepository)
  *
@@ -42,7 +42,7 @@ export class CreateOrderUseCase {
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
     private readonly stockManagementService: StockManagementService,
-    private readonly couponApplicationService: CouponApplicationService,
+    private readonly couponApplicationService: CouponApplyService,
   ) {}
 
   async execute(input: CreateOrderInput): Promise<CreateOrderOutput> {
@@ -112,7 +112,7 @@ export class CreateOrderUseCase {
           0,
         );
 
-        // CouponApplicationService를 통한 쿠폰 적용
+        // CouponApplyService를 통한 쿠폰 적용
         const couponResult = await this.couponApplicationService.applyCoupon(
           input.userId,
           input.couponId,

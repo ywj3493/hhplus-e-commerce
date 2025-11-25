@@ -4,7 +4,7 @@ import { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { ProductRepository } from '@/product/domain/repositories/product.repository';
 import { StockManagementService } from '@/product/domain/services/stock-management.service';
-import { CouponApplicationService } from '@/coupon/application/services/coupon-application.service';
+import { CouponApplyService } from '@/coupon/application/services/coupon-apply.service';
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { CartItem } from '@/order/domain/entities/cart-item.entity';
 import { Product } from '@/product/domain/entities/product.entity';
@@ -20,7 +20,7 @@ describe('CreateOrderUseCase', () => {
   let orderRepository: jest.Mocked<OrderRepository>;
   let productRepository: jest.Mocked<ProductRepository>;
   let stockManagementService: jest.Mocked<StockManagementService>;
-  let couponApplicationService: jest.Mocked<CouponApplicationService>;
+  let couponApplicationService: jest.Mocked<CouponApplyService>;
 
   beforeEach(() => {
     // Mock repositories
