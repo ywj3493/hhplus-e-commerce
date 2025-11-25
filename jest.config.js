@@ -6,7 +6,7 @@ module.exports = {
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
-  maxWorkers: 1, // 통합 테스트 순차 실행 (Testcontainers 리소스 관리)
+  maxWorkers: 4, // 병렬 테스트 실행 (Worker별 독립 DB 사용)
   collectCoverageFrom: [
     'src/**/*.(t|j)s',
     '!src/**/*.spec.ts',

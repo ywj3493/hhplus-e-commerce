@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
-import { MySqlContainer, StartedMySqlContainer } from '@testcontainers/mysql';
-import { PrismaClient } from '@prisma/client';
-import { execSync } from 'child_process';
 import { ProductModule } from '@/product/product.module';
 import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import {
+  setupTestDatabase,
+  cleanupTestDatabase,
+  type TestDbConfig,
+} from '../../utils/test-database';
 
 /**
  * E2E Test: Product API Endpoints
@@ -13,51 +15,18 @@ import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
  */
 describe('Product API (e2e)', () => {
   let app: INestApplication;
-  let container: StartedMySqlContainer;
-  let prismaClient: PrismaClient;
+  let db: TestDbConfig;
 
   beforeAll(async () => {
-    // MySQL Testcontainer 시작
-    container = await new MySqlContainer('mysql:8.0')
-      .withDatabase('test_db')
-      .withRootPassword('test')
-      .start();
-
-    // DATABASE_URL 설정
-    const databaseUrl = container.getConnectionUri();
-    process.env.DATABASE_URL = databaseUrl;
-
-    // Prisma Client 생성 및 Migration 실행
-    prismaClient = new PrismaClient({
-      datasources: {
-        db: {
-          url: databaseUrl,
-        },
-      },
-    });
-
-    // Migration 실행
-    execSync('pnpm prisma migrate deploy', {
-      env: {
-        ...process.env,
-        DATABASE_URL: databaseUrl,
-      },
-    });
-
-    // Seed 데이터 실행 (E2E 테스트용)
-    execSync('pnpm prisma db seed', {
-      env: {
-        ...process.env,
-        DATABASE_URL: databaseUrl,
-      },
-    });
+    // 독립된 DB 설정 + Seed 데이터 (E2E 테스트용)
+    db = await setupTestDatabase({ isolated: true, seed: true });
 
     // NestJS 앱 생성
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [ProductModule],
     })
       .overrideProvider(PrismaService)
-      .useValue(prismaClient)
+      .useValue(db.prisma)
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -71,16 +40,11 @@ describe('Product API (e2e)', () => {
     );
 
     await app.init();
-  }, 120000); // 120초 timeout (컨테이너 시작 + Migration + Seed)
+  }, 180000); // 180초 timeout (컨테이너 시작 + Migration + Seed)
 
   afterAll(async () => {
     await app.close();
-    if (prismaClient) {
-      await prismaClient.$disconnect();
-    }
-    if (container) {
-      await container.stop();
-    }
+    await cleanupTestDatabase(db);
   });
 
   describe('GET /products', () => {
