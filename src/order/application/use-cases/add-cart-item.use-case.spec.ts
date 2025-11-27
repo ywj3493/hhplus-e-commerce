@@ -4,7 +4,7 @@ import { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { ProductRepository } from '@/product/domain/repositories/product.repository';
 import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
-import { StockManagementService } from '@/product/domain/services/stock-management.service';
+import { ValidateStockUseCase } from '@/product/application/use-cases/validate-stock.use-case';
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
@@ -17,7 +17,7 @@ describe('AddCartItemUseCase', () => {
   let useCase: AddCartItemUseCase;
   let cartRepository: jest.Mocked<CartRepository>;
   let productRepository: jest.Mocked<ProductRepository>;
-  let stockManagementService: jest.Mocked<StockManagementService>;
+  let validateStockUseCase: jest.Mocked<ValidateStockUseCase>;
 
   beforeEach(async () => {
     const mockCartRepository: jest.Mocked<CartRepository> = {
@@ -32,10 +32,12 @@ describe('AddCartItemUseCase', () => {
       findPopular: jest.fn(),
       save: jest.fn(),
       exists: jest.fn(),
+      findByIdForUpdate: jest.fn(),
+      saveWithTx: jest.fn(),
     };
 
-    const mockStockManagementService: Partial<StockManagementService> = {
-      validateStockAvailability: jest.fn(),
+    const mockValidateStockUseCase = {
+      execute: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -50,8 +52,8 @@ describe('AddCartItemUseCase', () => {
           useValue: mockProductRepository,
         },
         {
-          provide: StockManagementService,
-          useValue: mockStockManagementService,
+          provide: ValidateStockUseCase,
+          useValue: mockValidateStockUseCase,
         },
       ],
     }).compile();
@@ -59,7 +61,7 @@ describe('AddCartItemUseCase', () => {
     useCase = module.get<AddCartItemUseCase>(AddCartItemUseCase);
     cartRepository = module.get(CART_REPOSITORY);
     productRepository = module.get(PRODUCT_REPOSITORY);
-    stockManagementService = module.get(StockManagementService);
+    validateStockUseCase = module.get(ValidateStockUseCase);
   });
 
   const createTestProduct = (): Product => {
@@ -99,7 +101,7 @@ describe('AddCartItemUseCase', () => {
 
       productRepository.findById.mockResolvedValue(product);
       cartRepository.findByUserId.mockResolvedValue(null); // 장바구니 없음
-      stockManagementService.validateStockAvailability.mockResolvedValue();
+      validateStockUseCase.execute.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When
@@ -125,7 +127,7 @@ describe('AddCartItemUseCase', () => {
 
       productRepository.findById.mockResolvedValue(product);
       cartRepository.findByUserId.mockResolvedValue(existingCart);
-      stockManagementService.validateStockAvailability.mockResolvedValue();
+      validateStockUseCase.execute.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When
@@ -170,14 +172,14 @@ describe('AddCartItemUseCase', () => {
 
       productRepository.findById.mockResolvedValue(product);
       cartRepository.findByUserId.mockResolvedValue(null);
-      stockManagementService.validateStockAvailability.mockResolvedValue();
+      validateStockUseCase.execute.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When
       await useCase.execute(input);
 
       // Then
-      expect(stockManagementService.validateStockAvailability).toHaveBeenCalledWith(
+      expect(validateStockUseCase.execute).toHaveBeenCalledWith(
         'product-1',
         'option-1',
         5,
@@ -205,7 +207,7 @@ describe('AddCartItemUseCase', () => {
 
       productRepository.findById.mockResolvedValue(product);
       cartRepository.findByUserId.mockResolvedValue(existingCart);
-      stockManagementService.validateStockAvailability.mockResolvedValue();
+      validateStockUseCase.execute.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When

@@ -1,9 +1,9 @@
 import { CreateOrderUseCase } from '@/order/application/use-cases/create-order.use-case';
 import { OrderRepository } from '@/order/domain/repositories/order.repository';
 import { CartRepository } from '@/order/domain/repositories/cart.repository';
-import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
 import { ProductRepository } from '@/product/domain/repositories/product.repository';
-import { StockManagementService } from '@/product/domain/services/stock-management.service';
+import { ReserveStockUseCase } from '@/product/application/use-cases/reserve-stock.use-case';
+import { ReleaseStockUseCase } from '@/product/application/use-cases/release-stock.use-case';
 import { CouponApplyService } from '@/coupon/application/services/coupon-apply.service';
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { CartItem } from '@/order/domain/entities/cart-item.entity';
@@ -19,7 +19,8 @@ describe('CreateOrderUseCase', () => {
   let cartRepository: jest.Mocked<CartRepository>;
   let orderRepository: jest.Mocked<OrderRepository>;
   let productRepository: jest.Mocked<ProductRepository>;
-  let stockManagementService: jest.Mocked<StockManagementService>;
+  let reserveStockUseCase: jest.Mocked<ReserveStockUseCase>;
+  let releaseStockUseCase: jest.Mocked<ReleaseStockUseCase>;
   let couponApplicationService: jest.Mocked<CouponApplyService>;
 
   beforeEach(() => {
@@ -44,13 +45,17 @@ describe('CreateOrderUseCase', () => {
       findPopular: jest.fn(),
       save: jest.fn(),
       exists: jest.fn(),
+      findByIdForUpdate: jest.fn(),
+      saveWithTx: jest.fn(),
     } as jest.Mocked<ProductRepository>;
 
-    // Mock services
-    stockManagementService = {
-      reserveStock: jest.fn(),
-      releaseStock: jest.fn(),
-      convertReservedToSold: jest.fn(),
+    // Mock use cases
+    reserveStockUseCase = {
+      execute: jest.fn(),
+    } as any;
+
+    releaseStockUseCase = {
+      execute: jest.fn(),
     } as any;
 
     couponApplicationService = {
@@ -62,7 +67,8 @@ describe('CreateOrderUseCase', () => {
       cartRepository,
       orderRepository,
       productRepository,
-      stockManagementService,
+      reserveStockUseCase,
+      releaseStockUseCase,
       couponApplicationService,
     );
   });
@@ -132,7 +138,7 @@ describe('CreateOrderUseCase', () => {
       const result = await useCase.execute(input);
 
       // Then
-      expect(stockManagementService.reserveStock).toHaveBeenCalledWith(
+      expect(reserveStockUseCase.execute).toHaveBeenCalledWith(
         'product-1',
         'option-1',
         2,
@@ -209,13 +215,13 @@ describe('CreateOrderUseCase', () => {
 
       cartRepository.findByUserId.mockResolvedValue(cart);
       productRepository.findById.mockResolvedValue(product);
-      stockManagementService.reserveStock.mockRejectedValue(
+      reserveStockUseCase.execute.mockRejectedValue(
         new Error('재고 부족'),
       );
 
       // When & Then
       await expect(useCase.execute(input)).rejects.toThrow('재고 부족');
-      expect(stockManagementService.releaseStock).not.toHaveBeenCalled();
+      expect(releaseStockUseCase.execute).not.toHaveBeenCalled();
     });
   });
 });

@@ -402,10 +402,12 @@ describe('PubSubDistributedLockService 통합 테스트', () => {
       const reservations = 10; // 10개 요청 (5개만 성공해야 함)
       let successCount = 0;
       let failureCount = 0;
+      // 고유한 키 사용 (다른 테스트와 충돌 방지)
+      const testId = Date.now();
 
       // When: 10개의 동시 예약 요청 (Pub/Sub 대기)
       const promises = Array.from({ length: reservations }, async () => {
-        const lockKey = 'stock:product-1:option-1';
+        const lockKey = `stock:product-1:option-1:${testId}`;
 
         try {
           await lockService.withLockExtended(
@@ -447,10 +449,12 @@ describe('PubSubDistributedLockService 통합 테스트', () => {
         'product-3': 10,
       };
       const results: { productId: string; success: boolean }[] = [];
+      // 고유한 키 사용 (다른 테스트와 충돌 방지)
+      const testId = Date.now();
 
       // When: 각 상품에 대해 1개씩 동시 예약
       const promises = Object.keys(stocks).map(async (productId) => {
-        const lockKey = `stock:${productId}:option-1`;
+        const lockKey = `stock:${productId}:option-1:${testId}`;
 
         try {
           await lockService.withLockExtended(

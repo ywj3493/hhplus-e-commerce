@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { CartRepository } from '@/order/domain/repositories/cart.repository';
 import type { ProductRepository } from '@/product/domain/repositories/product.repository';
 import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
-import { StockManagementService } from '@/product/domain/services/stock-management.service';
+import { ValidateStockUseCase } from '@/product/application/use-cases/validate-stock.use-case';
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 import { AddCartItemInput, AddCartItemOutput } from '@/order/application/dtos/add-cart-item.dto';
@@ -13,7 +13,7 @@ import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
  *
  * 흐름:
  * 1. 상품 존재 여부 확인
- * 2. 재고 검증 (Product 도메인 서비스)
+ * 2. 재고 검증 (ValidateStockUseCase)
  * 3. 장바구니 조회 또는 생성
  * 4. Cart.addItem() 호출 (도메인 로직)
  * 5. 장바구니 저장
@@ -26,7 +26,7 @@ export class AddCartItemUseCase {
     private readonly cartRepository: CartRepository,
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
-    private readonly stockManagementService: StockManagementService,
+    private readonly validateStockUseCase: ValidateStockUseCase,
   ) {}
 
   async execute(input: AddCartItemInput): Promise<AddCartItemOutput> {
@@ -36,8 +36,8 @@ export class AddCartItemUseCase {
       throw new ProductNotFoundException('상품을 찾을 수 없습니다.');
     }
 
-    // 2. 재고 검증 (Product 도메인 서비스)
-    await this.stockManagementService.validateStockAvailability(
+    // 2. 재고 검증 (ValidateStockUseCase)
+    await this.validateStockUseCase.execute(
       input.productId,
       input.productOptionId,
       input.quantity,

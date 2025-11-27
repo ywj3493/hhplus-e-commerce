@@ -7,7 +7,8 @@ import {
 } from '@/order/domain/repositories/tokens';
 import { Order } from '@/order/domain/entities/order.entity';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
-import { StockManagementService } from '@/product/domain/services/stock-management.service';
+import { ReserveStockUseCase } from '@/product/application/use-cases/reserve-stock.use-case';
+import { ReleaseStockUseCase } from '@/product/application/use-cases/release-stock.use-case';
 import { CouponApplyService } from '@/coupon/application/services/coupon-apply.service';
 import type { ProductRepository } from '@/product/domain/repositories/product.repository';
 import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
@@ -23,13 +24,13 @@ import { EmptyCartException } from '@/order/domain/order.exceptions';
  *
  * 플로우:
  * 1. 장바구니 조회 및 검증 (CartRepository)
- * 2. 재고 예약 (Product 도메인 서비스) - 분산락으로 동시성 제어
+ * 2. 재고 예약 (ReserveStockUseCase) - 분산락 + 비관락으로 동시성 제어
  * 3. 쿠폰 적용 (CouponApplyService)
  * 4. Order.create() 호출
  * 5. 장바구니 비우기 (CartRepository)
  *
  * 동시성 제어:
- * - 재고 예약은 StockManagementService에서 Redis 분산락으로 처리
+ * - 재고 예약은 ReserveStockUseCase에서 분산락 + 비관락으로 처리
  */
 @Injectable()
 export class CreateOrderUseCase {
@@ -42,7 +43,8 @@ export class CreateOrderUseCase {
     private readonly orderRepository: OrderRepository,
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
-    private readonly stockManagementService: StockManagementService,
+    private readonly reserveStockUseCase: ReserveStockUseCase,
+    private readonly releaseStockUseCase: ReleaseStockUseCase,
     private readonly couponApplicationService: CouponApplyService,
   ) {}
 
@@ -55,9 +57,9 @@ export class CreateOrderUseCase {
 
     const cartItems = cart.getItems();
 
-    // 2. 재고 예약 (Product 도메인 서비스) - 분산락으로 동시성 제어
+    // 2. 재고 예약 (ReserveStockUseCase) - 분산락 + 비관락으로 동시성 제어
     for (const cartItem of cartItems) {
-      await this.stockManagementService.reserveStock(
+      await this.reserveStockUseCase.execute(
         cartItem.productId,
         cartItem.productOptionId,
         cartItem.quantity,
@@ -143,7 +145,7 @@ export class CreateOrderUseCase {
     } catch (error) {
       // 오류 발생 시 예약된 재고 해제
       for (const cartItem of cartItems) {
-        await this.stockManagementService.releaseStock(
+        await this.releaseStockUseCase.execute(
           cartItem.productId,
           cartItem.productOptionId,
           cartItem.quantity,

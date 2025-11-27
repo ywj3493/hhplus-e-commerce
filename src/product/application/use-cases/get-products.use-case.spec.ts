@@ -18,6 +18,8 @@ describe('GetProductsUseCase', () => {
       findPopular: jest.fn(),
       save: jest.fn(),
       exists: jest.fn(),
+      findByIdForUpdate: jest.fn(),
+      saveWithTx: jest.fn(),
     };
     useCase = new GetProductsUseCase(mockRepository);
   });

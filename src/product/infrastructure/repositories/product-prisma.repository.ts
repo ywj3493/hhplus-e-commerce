@@ -164,6 +164,133 @@ export class ProductPrismaRepository implements ProductRepository {
   }
 
   /**
+   * ID로 상품 조회 (비관적 락 - FOR UPDATE)
+   * 동시성 제어를 위해 트랜잭션 내에서 사용
+   * @param id - 상품 ID
+   * @param tx - 트랜잭션 컨텍스트
+   * @returns Product 애그리거트 또는 undefined
+   */
+  async findByIdForUpdate(id: string, tx?: unknown): Promise<Product | undefined> {
+    const prisma = (tx || this.prisma) as PrismaService;
+
+    // Product FOR UPDATE 락 획득
+    const productRows = await prisma.$queryRaw<
+      Array<{
+        id: string;
+        name: string;
+        description: string;
+        price: Prisma.Decimal;
+        imageUrl: string | null;
+        categoryId: string | null;
+        hasOptions: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+      }>
+    >`SELECT * FROM products WHERE id = ${id} FOR UPDATE`;
+
+    if (!productRows || productRows.length === 0) {
+      return undefined;
+    }
+
+    const productRow = productRows[0];
+
+    // 옵션 및 Stock 조회 (Product가 잠겨있으므로 추가 락 불필요)
+    const options = await prisma.productOption.findMany({
+      where: { productId: id },
+      include: {
+        stocks: true,
+      },
+    });
+
+    // Domain 엔티티로 변환
+    const productOptions = options.map((optionModel) => {
+      const stockModel = optionModel.stocks[0];
+      if (!stockModel) {
+        throw new Error(`옵션 ${optionModel.id}에 재고 정보가 없습니다`);
+      }
+
+      const stock = Stock.create(
+        stockModel.id,
+        stockModel.productId,
+        stockModel.productOptionId,
+        stockModel.totalQuantity,
+        stockModel.availableQuantity,
+        stockModel.reservedQuantity,
+        stockModel.soldQuantity,
+        stockModel.version,
+      );
+
+      return ProductOption.create(
+        optionModel.id,
+        optionModel.productId,
+        optionModel.type,
+        optionModel.name,
+        Price.from(Number(optionModel.additionalPrice)),
+        stock,
+        optionModel.createdAt,
+        optionModel.updatedAt,
+      );
+    });
+
+    return Product.create(
+      productRow.id,
+      productRow.name,
+      Price.from(Number(productRow.price)),
+      productRow.description,
+      productRow.imageUrl,
+      productRow.categoryId,
+      productOptions,
+      productRow.createdAt,
+      productRow.updatedAt,
+    );
+  }
+
+  /**
+   * 상품 저장 (트랜잭션 컨텍스트 내에서)
+   * @param product - Product 도메인 엔티티
+   * @param tx - 트랜잭션 컨텍스트
+   */
+  async saveWithTx(product: Product, tx?: unknown): Promise<void> {
+    const prisma = (tx || this.prisma) as PrismaService;
+
+    const data = {
+      name: product.name,
+      description: product.description,
+      price: product.price.amount,
+      imageUrl: product.imageUrl,
+      categoryId: product.categoryId,
+      hasOptions: product.options.length > 0,
+      updatedAt: new Date(),
+    };
+
+    // Product 저장
+    await prisma.product.upsert({
+      where: { id: product.id },
+      update: data,
+      create: {
+        id: product.id,
+        ...data,
+        createdAt: product.createdAt,
+      },
+    });
+
+    // 각 옵션의 Stock 업데이트
+    for (const option of product.options) {
+      const stock = option.stock;
+      await prisma.stock.update({
+        where: { id: stock.id },
+        data: {
+          availableQuantity: stock.availableQuantity,
+          reservedQuantity: stock.reservedQuantity,
+          soldQuantity: stock.soldQuantity,
+          version: stock.version,
+          updatedAt: new Date(),
+        },
+      });
+    }
+  }
+
+  /**
    * 재고 예약
    * 동시성 제어는 서비스 레이어의 분산락(@DistributedLock)에서 처리
    *

@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import Redlock from 'redlock';
 import { CouponPrismaRepository } from '@/coupon/infrastructure/repositories/coupon-prisma.repository';
 import { UserCouponPrismaRepository } from '@/coupon/infrastructure/repositories/user-coupon-prisma.repository';
 import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
@@ -7,14 +8,28 @@ import { IssueCouponInput } from '@/coupon/application/dtos/issue-coupon.dto';
 import { CouponService } from '@/coupon/domain/services/coupon.service';
 import { COUPON_REPOSITORY, USER_COUPON_REPOSITORY } from '@/coupon/domain/repositories/tokens';
 import {
+  REDIS_CLIENT,
+  REDLOCK_INSTANCE,
+  DISTRIBUTED_LOCK_SERVICE,
+} from '@/common/infrastructure/locks/tokens';
+import { PubSubDistributedLockService } from '@/common/infrastructure/locks/pubsub-distributed-lock.service';
+import {
   setupTestDatabase,
   cleanupTestDatabase,
   clearAllTables,
   type TestDbConfig,
 } from '../../utils/test-database';
+import {
+  setupTestRedis,
+  cleanupTestRedis,
+  clearAllKeys,
+  type TestRedisConfig,
+} from '../../utils/test-redis';
 
 describe('IssueCoupon 동시성 통합 테스트', () => {
   let db: TestDbConfig;
+  let redisConfig: TestRedisConfig;
+  let redlock: Redlock;
   let prismaService: PrismaService;
   let issueCouponUseCase: IssueCouponUseCase;
   let moduleRef: TestingModule;
@@ -23,12 +38,33 @@ describe('IssueCoupon 동시성 통합 테스트', () => {
     // 독립된 DB 설정 (동시성 테스트용)
     db = await setupTestDatabase({ isolated: true });
 
+    // 실제 Redis 컨테이너 시작
+    redisConfig = await setupTestRedis();
+
+    // Redlock 인스턴스 생성
+    redlock = new Redlock([redisConfig.redis], {
+      retryCount: 0, // Pub/Sub으로 대기하므로 재시도 비활성화
+      automaticExtensionThreshold: 500,
+    });
+
     // NestJS 테스트 모듈 생성
     moduleRef = await Test.createTestingModule({
       providers: [
         {
           provide: PrismaService,
           useValue: db.prisma,
+        },
+        {
+          provide: REDIS_CLIENT,
+          useValue: redisConfig.redis,
+        },
+        {
+          provide: REDLOCK_INSTANCE,
+          useValue: redlock,
+        },
+        {
+          provide: DISTRIBUTED_LOCK_SERVICE,
+          useClass: PubSubDistributedLockService,
         },
         {
           provide: COUPON_REPOSITORY,
@@ -48,12 +84,14 @@ describe('IssueCoupon 동시성 통합 테스트', () => {
   }, 120000); // 120초 timeout (컨테이너 시작 + migration)
 
   afterAll(async () => {
+    await cleanupTestRedis(redisConfig);
     await cleanupTestDatabase(db);
   });
 
   beforeEach(async () => {
     // 각 테스트 전에 데이터 정리
     await clearAllTables(prismaService);
+    await clearAllKeys(redisConfig.redis);
   });
 
   describe('쿠폰 발급 동시성 제어', () => {

@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import Redis from 'ioredis';
 import Redlock, { Lock, ResourceLockedError, ExecutionError } from 'redlock';
 import { REDIS_CLIENT, REDLOCK_INSTANCE } from './tokens';
@@ -19,6 +19,7 @@ import {
  */
 @Injectable()
 export class PubSubDistributedLockService implements DistributedLockService {
+  private readonly logger = new Logger(PubSubDistributedLockService.name);
   private readonly LOCK_RELEASE_CHANNEL_PREFIX = 'lock:release:';
 
   constructor(
@@ -69,13 +70,16 @@ export class PubSubDistributedLockService implements DistributedLockService {
     // 1. 즉시 획득 시도
     try {
       const lock = await this.redlock.acquire([key], ttlMs);
+      this.logger.debug(`[Lock] Acquired: ${key}, lockId: ${lock.value}`);
       return { acquired: true, lockId: lock.value, lock };
     } catch (error) {
       // ResourceLockedError: 정상적인 락 경쟁
       if (error instanceof ResourceLockedError) {
         if (waitTimeoutMs <= 0) {
+          this.logger.debug(`[Lock] Acquisition failed (locked): ${key}`);
           return { acquired: false, lockId: null };
         }
+        this.logger.debug(`[Lock] Waiting for: ${key}`);
         return this.waitForLockWithPubSub(key, ttlMs, waitTimeoutMs);
       }
 
@@ -141,21 +145,26 @@ export class PubSubDistributedLockService implements DistributedLockService {
         if (isResolved) return;
         isResolved = true;
         cleanup();
+        this.logger.debug(`[Lock] Pub/Sub wait timeout: ${key}`);
         resolve({ acquired: false, lockId: null });
       }, waitTimeoutMs);
 
       const messageHandler = async (receivedChannel: string) => {
         if (isResolved || receivedChannel !== channel) return;
 
+        this.logger.debug(`[Lock] Pub/Sub message received for: ${key}`);
+
         try {
           const lock = await this.redlock.acquire([key], ttlMs);
           if (!isResolved) {
             isResolved = true;
             cleanup();
+            this.logger.debug(`[Lock] Acquired after Pub/Sub wait: ${key}, lockId: ${lock.value}`);
             resolve({ acquired: true, lockId: lock.value, lock });
           }
         } catch {
           // 다른 waiter가 먼저 획득한 경우, 계속 대기
+          this.logger.debug(`[Lock] Pub/Sub acquire failed, continuing to wait: ${key}`);
         }
       };
 
@@ -186,12 +195,15 @@ export class PubSubDistributedLockService implements DistributedLockService {
         await lock.release();
       } else {
         // Lock 객체가 없는 경우 해제 불가
+        this.logger.debug(`[Lock] Release failed (no lock object): ${key}`);
         return false;
       }
 
       await this.publishLockRelease(key);
+      this.logger.debug(`[Lock] Released: ${key}, lockId: ${lockId}`);
       return true;
-    } catch {
+    } catch (error) {
+      this.logger.debug(`[Lock] Release error: ${key}, error: ${error}`);
       return false;
     }
   }
@@ -233,12 +245,14 @@ export class PubSubDistributedLockService implements DistributedLockService {
     });
 
     if (!lockResult.acquired || !lockResult.lock) {
+      this.logger.debug(`[Lock] Acquisition failed for withLockExtended: ${key}`);
       throw new LockAcquisitionException(key);
     }
 
     let extensionTimer: NodeJS.Timeout | null = null;
 
     try {
+      this.logger.debug(`[Lock] Executing callback: ${key}`);
       if (autoExtend) {
         const extensionInterval = Math.floor(ttlMs / 2);
 

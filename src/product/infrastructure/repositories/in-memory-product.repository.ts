@@ -105,6 +105,22 @@ export class InMemoryProductRepository implements ProductRepository {
   }
 
   /**
+   * Find product by ID with pessimistic lock (FOR UPDATE)
+   * In-memory implementation: same as findById (no actual locking needed)
+   */
+  async findByIdForUpdate(id: string, _tx?: unknown): Promise<Product | undefined> {
+    return this.products.get(id);
+  }
+
+  /**
+   * Save product within transaction
+   * In-memory implementation: same as save (no actual transaction)
+   */
+  async saveWithTx(product: Product, _tx?: unknown): Promise<void> {
+    this.products.set(product.id, product);
+  }
+
+  /**
    * Clear all products (useful for testing)
    */
   clear(): void {
