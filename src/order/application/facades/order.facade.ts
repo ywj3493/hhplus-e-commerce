@@ -86,6 +86,13 @@ export class OrderFacade {
       if (!order) {
         throw new Error(`주문을 찾을 수 없습니다: ${input.orderId}`);
       }
+
+      // 멱등성 체크: 이미 완료된 주문이면 기존 결과 반환
+      if (order.status === 'COMPLETED') {
+        this.logger.log(`이미 완료된 주문입니다 (멱등성): orderId=${input.orderId}`);
+        return payment;
+      }
+
       orderItems = order.items;
 
       // Step 3: 재고 확정 (reserved → sold)

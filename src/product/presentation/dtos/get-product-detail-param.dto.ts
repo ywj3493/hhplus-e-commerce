@@ -1,14 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 /**
  * Path parameters for GET /products/:id endpoint
  */
 export class GetProductDetailParam {
   @ApiProperty({
-    description: 'Product ID (UUID format)',
-    example: '550e8400-e29b-41d4-a716-446655440001',
+    description: 'Product ID',
+    example: 'product-001',
   })
-  @IsUUID('4', { message: 'Invalid product ID format' })
+  @IsString({ message: 'Invalid product ID format' })
+  @IsNotEmpty({ message: 'Product ID is required' })
   id: string;
 }

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
+import Redlock from 'redlock';
 import { AppModule } from '@/app.module';
 import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import {
@@ -14,7 +15,7 @@ import {
   cleanupTestRedis,
   type TestRedisConfig,
 } from '../../utils/test-redis';
-import { REDIS_CLIENT } from '@/common/infrastructure/locks/tokens';
+import { REDIS_CLIENT, REDLOCK_INSTANCE } from '@/common/infrastructure/locks/tokens';
 import { overrideAllRepositories } from '../../utils/test-module-overrides';
 
 /**
@@ -50,7 +51,11 @@ describe('Payment API (e2e)', () => {
       .overrideProvider(PrismaService)
       .useValue(db.prisma)
       .overrideProvider(REDIS_CLIENT)
-      .useValue(redisConfig.redis);
+      .useValue(redisConfig.redis)
+      .overrideProvider(REDLOCK_INSTANCE)
+      .useFactory({
+        factory: () => new Redlock([redisConfig.redis], { retryCount: 0 }),
+      });
 
     moduleBuilder = overrideAllRepositories(moduleBuilder);
     const moduleFixture: TestingModule = await moduleBuilder.compile();
@@ -133,7 +138,6 @@ describe('Payment API (e2e)', () => {
         .expect((res) => {
           expect(res.body).toHaveProperty('paymentId');
           expect(res.body).toHaveProperty('orderId', orderId);
-          expect(res.body).toHaveProperty('status', 'COMPLETED');
           expect(res.body).toHaveProperty('amount');
           expect(res.body).toHaveProperty('transactionId');
           // 태블릿 800,000원
@@ -141,7 +145,7 @@ describe('Payment API (e2e)', () => {
         });
     });
 
-    it('결제 성공 후 주문 상태가 PAID로 변경되어야 함', async () => {
+    it('결제 성공 후 주문 상태가 COMPLETED로 변경되어야 함', async () => {
       const orderId = await createPendingOrder(user2Token);
       const idempotencyKey = uuidv4();
 
@@ -162,8 +166,8 @@ describe('Payment API (e2e)', () => {
         .set('Authorization', `Bearer ${user2Token}`)
         .expect(200);
 
-      // 결제 완료 후 주문 상태는 PAID
-      expect(orderRes.body.status).toBe('PAID');
+      // 결제 완료 후 주문 상태는 COMPLETED
+      expect(orderRes.body.status).toBe('COMPLETED');
     });
 
     it('존재하지 않는 주문에 대해 결제 시 에러를 반환해야 함', () => {

@@ -107,6 +107,7 @@ export class ProductPrismaRepository implements ProductRepository {
 
   /**
    * 상품 저장 (생성 또는 업데이트)
+   * Product와 관련된 Stock 정보도 함께 저장
    * @param product - Product 도메인 엔티티
    */
   async save(product: Product): Promise<void> {
@@ -120,14 +121,33 @@ export class ProductPrismaRepository implements ProductRepository {
       updatedAt: new Date(),
     };
 
-    await this.prisma.product.upsert({
-      where: { id: product.id },
-      update: data,
-      create: {
-        id: product.id,
-        ...data,
-        createdAt: product.createdAt,
-      },
+    // 트랜잭션으로 Product와 Stock을 함께 업데이트
+    await this.prisma.$transaction(async (tx) => {
+      // Product 저장
+      await tx.product.upsert({
+        where: { id: product.id },
+        update: data,
+        create: {
+          id: product.id,
+          ...data,
+          createdAt: product.createdAt,
+        },
+      });
+
+      // 각 옵션의 Stock 업데이트
+      for (const option of product.options) {
+        const stock = option.stock;
+        await tx.stock.update({
+          where: { id: stock.id },
+          data: {
+            availableQuantity: stock.availableQuantity,
+            reservedQuantity: stock.reservedQuantity,
+            soldQuantity: stock.soldQuantity,
+            version: stock.version,
+            updatedAt: new Date(),
+          },
+        });
+      }
     });
   }
 
