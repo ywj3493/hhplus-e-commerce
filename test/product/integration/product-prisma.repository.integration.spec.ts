@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductPrismaRepository } from '@/product/infrastructure/repositories/product-prisma.repository';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Product } from '@/product/domain/entities/product.entity';
 import { Price } from '@/product/domain/entities/price.vo';
 import {

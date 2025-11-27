@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CouponPrismaRepository } from '@/coupon/infrastructure/repositories/coupon-prisma.repository';
 import { UserCouponPrismaRepository } from '@/coupon/infrastructure/repositories/user-coupon-prisma.repository';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { IssueCouponUseCase } from '@/coupon/application/use-cases/issue-coupon.use-case';
 import { IssueCouponInput } from '@/coupon/application/dtos/issue-coupon.dto';
 import { CouponService } from '@/coupon/domain/services/coupon.service';

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrderPrismaRepository } from '@/order/infrastructure/repositories/order-prisma.repository';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Order } from '@/order/domain/entities/order.entity';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
 import { OrderStatus } from '@/order/domain/entities/order-status.enum';

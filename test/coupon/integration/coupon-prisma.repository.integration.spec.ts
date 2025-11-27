@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CouponPrismaRepository } from '@/coupon/infrastructure/repositories/coupon-prisma.repository';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
 import {
   setupTestDatabase,

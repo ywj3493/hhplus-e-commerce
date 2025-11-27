@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { ProductRepository, PaginationResult } from '@/product/domain/repositories/product.repository';
+import {
+  ProductRepository,
+  PaginationResult,
+} from '@/product/domain/repositories/product.repository';
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
 import { Price } from '@/product/domain/entities/price.vo';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Prisma } from '@prisma/client';
-import { OptimisticLockException } from '@/product/domain/exceptions/optimistic-lock.exception';
 
 /**
  * ProductPrismaRepository
@@ -14,7 +16,7 @@ import { OptimisticLockException } from '@/product/domain/exceptions/optimistic-
  *
  * 주요 기능:
  * - Product Aggregate (Product + ProductOptions + Stock) 조회
- * - 재고 동시성 제어 (SELECT FOR UPDATE)
+ * - 재고 관리 (분산락은 서비스 레이어에서 처리)
  */
 @Injectable()
 export class ProductPrismaRepository implements ProductRepository {
@@ -142,20 +144,19 @@ export class ProductPrismaRepository implements ProductRepository {
   }
 
   /**
-   * 재고 예약 (낙관적 락 사용)
-   * version 필드를 사용하여 동시성 제어
+   * 재고 예약
+   * 동시성 제어는 서비스 레이어의 분산락(@DistributedLock)에서 처리
    *
    * @param stockId - 재고 ID
    * @param quantity - 예약할 수량
    * @throws Error - 재고 부족 또는 유효하지 않은 수량
-   * @throws OptimisticLockException - 다른 트랜잭션이 동시에 재고를 수정한 경우
    */
   async reserveStock(stockId: string, quantity: number): Promise<void> {
     if (quantity <= 0) {
       throw new Error('예약 수량은 양수여야 합니다');
     }
 
-    // 1. 현재 재고 조회 (잠금 없이)
+    // 1. 현재 재고 조회
     const stockModel = await this.prisma.stock.findUnique({
       where: { id: stockId },
     });
@@ -171,37 +172,24 @@ export class ProductPrismaRepository implements ProductRepository {
       );
     }
 
-    // 3. 낙관적 락: version 필드를 조건에 포함하여 업데이트
-    const result = await this.prisma.stock.updateMany({
-      where: {
-        id: stockId,
-        version: stockModel.version, // 낙관적 락 조건
-        availableQuantity: { gte: quantity }, // 재고 충분 조건 (이중 체크)
-      },
+    // 3. 재고 업데이트 (분산락으로 동시성 보장)
+    await this.prisma.stock.update({
+      where: { id: stockId },
       data: {
         availableQuantity: { decrement: quantity },
         reservedQuantity: { increment: quantity },
-        version: { increment: 1 },
         updatedAt: new Date(),
       },
     });
-
-    // 4. 업데이트 실패 시 (다른 트랜잭션이 먼저 수정함)
-    if (result.count === 0) {
-      throw new OptimisticLockException(
-        '재고가 다른 트랜잭션에 의해 수정되었습니다. 다시 시도해주세요.',
-      );
-    }
   }
 
   /**
    * 예약된 재고 복원 (예: 주문 취소 시)
-   * version 필드를 사용하여 동시성 제어
+   * 동시성 제어는 서비스 레이어의 분산락(@DistributedLock)에서 처리
    *
    * @param stockId - 재고 ID
    * @param quantity - 복원할 수량
    * @throws Error - 예약 수량 초과 또는 유효하지 않은 수량
-   * @throws OptimisticLockException - 다른 트랜잭션이 동시에 재고를 수정한 경우
    */
   async releaseStock(stockId: string, quantity: number): Promise<void> {
     if (quantity <= 0) {
@@ -224,37 +212,24 @@ export class ProductPrismaRepository implements ProductRepository {
       );
     }
 
-    // 3. 낙관적 락: version 필드를 조건에 포함하여 업데이트
-    const result = await this.prisma.stock.updateMany({
-      where: {
-        id: stockId,
-        version: stockModel.version, // 낙관적 락 조건
-        reservedQuantity: { gte: quantity }, // 예약 수량 충분 조건 (이중 체크)
-      },
+    // 3. 재고 업데이트 (분산락으로 동시성 보장)
+    await this.prisma.stock.update({
+      where: { id: stockId },
       data: {
         availableQuantity: { increment: quantity },
         reservedQuantity: { decrement: quantity },
-        version: { increment: 1 },
         updatedAt: new Date(),
       },
     });
-
-    // 4. 업데이트 실패 시
-    if (result.count === 0) {
-      throw new OptimisticLockException(
-        '재고가 다른 트랜잭션에 의해 수정되었습니다. 다시 시도해주세요.',
-      );
-    }
   }
 
   /**
    * 예약된 재고를 판매로 확정 (예: 결제 완료 시)
-   * version 필드를 사용하여 동시성 제어
+   * 동시성 제어는 서비스 레이어의 분산락(@DistributedLock)에서 처리
    *
    * @param stockId - 재고 ID
    * @param quantity - 판매 확정할 수량
    * @throws Error - 예약 수량 초과 또는 유효하지 않은 수량
-   * @throws OptimisticLockException - 다른 트랜잭션이 동시에 재고를 수정한 경우
    */
   async confirmStock(stockId: string, quantity: number): Promise<void> {
     if (quantity <= 0) {
@@ -277,27 +252,15 @@ export class ProductPrismaRepository implements ProductRepository {
       );
     }
 
-    // 3. 낙관적 락: version 필드를 조건에 포함하여 업데이트
-    const result = await this.prisma.stock.updateMany({
-      where: {
-        id: stockId,
-        version: stockModel.version, // 낙관적 락 조건
-        reservedQuantity: { gte: quantity }, // 예약 수량 충분 조건 (이중 체크)
-      },
+    // 3. 재고 업데이트 (분산락으로 동시성 보장)
+    await this.prisma.stock.update({
+      where: { id: stockId },
       data: {
         reservedQuantity: { decrement: quantity },
         soldQuantity: { increment: quantity },
-        version: { increment: 1 },
         updatedAt: new Date(),
       },
     });
-
-    // 4. 업데이트 실패 시
-    if (result.count === 0) {
-      throw new OptimisticLockException(
-        '재고가 다른 트랜잭션에 의해 수정되었습니다. 다시 시도해주세요.',
-      );
-    }
   }
 
   /**

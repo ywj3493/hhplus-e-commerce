@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaymentPrismaRepository } from '@/order/infrastructure/repositories/payment-prisma.repository';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Payment } from '@/order/domain/entities/payment.entity';
 import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
 import {

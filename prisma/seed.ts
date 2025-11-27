@@ -517,6 +517,8 @@ async function main() {
       amount: 1400000,
       method: 'CREDIT_CARD',
       transactionId: 'txn-20251115-103500-abc123',
+      status: 'COMPLETED',
+      idempotencyKey: 'idem-order-001-20251115103500',
       createdAt: new Date('2025-11-15T10:35:00Z'),
     },
   });

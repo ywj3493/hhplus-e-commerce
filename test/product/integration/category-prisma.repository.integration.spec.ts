@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoryPrismaRepository } from '@/product/infrastructure/repositories/category-prisma.repository';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Category } from '@/product/domain/entities/category.entity';
 import {
   setupTestDatabase,

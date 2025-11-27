@@ -14,7 +14,7 @@ import {
   IssueCouponInput,
   IssueCouponOutput,
 } from '@/coupon/application/dtos/issue-coupon.dto';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 
 /**
  * 쿠폰 발급 Use Case

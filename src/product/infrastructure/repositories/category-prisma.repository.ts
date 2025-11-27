@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CategoryRepository } from '@/product/domain/repositories/category.repository';
 import { Category } from '@/product/domain/entities/category.entity';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 
 /**
  * CategoryPrismaRepository

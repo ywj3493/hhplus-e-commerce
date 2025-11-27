@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { FakeAuthController } from '@/__fake__/auth/fake-auth.controller';
 import { FakeJwtAuthGuard } from '@/__fake__/auth/fake-jwt-auth.guard';
-import { PrismaModule } from '@/common/infrastructure/prisma/prisma.module';
+import { PrismaModule } from '@/common/infrastructure/persistance/prisma.module';
+import { RedisModule } from '@/common/infrastructure/locks/locks.module';
 import { ProductModule } from '@/product/product.module';
 import { CouponModule } from '@/coupon/coupon.module';
 import { OrderModule } from '@/order/order.module';
@@ -13,6 +14,7 @@ import { UserModule } from '@/user/user.module';
  *
  * 도메인 통합 후 구조:
  * - PrismaModule: 전역 데이터베이스 연결 (Global)
+ * - RedisModule: 전역 Redis 연결 및 분산락 (Global)
  * - UserModule: 사용자 정보 관리
  * - ProductModule: 상품 및 재고 관리
  * - CouponModule: 쿠폰 관리
@@ -26,6 +28,7 @@ import { UserModule } from '@/user/user.module';
       signOptions: { expiresIn: '1d' },
     }),
     PrismaModule, // Global module for database connection
+    RedisModule, // Global module for Redis and distributed lock
     UserModule,
     ProductModule,
     CouponModule,

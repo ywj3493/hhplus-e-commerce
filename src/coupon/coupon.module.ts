@@ -9,7 +9,7 @@ import { InMemoryCouponRepository } from '@/coupon/infrastructure/repositories/i
 import { InMemoryUserCouponRepository } from '@/coupon/infrastructure/repositories/in-memory-user-coupon.repository';
 import { CouponPrismaRepository } from '@/coupon/infrastructure/repositories/coupon-prisma.repository';
 import { UserCouponPrismaRepository } from '@/coupon/infrastructure/repositories/user-coupon-prisma.repository';
-import { PrismaModule } from '@/common/infrastructure/prisma/prisma.module';
+import { PrismaModule } from '@/common/infrastructure/persistance/prisma.module';
 import {
   COUPON_REPOSITORY,
   USER_COUPON_REPOSITORY,
