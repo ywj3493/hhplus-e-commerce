@@ -8,7 +8,7 @@ import { InMemoryCategoryRepository } from '@/product/infrastructure/repositorie
 import { ProductPrismaRepository } from '@/product/infrastructure/repositories/product-prisma.repository';
 import { CategoryPrismaRepository } from '@/product/infrastructure/repositories/category-prisma.repository';
 import { StockManagementService } from '@/product/domain/services/stock-management.service';
-import { PrismaModule } from '@/common/infrastructure/prisma/prisma.module';
+import { PrismaModule } from '@/common/infrastructure/persistance/prisma.module';
 
 /**
  * Product Module

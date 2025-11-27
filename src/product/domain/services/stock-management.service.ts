@@ -5,6 +5,9 @@ import {
   ProductNotFoundException,
   InsufficientStockException,
 } from '@/product/domain/product.exceptions';
+import { DistributedLock } from '@/common/utils/decorators/distributed-lock.decorator';
+import { DistributedLockService } from '@/common/infrastructure/locks/simple-distributed-lock.interface';
+import { DISTRIBUTED_LOCK_SERVICE } from '@/common/infrastructure/locks/tokens';
 
 /**
  * StockManagementService
@@ -20,12 +23,20 @@ import {
  * BR-ORDER-14: 예약 취소/만료 시 재고 해제
  * BR-PAYMENT-02: 결제 완료 시 reserved → sold
  * BR-CART-02: 장바구니 추가 시 재고 확인
+ *
+ * 동시성 제어:
+ * - Redlock 기반 분산락 사용 (@DistributedLock 데코레이터)
+ * - Pub/Sub 대기: 락 해제 알림을 받아 순차적으로 처리
+ * - TTL 자동 연장: 긴 작업에서도 락 유지
+ * - 락 키 패턴: 'stock:{productId}:{optionId}'
  */
 @Injectable()
 export class StockManagementService {
   constructor(
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
+    @Inject(DISTRIBUTED_LOCK_SERVICE)
+    private readonly lockService: DistributedLockService,
   ) {}
 
   /**
@@ -38,6 +49,10 @@ export class StockManagementService {
    * @throws ProductNotFoundException 상품 또는 옵션을 찾을 수 없을 때
    * @throws InsufficientStockException 재고 부족 시
    */
+  @DistributedLock('stock:{productId}:{optionId}', {
+    waitTimeoutMs: 5000,
+    autoExtend: true,
+  })
   async reserveStock(
     productId: string,
     optionId: string,
@@ -68,6 +83,10 @@ export class StockManagementService {
    * @param optionId 옵션 ID
    * @param quantity 해제 수량
    */
+  @DistributedLock('stock:{productId}:{optionId}', {
+    waitTimeoutMs: 5000,
+    autoExtend: true,
+  })
   async releaseStock(
     productId: string,
     optionId: string,
@@ -105,6 +124,10 @@ export class StockManagementService {
    * @param quantity 판매 수량
    * @throws ProductNotFoundException 상품 또는 옵션을 찾을 수 없을 때
    */
+  @DistributedLock('stock:{productId}:{optionId}', {
+    waitTimeoutMs: 5000,
+    autoExtend: true,
+  })
   async confirmSale(
     productId: string,
     optionId: string,
