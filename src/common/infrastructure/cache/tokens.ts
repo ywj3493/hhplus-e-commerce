@@ -1,0 +1,5 @@
+/**
+ * Redis 캐시 관련 DI 토큰
+ */
+export const REDIS_CACHE_SERVICE = Symbol('REDIS_CACHE_SERVICE');
+export const REDIS_CACHE_INVALIDATION_SERVICE = Symbol('REDIS_CACHE_INVALIDATION_SERVICE');

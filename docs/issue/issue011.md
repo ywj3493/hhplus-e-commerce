@@ -289,7 +289,7 @@ async convertReservedToSold(orderIdOrItems: string | OrderItem[]): Promise<void>
 
 #### Coupon Module Integration (Refactoring)
 
-- `src/coupon/application/services/coupon-application.service.ts` - Coupon application service
+- `src/coupon/application/services/coupon-apply.service.ts` - Coupon application service
   - Encapsulates coupon application logic for Order domain
   - `applyCoupon()`: Validate, use coupon, and calculate discount
 
@@ -312,7 +312,7 @@ async convertReservedToSold(orderIdOrItems: string | OrderItem[]): Promise<void>
 
 - `src/order/application/use-cases/create-order.use-case.ts` (Refactoring)
   - Reduced repository dependencies from 5 to 2
-  - Now uses CartCheckoutService and CouponApplicationService
+  - Now uses CartCheckoutService and CouponApplyService
   - Before: CART_REPOSITORY, USER_COUPON_REPOSITORY, COUPON_REPOSITORY, PRODUCT_REPOSITORY, ORDER_REPOSITORY
   - After: ORDER_REPOSITORY, PRODUCT_REPOSITORY + Application Services
 
@@ -328,7 +328,7 @@ async convertReservedToSold(orderIdOrItems: string | OrderItem[]): Promise<void>
 #### Coupon Module (Refactoring)
 
 - `src/coupon/coupon.module.ts`
-  - Added CouponApplicationService to providers and exports
+  - Added CouponApplyService to providers and exports
   - Exported for Order module consumption
 
 ## Testing
@@ -365,7 +365,7 @@ async convertReservedToSold(orderIdOrItems: string | OrderItem[]): Promise<void>
 #### Refactoring
 
 - ✅ CartCheckoutService integration
-- ✅ CouponApplicationService integration
+- ✅ CouponApplyService integration
 - ✅ CreateOrderUseCase with reduced dependencies
 - ✅ All existing tests continue to pass
 
@@ -418,7 +418,7 @@ Tests:       412 passed, 412 total
 - Consistent with existing architecture (Product, Cart, Order, Coupon)
 
 ### 6. Application Service Pattern for Cross-Domain Operations
-**Decision:** Introduce Application Services (CartCheckoutService, CouponApplicationService) to reduce domain coupling
+**Decision:** Introduce Application Services (CartCheckoutService, CouponApplyService) to reduce domain coupling
 **Rationale:**
 - **Domain Boundary Enforcement**: Order domain no longer directly accesses Cart/Coupon repositories
 - **Reduced Coupling**: CreateOrderUseCase dependencies reduced from 5 repositories to 2 repositories + Application Services

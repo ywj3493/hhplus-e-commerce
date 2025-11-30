@@ -43,12 +43,18 @@ describe('IssueCouponUseCase', () => {
       $transaction: jest.fn((callback) => callback(mockPrisma)),
     };
 
+    // Mock DistributedLockService
+    const mockLockService = {
+      withLockExtended: jest.fn((key, callback) => callback()),
+    };
+
     // Create use case
     useCase = new IssueCouponUseCase(
       couponRepository,
       userCouponRepository,
       couponService,
       mockPrisma,
+      mockLockService as any,
     );
   });
 

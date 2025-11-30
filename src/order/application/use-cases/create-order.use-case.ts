@@ -1,16 +1,22 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import type { OrderRepository } from '@/order/domain/repositories/order.repository';
 import type { CartRepository } from '@/order/domain/repositories/cart.repository';
-import { ORDER_REPOSITORY, CART_REPOSITORY } from '@/order/domain/repositories/tokens';
+import {
+  ORDER_REPOSITORY,
+  CART_REPOSITORY,
+} from '@/order/domain/repositories/tokens';
 import { Order } from '@/order/domain/entities/order.entity';
 import { OrderItem } from '@/order/domain/entities/order-item.entity';
-import { StockManagementService } from '@/product/domain/services/stock-management.service';
-import { CouponApplicationService } from '@/coupon/application/services/coupon-application.service';
+import { ReserveStockUseCase } from '@/product/application/use-cases/reserve-stock.use-case';
+import { ReleaseStockUseCase } from '@/product/application/use-cases/release-stock.use-case';
+import { CouponApplyService } from '@/coupon/application/services/coupon-apply.service';
 import type { ProductRepository } from '@/product/domain/repositories/product.repository';
 import { PRODUCT_REPOSITORY } from '@/product/domain/repositories/tokens';
-import { CreateOrderInput, CreateOrderOutput } from '@/order/application/dtos/create-order.dto';
+import {
+  CreateOrderInput,
+  CreateOrderOutput,
+} from '@/order/application/dtos/create-order.dto';
 import { EmptyCartException } from '@/order/domain/order.exceptions';
-import { OptimisticLockException } from '@/product/domain/exceptions/optimistic-lock.exception';
 
 /**
  * CreateOrderUseCase
@@ -18,21 +24,17 @@ import { OptimisticLockException } from '@/product/domain/exceptions/optimistic-
  *
  * 플로우:
  * 1. 장바구니 조회 및 검증 (CartRepository)
- * 2. 재고 예약 (Product 도메인 서비스) - 낙관적 락 + 재시도
- * 3. 쿠폰 적용 (CouponApplicationService)
+ * 2. 재고 예약 (ReserveStockUseCase) - 분산락 + 비관락으로 동시성 제어
+ * 3. 쿠폰 적용 (CouponApplyService)
  * 4. Order.create() 호출
  * 5. 장바구니 비우기 (CartRepository)
  *
- * 재시도 정책:
- * - 최대 3회 재시도
- * - Exponential Backoff (50ms → 100ms → 200ms)
- * - OptimisticLockException 발생 시에만 재시도
+ * 동시성 제어:
+ * - 재고 예약은 ReserveStockUseCase에서 분산락 + 비관락으로 처리
  */
 @Injectable()
 export class CreateOrderUseCase {
   private readonly logger = new Logger(CreateOrderUseCase.name);
-  private readonly MAX_RETRIES = 3;
-  private readonly BASE_DELAY_MS = 50;
 
   constructor(
     @Inject(CART_REPOSITORY)
@@ -41,44 +43,12 @@ export class CreateOrderUseCase {
     private readonly orderRepository: OrderRepository,
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
-    private readonly stockManagementService: StockManagementService,
-    private readonly couponApplicationService: CouponApplicationService,
+    private readonly reserveStockUseCase: ReserveStockUseCase,
+    private readonly releaseStockUseCase: ReleaseStockUseCase,
+    private readonly couponApplicationService: CouponApplyService,
   ) {}
 
   async execute(input: CreateOrderInput): Promise<CreateOrderOutput> {
-    // 재시도 루프
-    for (let attempt = 0; attempt < this.MAX_RETRIES; attempt++) {
-      try {
-        return await this.executeWithRetry(input, attempt);
-      } catch (error) {
-        // OptimisticLockException이고 마지막 시도가 아니면 재시도
-        if (
-          error instanceof OptimisticLockException &&
-          attempt < this.MAX_RETRIES - 1
-        ) {
-          const delayMs = this.BASE_DELAY_MS * Math.pow(2, attempt);
-          this.logger.warn(
-            `재고 예약 충돌 발생. ${delayMs}ms 후 재시도합니다. (시도 ${attempt + 1}/${this.MAX_RETRIES})`,
-          );
-          await this.sleep(delayMs);
-          continue;
-        }
-        // 다른 에러거나 마지막 시도면 그대로 throw
-        throw error;
-      }
-    }
-
-    // 이 코드에는 도달하지 않지만 TypeScript를 위한 fallback
-    throw new Error('주문 생성에 실패했습니다.');
-  }
-
-  /**
-   * 재시도 가능한 주문 생성 로직
-   */
-  private async executeWithRetry(
-    input: CreateOrderInput,
-    attempt: number,
-  ): Promise<CreateOrderOutput> {
     // 1. 장바구니 조회 및 검증
     const cart = await this.cartRepository.findByUserId(input.userId);
     if (!cart || cart.getItems().length === 0) {
@@ -87,9 +57,9 @@ export class CreateOrderUseCase {
 
     const cartItems = cart.getItems();
 
-    // 2. 재고 예약 (Product 도메인 서비스) - OptimisticLockException 발생 가능
+    // 2. 재고 예약 (ReserveStockUseCase) - 분산락 + 비관락으로 동시성 제어
     for (const cartItem of cartItems) {
-      await this.stockManagementService.reserveStock(
+      await this.reserveStockUseCase.execute(
         cartItem.productId,
         cartItem.productOptionId,
         cartItem.quantity,
@@ -112,7 +82,7 @@ export class CreateOrderUseCase {
           0,
         );
 
-        // CouponApplicationService를 통한 쿠폰 적용
+        // CouponApplyService를 통한 쿠폰 적용
         const couponResult = await this.couponApplicationService.applyCoupon(
           input.userId,
           input.couponId,
@@ -175,7 +145,7 @@ export class CreateOrderUseCase {
     } catch (error) {
       // 오류 발생 시 예약된 재고 해제
       for (const cartItem of cartItems) {
-        await this.stockManagementService.releaseStock(
+        await this.releaseStockUseCase.execute(
           cartItem.productId,
           cartItem.productOptionId,
           cartItem.quantity,
@@ -226,12 +196,5 @@ export class CreateOrderUseCase {
     }
 
     return orderItems;
-  }
-
-  /**
-   * 지정된 시간(ms) 동안 대기
-   */
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

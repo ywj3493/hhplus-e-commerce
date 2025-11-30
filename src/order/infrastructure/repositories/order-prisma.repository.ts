@@ -10,7 +10,7 @@ import {
 } from '@/order/domain/entities/order-item.entity';
 import { OrderStatus } from '@/order/domain/entities/order-status.enum';
 import { Price } from '@/product/domain/entities/price.vo';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Order as PrismaOrder, OrderItem as PrismaOrderItem } from '@prisma/client';
 
 /**

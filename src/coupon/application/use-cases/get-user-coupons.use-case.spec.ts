@@ -4,7 +4,7 @@ import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.r
 import { Coupon, CouponType } from '@/coupon/domain/entities/coupon.entity';
 import { UserCoupon, CouponStatus } from '@/coupon/domain/entities/user-coupon.entity';
 import { GetUserCouponsInput } from '@/coupon/application/dtos/get-user-coupons.dto';
-import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon-query.service';
+import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon.service';
 
 describe('GetUserCouponsUseCase', () => {
   let useCase: GetUserCouponsUseCase;

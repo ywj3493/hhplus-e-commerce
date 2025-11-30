@@ -9,7 +9,7 @@ import {
 import type { OrderRepository } from '@/order/domain/repositories/order.repository';
 import type { PaymentRepository } from '@/order/domain/repositories/payment.repository';
 import { ORDER_REPOSITORY, PAYMENT_REPOSITORY } from '@/order/domain/repositories/tokens';
-import { StockManagementService } from '@/product/domain/services/stock-management.service';
+import { ReleaseStockUseCase } from '@/product/application/use-cases/release-stock.use-case';
 import type { OrderItem } from '@/order/domain/entities/order-item.entity';
 
 /**
@@ -40,7 +40,7 @@ export class OrderFacade {
     private readonly processPaymentUseCase: ProcessPaymentUseCase,
     private readonly confirmStockUseCase: ConfirmStockUseCase,
     private readonly completeOrderUseCase: CompleteOrderUseCase,
-    private readonly stockManagementService: StockManagementService,
+    private readonly releaseStockUseCase: ReleaseStockUseCase,
   ) {}
 
   /**
@@ -86,6 +86,13 @@ export class OrderFacade {
       if (!order) {
         throw new Error(`주문을 찾을 수 없습니다: ${input.orderId}`);
       }
+
+      // 멱등성 체크: 이미 완료된 주문이면 기존 결과 반환
+      if (order.status === 'COMPLETED') {
+        this.logger.log(`이미 완료된 주문입니다 (멱등성): orderId=${input.orderId}`);
+        return payment;
+      }
+
       orderItems = order.items;
 
       // Step 3: 재고 확정 (reserved → sold)
@@ -172,7 +179,7 @@ export class OrderFacade {
   private async releaseStockForItems(orderItems: OrderItem[]): Promise<void> {
     for (const item of orderItems) {
       try {
-        await this.stockManagementService.releaseStock(
+        await this.releaseStockUseCase.execute(
           item.productId,
           item.productOptionId!,
           item.quantity,

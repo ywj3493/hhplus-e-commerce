@@ -1,52 +1,31 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MySqlContainer, StartedMySqlContainer } from '@testcontainers/mysql';
-import { PrismaClient } from '@prisma/client';
 import { ProductPrismaRepository } from '@/product/infrastructure/repositories/product-prisma.repository';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Product } from '@/product/domain/entities/product.entity';
 import { Price } from '@/product/domain/entities/price.vo';
-import { execSync } from 'child_process';
+import {
+  setupTestDatabase,
+  cleanupTestDatabase,
+  clearAllTables,
+  type TestDbConfig,
+} from '../../utils/test-database';
 
 describe('ProductPrismaRepository 통합 테스트', () => {
-  let container: StartedMySqlContainer;
+  let db: TestDbConfig;
   let prismaService: PrismaService;
   let repository: ProductPrismaRepository;
   let moduleRef: TestingModule;
 
   beforeAll(async () => {
-    // MySQL Testcontainer 시작
-    container = await new MySqlContainer('mysql:8.0')
-      .withDatabase('test_db')
-      .withRootPassword('test')
-      .start();
-
-    // DATABASE_URL 설정
-    const databaseUrl = container.getConnectionUri();
-    process.env.DATABASE_URL = databaseUrl;
-
-    // Prisma Client 생성 및 Migration 실행
-    const prisma = new PrismaClient({
-      datasources: {
-        db: {
-          url: databaseUrl,
-        },
-      },
-    });
-
-    // Migration 실행
-    execSync('pnpm prisma migrate deploy', {
-      env: {
-        ...process.env,
-        DATABASE_URL: databaseUrl,
-      },
-    });
+    // 공유 DB 설정
+    db = await setupTestDatabase({ isolated: false });
 
     // NestJS 테스트 모듈 생성
     moduleRef = await Test.createTestingModule({
       providers: [
         {
           provide: PrismaService,
-          useValue: prisma,
+          useValue: db.prisma,
         },
         ProductPrismaRepository,
       ],
@@ -54,24 +33,15 @@ describe('ProductPrismaRepository 통합 테스트', () => {
 
     prismaService = moduleRef.get<PrismaService>(PrismaService);
     repository = moduleRef.get<ProductPrismaRepository>(ProductPrismaRepository);
-  }, 60000); // 60초 timeout
+  }, 120000); // 120초 timeout
 
   afterAll(async () => {
-    // 연결 해제 및 컨테이너 종료
-    if (prismaService) {
-      await prismaService.$disconnect();
-    }
-    if (container) {
-      await container.stop();
-    }
+    await cleanupTestDatabase(db);
   });
 
   beforeEach(async () => {
     // 각 테스트 전에 데이터 정리
-    await prismaService.stock.deleteMany({});
-    await prismaService.productOption.deleteMany({});
-    await prismaService.product.deleteMany({});
-    await prismaService.category.deleteMany({});
+    await clearAllTables(prismaService);
   });
 
   describe('findById', () => {
@@ -649,7 +619,7 @@ describe('ProductPrismaRepository 통합 테스트', () => {
       const tables = await prismaService.$queryRaw<{ TABLE_NAME: string }[]>`
         SELECT TABLE_NAME
         FROM information_schema.TABLES
-        WHERE TABLE_SCHEMA = 'test_db'
+        WHERE TABLE_SCHEMA = DATABASE()
           AND TABLE_NAME IN ('products', 'product_options', 'stocks')
         ORDER BY TABLE_NAME
       `;

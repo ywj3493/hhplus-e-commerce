@@ -3,7 +3,7 @@ import { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { Cart } from '@/order/domain/entities/cart.entity';
 import { CartItem, CartItemData } from '@/order/domain/entities/cart-item.entity';
 import { Price } from '@/product/domain/entities/price.vo';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Cart as PrismaCart, CartItem as PrismaCartItem } from '@prisma/client';
 
 /**

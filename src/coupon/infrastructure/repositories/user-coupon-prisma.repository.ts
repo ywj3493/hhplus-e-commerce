@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserCouponRepository } from '@/coupon/domain/repositories/user-coupon.repository';
 import { UserCoupon } from '@/coupon/domain/entities/user-coupon.entity';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Prisma } from '@prisma/client';
 
 /**

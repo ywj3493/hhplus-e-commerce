@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { ProductRepository, PaginationResult } from '@/product/domain/repositories/product.repository';
+import {
+  ProductRepository,
+  PaginationResult,
+} from '@/product/domain/repositories/product.repository';
 import { Product } from '@/product/domain/entities/product.entity';
 import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
 import { Price } from '@/product/domain/entities/price.vo';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 import { Prisma } from '@prisma/client';
-import { OptimisticLockException } from '@/product/domain/exceptions/optimistic-lock.exception';
 
 /**
  * ProductPrismaRepository
@@ -14,7 +16,7 @@ import { OptimisticLockException } from '@/product/domain/exceptions/optimistic-
  *
  * 주요 기능:
  * - Product Aggregate (Product + ProductOptions + Stock) 조회
- * - 재고 동시성 제어 (SELECT FOR UPDATE)
+ * - 재고 관리 (분산락은 서비스 레이어에서 처리)
  */
 @Injectable()
 export class ProductPrismaRepository implements ProductRepository {
@@ -105,6 +107,7 @@ export class ProductPrismaRepository implements ProductRepository {
 
   /**
    * 상품 저장 (생성 또는 업데이트)
+   * Product와 관련된 Stock 정보도 함께 저장
    * @param product - Product 도메인 엔티티
    */
   async save(product: Product): Promise<void> {
@@ -118,14 +121,33 @@ export class ProductPrismaRepository implements ProductRepository {
       updatedAt: new Date(),
     };
 
-    await this.prisma.product.upsert({
-      where: { id: product.id },
-      update: data,
-      create: {
-        id: product.id,
-        ...data,
-        createdAt: product.createdAt,
-      },
+    // 트랜잭션으로 Product와 Stock을 함께 업데이트
+    await this.prisma.$transaction(async (tx) => {
+      // Product 저장
+      await tx.product.upsert({
+        where: { id: product.id },
+        update: data,
+        create: {
+          id: product.id,
+          ...data,
+          createdAt: product.createdAt,
+        },
+      });
+
+      // 각 옵션의 Stock 업데이트
+      for (const option of product.options) {
+        const stock = option.stock;
+        await tx.stock.update({
+          where: { id: stock.id },
+          data: {
+            availableQuantity: stock.availableQuantity,
+            reservedQuantity: stock.reservedQuantity,
+            soldQuantity: stock.soldQuantity,
+            version: stock.version,
+            updatedAt: new Date(),
+          },
+        });
+      }
     });
   }
 
@@ -142,20 +164,146 @@ export class ProductPrismaRepository implements ProductRepository {
   }
 
   /**
-   * 재고 예약 (낙관적 락 사용)
-   * version 필드를 사용하여 동시성 제어
+   * ID로 상품 조회 (비관적 락 - FOR UPDATE)
+   * 동시성 제어를 위해 트랜잭션 내에서 사용
+   * @param id - 상품 ID
+   * @param tx - 트랜잭션 컨텍스트
+   * @returns Product 애그리거트 또는 undefined
+   */
+  async findByIdForUpdate(id: string, tx?: unknown): Promise<Product | undefined> {
+    const prisma = (tx || this.prisma) as PrismaService;
+
+    // Product FOR UPDATE 락 획득
+    const productRows = await prisma.$queryRaw<
+      Array<{
+        id: string;
+        name: string;
+        description: string;
+        price: Prisma.Decimal;
+        imageUrl: string | null;
+        categoryId: string | null;
+        hasOptions: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+      }>
+    >`SELECT * FROM products WHERE id = ${id} FOR UPDATE`;
+
+    if (!productRows || productRows.length === 0) {
+      return undefined;
+    }
+
+    const productRow = productRows[0];
+
+    // 옵션 및 Stock 조회 (Product가 잠겨있으므로 추가 락 불필요)
+    const options = await prisma.productOption.findMany({
+      where: { productId: id },
+      include: {
+        stocks: true,
+      },
+    });
+
+    // Domain 엔티티로 변환
+    const productOptions = options.map((optionModel) => {
+      const stockModel = optionModel.stocks[0];
+      if (!stockModel) {
+        throw new Error(`옵션 ${optionModel.id}에 재고 정보가 없습니다`);
+      }
+
+      const stock = Stock.create(
+        stockModel.id,
+        stockModel.productId,
+        stockModel.productOptionId,
+        stockModel.totalQuantity,
+        stockModel.availableQuantity,
+        stockModel.reservedQuantity,
+        stockModel.soldQuantity,
+        stockModel.version,
+      );
+
+      return ProductOption.create(
+        optionModel.id,
+        optionModel.productId,
+        optionModel.type,
+        optionModel.name,
+        Price.from(Number(optionModel.additionalPrice)),
+        stock,
+        optionModel.createdAt,
+        optionModel.updatedAt,
+      );
+    });
+
+    return Product.create(
+      productRow.id,
+      productRow.name,
+      Price.from(Number(productRow.price)),
+      productRow.description,
+      productRow.imageUrl,
+      productRow.categoryId,
+      productOptions,
+      productRow.createdAt,
+      productRow.updatedAt,
+    );
+  }
+
+  /**
+   * 상품 저장 (트랜잭션 컨텍스트 내에서)
+   * @param product - Product 도메인 엔티티
+   * @param tx - 트랜잭션 컨텍스트
+   */
+  async saveWithTx(product: Product, tx?: unknown): Promise<void> {
+    const prisma = (tx || this.prisma) as PrismaService;
+
+    const data = {
+      name: product.name,
+      description: product.description,
+      price: product.price.amount,
+      imageUrl: product.imageUrl,
+      categoryId: product.categoryId,
+      hasOptions: product.options.length > 0,
+      updatedAt: new Date(),
+    };
+
+    // Product 저장
+    await prisma.product.upsert({
+      where: { id: product.id },
+      update: data,
+      create: {
+        id: product.id,
+        ...data,
+        createdAt: product.createdAt,
+      },
+    });
+
+    // 각 옵션의 Stock 업데이트
+    for (const option of product.options) {
+      const stock = option.stock;
+      await prisma.stock.update({
+        where: { id: stock.id },
+        data: {
+          availableQuantity: stock.availableQuantity,
+          reservedQuantity: stock.reservedQuantity,
+          soldQuantity: stock.soldQuantity,
+          version: stock.version,
+          updatedAt: new Date(),
+        },
+      });
+    }
+  }
+
+  /**
+   * 재고 예약
+   * 동시성 제어는 서비스 레이어의 분산락(@DistributedLock)에서 처리
    *
    * @param stockId - 재고 ID
    * @param quantity - 예약할 수량
    * @throws Error - 재고 부족 또는 유효하지 않은 수량
-   * @throws OptimisticLockException - 다른 트랜잭션이 동시에 재고를 수정한 경우
    */
   async reserveStock(stockId: string, quantity: number): Promise<void> {
     if (quantity <= 0) {
       throw new Error('예약 수량은 양수여야 합니다');
     }
 
-    // 1. 현재 재고 조회 (잠금 없이)
+    // 1. 현재 재고 조회
     const stockModel = await this.prisma.stock.findUnique({
       where: { id: stockId },
     });
@@ -171,37 +319,24 @@ export class ProductPrismaRepository implements ProductRepository {
       );
     }
 
-    // 3. 낙관적 락: version 필드를 조건에 포함하여 업데이트
-    const result = await this.prisma.stock.updateMany({
-      where: {
-        id: stockId,
-        version: stockModel.version, // 낙관적 락 조건
-        availableQuantity: { gte: quantity }, // 재고 충분 조건 (이중 체크)
-      },
+    // 3. 재고 업데이트 (분산락으로 동시성 보장)
+    await this.prisma.stock.update({
+      where: { id: stockId },
       data: {
         availableQuantity: { decrement: quantity },
         reservedQuantity: { increment: quantity },
-        version: { increment: 1 },
         updatedAt: new Date(),
       },
     });
-
-    // 4. 업데이트 실패 시 (다른 트랜잭션이 먼저 수정함)
-    if (result.count === 0) {
-      throw new OptimisticLockException(
-        '재고가 다른 트랜잭션에 의해 수정되었습니다. 다시 시도해주세요.',
-      );
-    }
   }
 
   /**
    * 예약된 재고 복원 (예: 주문 취소 시)
-   * version 필드를 사용하여 동시성 제어
+   * 동시성 제어는 서비스 레이어의 분산락(@DistributedLock)에서 처리
    *
    * @param stockId - 재고 ID
    * @param quantity - 복원할 수량
    * @throws Error - 예약 수량 초과 또는 유효하지 않은 수량
-   * @throws OptimisticLockException - 다른 트랜잭션이 동시에 재고를 수정한 경우
    */
   async releaseStock(stockId: string, quantity: number): Promise<void> {
     if (quantity <= 0) {
@@ -224,37 +359,24 @@ export class ProductPrismaRepository implements ProductRepository {
       );
     }
 
-    // 3. 낙관적 락: version 필드를 조건에 포함하여 업데이트
-    const result = await this.prisma.stock.updateMany({
-      where: {
-        id: stockId,
-        version: stockModel.version, // 낙관적 락 조건
-        reservedQuantity: { gte: quantity }, // 예약 수량 충분 조건 (이중 체크)
-      },
+    // 3. 재고 업데이트 (분산락으로 동시성 보장)
+    await this.prisma.stock.update({
+      where: { id: stockId },
       data: {
         availableQuantity: { increment: quantity },
         reservedQuantity: { decrement: quantity },
-        version: { increment: 1 },
         updatedAt: new Date(),
       },
     });
-
-    // 4. 업데이트 실패 시
-    if (result.count === 0) {
-      throw new OptimisticLockException(
-        '재고가 다른 트랜잭션에 의해 수정되었습니다. 다시 시도해주세요.',
-      );
-    }
   }
 
   /**
    * 예약된 재고를 판매로 확정 (예: 결제 완료 시)
-   * version 필드를 사용하여 동시성 제어
+   * 동시성 제어는 서비스 레이어의 분산락(@DistributedLock)에서 처리
    *
    * @param stockId - 재고 ID
    * @param quantity - 판매 확정할 수량
    * @throws Error - 예약 수량 초과 또는 유효하지 않은 수량
-   * @throws OptimisticLockException - 다른 트랜잭션이 동시에 재고를 수정한 경우
    */
   async confirmStock(stockId: string, quantity: number): Promise<void> {
     if (quantity <= 0) {
@@ -277,27 +399,15 @@ export class ProductPrismaRepository implements ProductRepository {
       );
     }
 
-    // 3. 낙관적 락: version 필드를 조건에 포함하여 업데이트
-    const result = await this.prisma.stock.updateMany({
-      where: {
-        id: stockId,
-        version: stockModel.version, // 낙관적 락 조건
-        reservedQuantity: { gte: quantity }, // 예약 수량 충분 조건 (이중 체크)
-      },
+    // 3. 재고 업데이트 (분산락으로 동시성 보장)
+    await this.prisma.stock.update({
+      where: { id: stockId },
       data: {
         reservedQuantity: { decrement: quantity },
         soldQuantity: { increment: quantity },
-        version: { increment: 1 },
         updatedAt: new Date(),
       },
     });
-
-    // 4. 업데이트 실패 시
-    if (result.count === 0) {
-      throw new OptimisticLockException(
-        '재고가 다른 트랜잭션에 의해 수정되었습니다. 다시 시도해주세요.',
-      );
-    }
   }
 
   /**

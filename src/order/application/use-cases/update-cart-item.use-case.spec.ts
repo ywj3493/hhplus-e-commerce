@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UpdateCartItemUseCase } from '@/order/application/use-cases/update-cart-item.use-case';
 import { CartRepository } from '@/order/domain/repositories/cart.repository';
 import { CART_REPOSITORY } from '@/order/domain/repositories/tokens';
-import { StockManagementService } from '@/product/domain/services/stock-management.service';
+import { ValidateStockUseCase } from '@/product/application/use-cases/validate-stock.use-case';
 import { UpdateCartItemInput } from '@/order/application/dtos/update-cart-item.dto';
 import { CartNotFoundException, CartItemNotFoundException } from '@/order/domain/order.exceptions';
 import { createTestCart } from '@/order/infrastructure/fixtures/cart.fixtures';
@@ -11,7 +11,7 @@ import { Price } from '@/product/domain/entities/price.vo';
 describe('UpdateCartItemUseCase', () => {
   let useCase: UpdateCartItemUseCase;
   let cartRepository: jest.Mocked<CartRepository>;
-  let stockManagementService: jest.Mocked<StockManagementService>;
+  let validateStockUseCase: jest.Mocked<ValidateStockUseCase>;
 
   beforeEach(async () => {
     const mockCartRepository: jest.Mocked<CartRepository> = {
@@ -20,8 +20,8 @@ describe('UpdateCartItemUseCase', () => {
       clearByUserId: jest.fn(),
     };
 
-    const mockStockValidationService: Partial<StockManagementService> = {
-      validateStockAvailability: jest.fn(),
+    const mockValidateStockUseCase = {
+      execute: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -32,15 +32,15 @@ describe('UpdateCartItemUseCase', () => {
           useValue: mockCartRepository,
         },
         {
-          provide: StockManagementService,
-          useValue: mockStockValidationService,
+          provide: ValidateStockUseCase,
+          useValue: mockValidateStockUseCase,
         },
       ],
     }).compile();
 
     useCase = module.get<UpdateCartItemUseCase>(UpdateCartItemUseCase);
     cartRepository = module.get(CART_REPOSITORY);
-    stockManagementService = module.get(StockManagementService);
+    validateStockUseCase = module.get(ValidateStockUseCase);
   });
 
   describe('실행', () => {
@@ -62,7 +62,7 @@ describe('UpdateCartItemUseCase', () => {
       });
 
       cartRepository.findByUserId.mockResolvedValue(cart);
-      stockManagementService.validateStockAvailability.mockResolvedValue();
+      validateStockUseCase.execute.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When
@@ -72,7 +72,7 @@ describe('UpdateCartItemUseCase', () => {
       expect(output.cartItemId).toBe(addedItemId);
       expect(output.quantity).toBe(5);
       expect(output.subtotal).toBe(50000);
-      expect(stockManagementService.validateStockAvailability).toHaveBeenCalledWith(
+      expect(validateStockUseCase.execute).toHaveBeenCalledWith(
         'prod-1',
         'opt-1',
         5,
@@ -108,7 +108,7 @@ describe('UpdateCartItemUseCase', () => {
       expect(output.quantity).toBe(2);
       expect(output.subtotal).toBe(20000);
       // 수량 감소 시 재고 검증 안 함
-      expect(stockManagementService.validateStockAvailability).not.toHaveBeenCalled();
+      expect(validateStockUseCase.execute).not.toHaveBeenCalled();
       expect(cartRepository.save).toHaveBeenCalled();
     });
 
@@ -130,14 +130,14 @@ describe('UpdateCartItemUseCase', () => {
       });
 
       cartRepository.findByUserId.mockResolvedValue(cart);
-      stockManagementService.validateStockAvailability.mockResolvedValue();
+      validateStockUseCase.execute.mockResolvedValue();
       cartRepository.save.mockImplementation(async (cart) => cart);
 
       // When
       await useCase.execute(input);
 
       // Then
-      expect(stockManagementService.validateStockAvailability).toHaveBeenCalledWith(
+      expect(validateStockUseCase.execute).toHaveBeenCalledWith(
         'prod-1',
         'opt-1',
         7,
@@ -173,7 +173,7 @@ describe('UpdateCartItemUseCase', () => {
       expect(cart.getItems()).toHaveLength(0);
       expect(cartRepository.save).toHaveBeenCalled();
       // 삭제 시 재고 검증 안 함
-      expect(stockManagementService.validateStockAvailability).not.toHaveBeenCalled();
+      expect(validateStockUseCase.execute).not.toHaveBeenCalled();
     });
 
     it('음수 수량을 입력하면 InvalidQuantityException을 발생시켜야 함', async () => {

@@ -11,15 +11,15 @@ import { CouponMinAmountNotMetException } from '@/coupon/domain/coupon.exception
 /**
  * 쿠폰 적용 결과
  */
-export interface CouponApplicationResult {
+export interface CouponApplyResult {
   discountAmount: number;
   userCouponId: string;
 }
 
 /**
- * CouponApplicationService
+ * CouponApplyService
  *
- * 주문 생성 시 쿠폰 적용 로직을 캡슐화하는 Application Service
+ * 주문에서 쿠폰 적용 시 사용하도록 하는 서비스
  *
  * 책임:
  * 1. 쿠폰 조회 및 검증
@@ -27,7 +27,7 @@ export interface CouponApplicationResult {
  * 3. 할인 금액 계산
  */
 @Injectable()
-export class CouponApplicationService {
+export class CouponApplyService {
   constructor(
     @Inject(USER_COUPON_REPOSITORY)
     private readonly userCouponRepository: UserCouponRepository,
@@ -49,7 +49,7 @@ export class CouponApplicationService {
     userId: string,
     couponId: string,
     totalAmount: number,
-  ): Promise<CouponApplicationResult> {
+  ): Promise<CouponApplyResult> {
     // 1. UserCoupon 조회
     const userCoupon = await this.userCouponRepository.findById(couponId);
 

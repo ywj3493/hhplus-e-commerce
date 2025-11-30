@@ -215,7 +215,7 @@ export enum CouponStatus {
 - 할인 금액 계산 (BR-COUPON-10, BR-COUPON-11)
 
 ##### 1.3.2 UserCouponQueryService
-**파일**: `src/coupon/domain/services/user-coupon-query.service.ts`
+**파일**: `src/coupon/domain/services/user-coupon.service.ts`
 
 **목적**:
 사용자 쿠폰 조회 관련 도메인 로직을 분리하여 책임을 명확히 함

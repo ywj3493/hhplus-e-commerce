@@ -11,7 +11,7 @@ import {
   GetUserCouponsOutput,
 } from '@/coupon/application/dtos/get-user-coupons.dto';
 import { Coupon } from '@/coupon/domain/entities/coupon.entity';
-import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon-query.service';
+import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon.service';
 
 /**
  * 사용자 쿠폰 조회 Use Case

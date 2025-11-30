@@ -17,18 +17,18 @@ services:
     networks:
       - hhplus-network
 
-  # Future services (uncomment when needed)
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: hhplus-ecommerce-redis
-  #   restart: unless-stopped
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - redis_data:/data
-  #   networks:
-  #     - hhplus-network
+  redis:
+    image: redis:7-alpine
+    container_name: hhplus-ecommerce-redis
+    restart: unless-stopped
+    ports:
+      - "16379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - hhplus-network
 
+  # Future services (uncomment when needed)
   # kafka:
   #   image: confluentinc/cp-kafka:7.5.0
   #   container_name: hhplus-ecommerce-kafka
@@ -40,8 +40,8 @@ services:
 volumes:
   mysql_data:
     driver: local
-  # redis_data:
-  #   driver: local
+  redis_data:
+    driver: local
 
 networks:
   hhplus-network:

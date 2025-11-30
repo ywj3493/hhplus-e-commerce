@@ -50,4 +50,20 @@ export interface ProductRepository {
    * @param id - Product ID
    */
   exists(id: string): Promise<boolean>;
+
+  /**
+   * Find product by ID with pessimistic lock (FOR UPDATE)
+   * 동시성 제어를 위해 비관적 락 사용
+   * @param id - Product ID
+   * @param tx - Transaction context (optional)
+   * @returns Product or undefined if not found
+   */
+  findByIdForUpdate(id: string, tx?: unknown): Promise<Product | undefined>;
+
+  /**
+   * Save product within transaction
+   * @param product - Product to save
+   * @param tx - Transaction context (optional)
+   */
+  saveWithTx(product: Product, tx?: unknown): Promise<void>;
 }

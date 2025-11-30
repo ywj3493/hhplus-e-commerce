@@ -3,13 +3,13 @@ import { CouponController } from '@/coupon/presentation/controllers/coupon.contr
 import { IssueCouponUseCase } from '@/coupon/application/use-cases/issue-coupon.use-case';
 import { GetUserCouponsUseCase } from '@/coupon/application/use-cases/get-user-coupons.use-case';
 import { CouponService } from '@/coupon/domain/services/coupon.service';
-import { CouponApplicationService } from '@/coupon/application/services/coupon-application.service';
-import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon-query.service';
+import { CouponApplyService } from '@/coupon/application/services/coupon-apply.service';
+import { UserCouponQueryService } from '@/coupon/domain/services/user-coupon.service';
 import { InMemoryCouponRepository } from '@/coupon/infrastructure/repositories/in-memory-coupon.repository';
 import { InMemoryUserCouponRepository } from '@/coupon/infrastructure/repositories/in-memory-user-coupon.repository';
 import { CouponPrismaRepository } from '@/coupon/infrastructure/repositories/coupon-prisma.repository';
 import { UserCouponPrismaRepository } from '@/coupon/infrastructure/repositories/user-coupon-prisma.repository';
-import { PrismaModule } from '@/common/infrastructure/prisma/prisma.module';
+import { PrismaModule } from '@/common/infrastructure/persistance/prisma.module';
 import {
   COUPON_REPOSITORY,
   USER_COUPON_REPOSITORY,
@@ -36,7 +36,7 @@ import {
     UserCouponQueryService,
 
     // Application Services
-    CouponApplicationService,
+    CouponApplyService,
 
     // Use Cases
     IssueCouponUseCase,
@@ -62,7 +62,7 @@ import {
     COUPON_REPOSITORY,
     USER_COUPON_REPOSITORY,
     CouponService,
-    CouponApplicationService, // Export for Order module
+    CouponApplyService, // Export for Order module
   ],
 })
 export class CouponModule {}

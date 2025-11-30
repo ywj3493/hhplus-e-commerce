@@ -6,7 +6,7 @@ import {
 } from '@/order/domain/entities/payment.entity';
 import { PaymentMethod } from '@/order/domain/entities/payment-method.enum';
 import { PaymentStatus } from '@/order/domain/entities/payment-status.enum';
-import { PrismaService } from '@/common/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
 
 /**
  * PaymentPrismaRepository

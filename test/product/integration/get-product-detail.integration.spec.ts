@@ -3,6 +3,15 @@ import { GetProductDetailInput } from '@/product/application/dtos/get-product-de
 import { InMemoryProductRepository } from '@/product/infrastructure/repositories/in-memory-product.repository';
 import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 import { StockStatusType } from '@/product/domain/entities/stock-status.vo';
+import { RedisCacheServiceInterface } from '@/common/infrastructure/cache/redis-cache.service.interface';
+
+// 캐시 미적용 Mock 서비스
+const mockRedisCacheService: RedisCacheServiceInterface = {
+  get: jest.fn().mockResolvedValue(undefined),
+  set: jest.fn().mockResolvedValue(undefined),
+  del: jest.fn().mockResolvedValue(undefined),
+  delByPattern: jest.fn().mockResolvedValue(undefined),
+};
 
 /**
  * Integration Test: GetProductDetailUseCase + InMemoryProductRepository
@@ -13,7 +22,7 @@ describe('GetProductDetailUseCase 통합 테스트', () => {
 
   beforeEach(() => {
     repository = new InMemoryProductRepository();
-    useCase = new GetProductDetailUseCase(repository);
+    useCase = new GetProductDetailUseCase(repository, mockRedisCacheService);
   });
 
   describe('실제 레포지토리와 함께 실행', () => {
