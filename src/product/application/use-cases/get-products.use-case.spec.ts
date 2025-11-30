@@ -6,10 +6,12 @@ import { ProductOption } from '@/product/domain/entities/product-option.entity';
 import { Stock } from '@/product/domain/entities/stock.entity';
 import { Price } from '@/product/domain/entities/price.vo';
 import { StockStatusType } from '@/product/domain/entities/stock-status.vo';
+import { RedisCacheServiceInterface } from '@/common/infrastructure/cache/redis-cache.service.interface';
 
 describe('GetProductsUseCase', () => {
   let useCase: GetProductsUseCase;
   let mockRepository: jest.Mocked<ProductRepository>;
+  let mockRedisCacheService: jest.Mocked<RedisCacheServiceInterface>;
 
   beforeEach(() => {
     mockRepository = {
@@ -21,7 +23,13 @@ describe('GetProductsUseCase', () => {
       findByIdForUpdate: jest.fn(),
       saveWithTx: jest.fn(),
     };
-    useCase = new GetProductsUseCase(mockRepository);
+    mockRedisCacheService = {
+      get: jest.fn().mockResolvedValue(undefined), // 캐시 미스 시뮬레이션
+      set: jest.fn().mockResolvedValue(undefined),
+      del: jest.fn().mockResolvedValue(undefined),
+      delByPattern: jest.fn().mockResolvedValue(undefined),
+    };
+    useCase = new GetProductsUseCase(mockRepository, mockRedisCacheService);
   });
 
   const createTestProduct = (

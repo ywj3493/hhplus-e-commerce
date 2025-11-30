@@ -6,6 +6,8 @@ import { ProductNotFoundException } from '@/product/domain/product.exceptions';
 import { DistributedLockService } from '@/common/infrastructure/locks/simple-distributed-lock.interface';
 import { DISTRIBUTED_LOCK_SERVICE } from '@/common/infrastructure/locks/tokens';
 import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
+import { REDIS_CACHE_SERVICE } from '@/common/infrastructure/cache/tokens';
+import { RedisCacheServiceInterface } from '@/common/infrastructure/cache/redis-cache.service.interface';
 
 /**
  * ReserveStockUseCase
@@ -32,6 +34,8 @@ export class ReserveStockUseCase {
     @Inject(DISTRIBUTED_LOCK_SERVICE)
     private readonly lockService: DistributedLockService,
     private readonly prisma: PrismaService,
+    @Inject(REDIS_CACHE_SERVICE)
+    private readonly redisCacheService: RedisCacheServiceInterface,
   ) {}
 
   /**
@@ -44,11 +48,7 @@ export class ReserveStockUseCase {
    * @throws InsufficientStockException 재고 부족 시
    * @throws LockAcquisitionException 락 획득 실패 시
    */
-  async execute(
-    productId: string,
-    optionId: string,
-    quantity: number,
-  ): Promise<void> {
+  async execute(productId: string, optionId: string, quantity: number): Promise<void> {
     const lockKey = `stock:${productId}:${optionId}`;
 
     // 분산락 획득 후 비관적 락 + 트랜잭션 실행
@@ -57,10 +57,7 @@ export class ReserveStockUseCase {
       async () => {
         await this.prisma.$transaction(async (tx) => {
           // 1. 비관적 락으로 상품 조회
-          const product = await this.productRepository.findByIdForUpdate(
-            productId,
-            tx,
-          );
+          const product = await this.productRepository.findByIdForUpdate(productId, tx);
 
           if (!product) {
             throw new ProductNotFoundException(productId);
@@ -78,5 +75,18 @@ export class ReserveStockUseCase {
         autoExtend: true,
       },
     );
+
+    // 캐시 무효화 (재고 변경으로 인해 상품 목록/상세 캐시 갱신 필요)
+    await this.invalidateProductCache(productId);
+  }
+
+  /**
+   * 상품 관련 캐시 무효화
+   */
+  private async invalidateProductCache(productId: string): Promise<void> {
+    await Promise.all([
+      this.redisCacheService.delByPattern('products:list:*'),
+      this.redisCacheService.delByPattern(`products:detail:${productId}`),
+    ]);
   }
 }

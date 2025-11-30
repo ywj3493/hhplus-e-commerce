@@ -5,6 +5,8 @@ import { StockManagementService } from '@/product/domain/services/stock-manageme
 import { DistributedLockService } from '@/common/infrastructure/locks/simple-distributed-lock.interface';
 import { DISTRIBUTED_LOCK_SERVICE } from '@/common/infrastructure/locks/tokens';
 import { PrismaService } from '@/common/infrastructure/persistance/prisma.service';
+import { REDIS_CACHE_SERVICE } from '@/common/infrastructure/cache/tokens';
+import { RedisCacheServiceInterface } from '@/common/infrastructure/cache/redis-cache.service.interface';
 
 /**
  * ReleaseStockUseCase
@@ -33,6 +35,8 @@ export class ReleaseStockUseCase {
     @Inject(DISTRIBUTED_LOCK_SERVICE)
     private readonly lockService: DistributedLockService,
     private readonly prisma: PrismaService,
+    @Inject(REDIS_CACHE_SERVICE)
+    private readonly redisCacheService: RedisCacheServiceInterface,
   ) {}
 
   /**
@@ -44,11 +48,7 @@ export class ReleaseStockUseCase {
    * @param optionId 옵션 ID
    * @param quantity 해제 수량
    */
-  async execute(
-    productId: string,
-    optionId: string,
-    quantity: number,
-  ): Promise<void> {
+  async execute(productId: string, optionId: string, quantity: number): Promise<void> {
     const lockKey = `stock:${productId}:${optionId}`;
 
     try {
@@ -58,29 +58,18 @@ export class ReleaseStockUseCase {
         async () => {
           await this.prisma.$transaction(async (tx) => {
             // 1. 비관적 락으로 상품 조회
-            const product = await this.productRepository.findByIdForUpdate(
-              productId,
-              tx,
-            );
+            const product = await this.productRepository.findByIdForUpdate(productId, tx);
 
             if (!product) {
-              this.logger.warn(
-                `재고 해제 실패: 상품을 찾을 수 없습니다: ${productId}`,
-              );
+              this.logger.warn(`재고 해제 실패: 상품을 찾을 수 없습니다: ${productId}`);
               return;
             }
 
             // 2. 도메인 서비스에서 비즈니스 로직 실행
-            const success = this.stockManagementService.releaseStock(
-              product,
-              optionId,
-              quantity,
-            );
+            const success = this.stockManagementService.releaseStock(product, optionId, quantity);
 
             if (!success) {
-              this.logger.warn(
-                `재고 해제 실패: 옵션을 찾을 수 없습니다: ${optionId}`,
-              );
+              this.logger.warn(`재고 해제 실패: 옵션을 찾을 수 없습니다: ${optionId}`);
               return;
             }
 
@@ -93,12 +82,21 @@ export class ReleaseStockUseCase {
           autoExtend: true,
         },
       );
+      // 캐시 무효화 (재고 변경으로 인해 상품 목록/상세 캐시 갱신 필요)
+      await this.invalidateProductCache(productId);
     } catch (error) {
-      this.logger.error(
-        `재고 해제 중 오류 발생: ${productId}/${optionId}`,
-        error,
-      );
+      this.logger.error(`재고 해제 중 오류 발생: ${productId}/${optionId}`, error);
       // 재고 해제 실패는 시스템에 치명적이지 않으므로 에러를 전파하지 않음
     }
+  }
+
+  /**
+   * 상품 관련 캐시 무효화
+   */
+  private async invalidateProductCache(productId: string): Promise<void> {
+    await Promise.all([
+      this.redisCacheService.delByPattern('products:list:*'),
+      this.redisCacheService.delByPattern(`products:detail:${productId}`),
+    ]);
   }
 }

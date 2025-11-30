@@ -8,6 +8,9 @@ import {
   ProductOptionDetail,
   ProductOptionGroup,
 } from '@/product/application/dtos/get-product-detail.dto';
+import { REDIS_CACHE_SERVICE } from '@/common/infrastructure/cache/tokens';
+import { RedisCacheServiceInterface } from '@/common/infrastructure/cache/redis-cache.service.interface';
+import { RedisCacheable } from '@/common/utils/decorators/redis-cacheable.decorator';
 
 /**
  * 상품 상세 조회 Use Case
@@ -19,6 +22,8 @@ export class GetProductDetailUseCase {
   constructor(
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
+    @Inject(REDIS_CACHE_SERVICE)
+    private readonly redisCacheService: RedisCacheServiceInterface,
   ) {}
 
   /**
@@ -27,6 +32,7 @@ export class GetProductDetailUseCase {
    * @returns 그룹화된 옵션과 함께 상품 상세 정보
    * @throws ProductNotFoundException 상품을 찾을 수 없는 경우
    */
+  @RedisCacheable('products:detail:{input.productId}', { ttlMs: 60000 })
   async execute(input: GetProductDetailInput): Promise<GetProductDetailOutput> {
     // Repository에서 상품 조회
     const product = await this.productRepository.findById(input.productId);
