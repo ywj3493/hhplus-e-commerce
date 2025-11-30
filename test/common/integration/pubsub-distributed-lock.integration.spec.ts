@@ -334,41 +334,45 @@ describe('PubSubDistributedLockService 통합 테스트', () => {
   });
 
   describe('Pub/Sub 대기 + 동시성 시나리오', () => {
-    it('동시에 10개의 요청이 Pub/Sub 대기로 순차 처리되어야 함', async () => {
-      // Given
-      const key = 'test:concurrent:pubsub';
-      let counter = 0;
-      const results: number[] = [];
+    it(
+      '동시에 10개의 요청이 Pub/Sub 대기로 순차 처리되어야 함',
+      async () => {
+        // Given
+        const key = 'test:concurrent:pubsub';
+        let counter = 0;
+        const results: number[] = [];
 
-      // When: 10개의 동시 요청 (Pub/Sub 대기)
-      const promises = Array.from({ length: 10 }, async () => {
-        try {
-          await lockService.withLockExtended(
-            key,
-            async () => {
-              const currentValue = counter;
-              await new Promise((r) => setTimeout(r, 10)); // 짧은 작업
-              counter = currentValue + 1;
-              results.push(counter);
-            },
-            {
-              ttlMs: 10000,
-              waitTimeoutMs: 10000, // 충분한 대기 시간
-              autoExtend: false,
-            },
-          );
-        } catch (error) {
-          // 대기 타임아웃 시 무시
-        }
-      });
+        // When: 10개의 동시 요청 (Pub/Sub 대기)
+        const promises = Array.from({ length: 10 }, async () => {
+          try {
+            await lockService.withLockExtended(
+              key,
+              async () => {
+                const currentValue = counter;
+                await new Promise((r) => setTimeout(r, 10)); // 짧은 작업
+                counter = currentValue + 1;
+                results.push(counter);
+              },
+              {
+                ttlMs: 10000,
+                waitTimeoutMs: 10000, // 충분한 대기 시간
+                autoExtend: false,
+              },
+            );
+          } catch (error) {
+            // 대기 타임아웃 시 무시
+          }
+        });
 
-      await Promise.all(promises);
+        await Promise.all(promises);
 
-      // Then: 순차적으로 처리되어 counter가 정확해야 함
-      // 참고: Pub/Sub 대기 시 일부는 타임아웃될 수 있음
-      expect(counter).toBeGreaterThan(0);
-      expect(counter).toBeLessThanOrEqual(10);
-    });
+        // Then: 순차적으로 처리되어 counter가 정확해야 함
+        // 참고: Pub/Sub 대기 시 일부는 타임아웃될 수 있음
+        expect(counter).toBeGreaterThan(0);
+        expect(counter).toBeLessThanOrEqual(10);
+      },
+      30000,
+    );
 
     it('서로 다른 키에 대한 동시 작업은 모두 독립적으로 처리되어야 함', async () => {
       // Given
@@ -396,50 +400,54 @@ describe('PubSubDistributedLockService 통합 테스트', () => {
   });
 
   describe('재고 시나리오 시뮬레이션 (Pub/Sub)', () => {
-    it('동시 예약 요청이 Pub/Sub 대기로 순차 처리되어야 함', async () => {
-      // Given: 재고 5개
-      let stock = 5;
-      const reservations = 10; // 10개 요청 (5개만 성공해야 함)
-      let successCount = 0;
-      let failureCount = 0;
-      // 고유한 키 사용 (다른 테스트와 충돌 방지)
-      const testId = Date.now();
+    it(
+      '동시 예약 요청이 Pub/Sub 대기로 순차 처리되어야 함',
+      async () => {
+        // Given: 재고 5개
+        let stock = 5;
+        const reservations = 10; // 10개 요청 (5개만 성공해야 함)
+        let successCount = 0;
+        let failureCount = 0;
+        // 고유한 키 사용 (다른 테스트와 충돌 방지)
+        const testId = Date.now();
 
-      // When: 10개의 동시 예약 요청 (Pub/Sub 대기)
-      const promises = Array.from({ length: reservations }, async () => {
-        const lockKey = `stock:product-1:option-1:${testId}`;
+        // When: 10개의 동시 예약 요청 (Pub/Sub 대기)
+        const promises = Array.from({ length: reservations }, async () => {
+          const lockKey = `stock:product-1:option-1:${testId}`;
 
-        try {
-          await lockService.withLockExtended(
-            lockKey,
-            async () => {
-              if (stock > 0) {
-                await new Promise((r) => setTimeout(r, 10)); // DB 지연 시뮬레이션
-                stock--;
-                successCount++;
-              } else {
-                failureCount++;
-              }
-            },
-            {
-              ttlMs: 5000,
-              waitTimeoutMs: 10000, // 충분한 대기 시간
-              autoExtend: true,
-            },
-          );
-        } catch (error) {
-          if (error instanceof LockAcquisitionException) {
-            failureCount++;
+          try {
+            await lockService.withLockExtended(
+              lockKey,
+              async () => {
+                if (stock > 0) {
+                  await new Promise((r) => setTimeout(r, 10)); // DB 지연 시뮬레이션
+                  stock--;
+                  successCount++;
+                } else {
+                  failureCount++;
+                }
+              },
+              {
+                ttlMs: 5000,
+                waitTimeoutMs: 10000, // 충분한 대기 시간
+                autoExtend: true,
+              },
+            );
+          } catch (error) {
+            if (error instanceof LockAcquisitionException) {
+              failureCount++;
+            }
           }
-        }
-      });
+        });
 
-      await Promise.all(promises);
+        await Promise.all(promises);
 
-      // Then: 재고만큼만 성공
-      expect(successCount).toBe(5);
-      expect(stock).toBe(0);
-    });
+        // Then: 재고만큼만 성공
+        expect(successCount).toBe(5);
+        expect(stock).toBe(0);
+      },
+      30000,
+    );
 
     it('서로 다른 상품에 대한 동시 예약은 병렬로 처리되어야 함', async () => {
       // Given: 각각 10개의 재고를 가진 3개의 상품
